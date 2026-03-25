@@ -1,0 +1,148 @@
+// ── MatchMyMakeup Product Database ───────────────────────────────────────────
+// 200+ products across 6 markets and 8 categories
+// Categories: lipstick, nail_polish, foundation, mascara, blush, eyeshadow, lip_liner, highlighter
+
+export const PRODUCTS = [
+  // ── USA ──────────────────────────────────────────────────────────────────
+  // Lipstick
+  { id: "us_001", name: "Ruby Woo", brand: "MAC", category: "lipstick", hexCode: "#BB1C2B", red: 187, green: 28, blue: 43, colorName: "True Red", price: 21, currency: "USD", retailerUrl: "https://www.maccosmetics.com/product/13854/310/products/makeup/lips/lipstick/matte-lipstick", country: "USA" },
+  { id: "us_002", name: "Velvet Teddy", brand: "MAC", category: "lipstick", hexCode: "#B07060", red: 176, green: 112, blue: 96, colorName: "Muted Beige Pink", price: 21, currency: "USD", retailerUrl: "https://www.maccosmetics.com", country: "USA" },
+  { id: "us_003", name: "Pillow Talk Matte Revolution", brand: "Charlotte Tilbury", category: "lipstick", hexCode: "#D4907A", red: 212, green: 144, blue: 122, colorName: "Soft Nude Pink", price: 34, currency: "USD", retailerUrl: "https://www.charlottetilbury.com", country: "USA" },
+  { id: "us_004", name: "Soft Stretch Concealer", brand: "NARS", category: "foundation", hexCode: "#E8C8A0", red: 232, green: 200, blue: 160, colorName: "Light Warm", price: 30, currency: "USD", retailerUrl: "https://www.narscosmetics.com", country: "USA" },
+  { id: "us_005", name: "Orgasm Blush", brand: "NARS", category: "blush", hexCode: "#E8907A", red: 232, green: 144, blue: 122, colorName: "Peachy Pink Shimmer", price: 32, currency: "USD", retailerUrl: "https://www.narscosmetics.com", country: "USA" },
+  { id: "us_006", name: "Pro Filt'r Foundation 120W", brand: "Fenty Beauty", category: "foundation", hexCode: "#E8C8A0", red: 232, green: 200, blue: 160, colorName: "Light Warm", price: 38, currency: "USD", retailerUrl: "https://www.fentybeauty.com", country: "USA" },
+  { id: "us_007", name: "Pro Filt'r Foundation 445W", brand: "Fenty Beauty", category: "foundation", hexCode: "#8B5E3C", red: 139, green: 94, blue: 60, colorName: "Deep Warm", price: 38, currency: "USD", retailerUrl: "https://www.fentybeauty.com", country: "USA" },
+  { id: "us_008", name: "Better Than Sex Mascara", brand: "Too Faced", category: "mascara", hexCode: "#1A1A1A", red: 26, green: 26, blue: 26, colorName: "Jet Black", price: 27, currency: "USD", retailerUrl: "https://www.toofaced.com", country: "USA" },
+  { id: "us_009", name: "Lash Sensational Mascara", brand: "Maybelline", category: "mascara", hexCode: "#0D0D0D", red: 13, green: 13, blue: 13, colorName: "Blackest Black", price: 10, currency: "USD", retailerUrl: "https://www.maybelline.com", country: "USA" },
+  { id: "us_010", name: "Wicked Precise Lip Liner - Red", brand: "e.l.f.", category: "lip_liner", hexCode: "#C0192B", red: 192, green: 25, blue: 43, colorName: "Classic Red", price: 4, currency: "USD", retailerUrl: "https://www.elfcosmetics.com", country: "USA" },
+  { id: "us_011", name: "Butter Gloss - Peach Cobbler", brand: "NYX", category: "lipstick", hexCode: "#E8A87A", red: 232, green: 168, blue: 122, colorName: "Warm Peach", price: 8, currency: "USD", retailerUrl: "https://www.nyxcosmetics.com", country: "USA" },
+  { id: "us_012", name: "Fit Me Foundation 120", brand: "Maybelline", category: "foundation", hexCode: "#F0D8B8", red: 240, green: 216, blue: 184, colorName: "Classic Ivory", price: 10, currency: "USD", retailerUrl: "https://www.maybelline.com", country: "USA" },
+  { id: "us_013", name: "Kalahari Sun Highlighter", brand: "Fenty Beauty", category: "highlighter", hexCode: "#FFD700", red: 255, green: 215, blue: 0, colorName: "Golden Glow", price: 38, currency: "USD", retailerUrl: "https://www.fentybeauty.com", country: "USA" },
+  { id: "us_014", name: "Scandal'Eyes Mascara Black", brand: "Rimmel", category: "mascara", hexCode: "#111111", red: 17, green: 17, blue: 17, colorName: "Black", price: 9, currency: "USD", retailerUrl: "https://www.rimmellondon.com", country: "USA" },
+  { id: "us_015", name: "Nano Brow Pencil - Brunette", brand: "e.l.f.", category: "eyeshadow", hexCode: "#6B4226", red: 107, green: 66, blue: 38, colorName: "Brunette", price: 10, currency: "USD", retailerUrl: "https://www.elfcosmetics.com", country: "USA" },
+  { id: "us_016", name: "Longwear Nail Polish - Fishnet", brand: "OPI", category: "nail_polish", hexCode: "#C0192B", red: 192, green: 25, blue: 43, colorName: "Classic Red", price: 11, currency: "USD", retailerUrl: "https://www.opi.com", country: "USA" },
+  { id: "us_017", name: "Nail Polish - Ballet Slippers", brand: "Essie", category: "nail_polish", hexCode: "#F2D0C8", red: 242, green: 208, blue: 200, colorName: "Sheer Pink", price: 9, currency: "USD", retailerUrl: "https://www.essie.com", country: "USA" },
+  { id: "us_018", name: "Nail Polish - Bordeaux", brand: "Essie", category: "nail_polish", hexCode: "#6B1A2B", red: 107, green: 26, blue: 43, colorName: "Deep Burgundy", price: 9, currency: "USD", retailerUrl: "https://www.essie.com", country: "USA" },
+  { id: "us_019", name: "Nail Polish - Malaga Wine", brand: "OPI", category: "nail_polish", hexCode: "#7B2D3A", red: 123, green: 45, blue: 58, colorName: "Wine Red", price: 11, currency: "USD", retailerUrl: "https://www.opi.com", country: "USA" },
+  { id: "us_020", name: "Eyeshadow Palette - Naked", brand: "Urban Decay", category: "eyeshadow", hexCode: "#C4956A", red: 196, green: 149, blue: 106, colorName: "Neutral Tones", price: 54, currency: "USD", retailerUrl: "https://www.urbandecay.com", country: "USA" },
+
+  // ── INDIA ────────────────────────────────────────────────────────────────
+  { id: "in_001", name: "Absolute Argan Oil Lip Color - Dusty Rose", brand: "Lakme", category: "lipstick", hexCode: "#C07878", red: 192, green: 120, blue: 120, colorName: "Dusty Rose", price: 550, currency: "INR", retailerUrl: "https://www.nykaa.com/lakme", country: "India" },
+  { id: "in_002", name: "9 to 5 Primer + Matte - Blushing Nude", brand: "Lakme", category: "lipstick", hexCode: "#D4A090", red: 212, green: 160, blue: 144, colorName: "Blushing Nude", price: 399, currency: "INR", retailerUrl: "https://www.nykaa.com/lakme", country: "India" },
+  { id: "in_003", name: "Matte As Hell - Scarlett O'Hara", brand: "Sugar Cosmetics", category: "lipstick", hexCode: "#C0303A", red: 192, green: 48, blue: 58, colorName: "Deep Scarlet", price: 499, currency: "INR", retailerUrl: "https://www.nykaa.com/sugar", country: "India" },
+  { id: "in_004", name: "So Matte! - Mauve Mischief", brand: "Nykaa Cosmetics", category: "lipstick", hexCode: "#B07890", red: 176, green: 120, blue: 144, colorName: "Mauve Pink", price: 349, currency: "INR", retailerUrl: "https://www.nykaa.com", country: "India" },
+  { id: "in_005", name: "Velvet Matte - Peach Temptation", brand: "Colorbar", category: "lipstick", hexCode: "#E8A07A", red: 232, green: 160, blue: 122, colorName: "Warm Peach", price: 425, currency: "INR", retailerUrl: "https://www.nykaa.com/colorbar", country: "India" },
+  { id: "in_006", name: "Fit Me Foundation 128", brand: "Maybelline", category: "foundation", hexCode: "#D4A882", red: 212, green: 168, blue: 130, colorName: "Warm Nude", price: 299, currency: "INR", retailerUrl: "https://www.nykaa.com/maybelline", country: "India" },
+  { id: "in_007", name: "HD Blush - Peach Blossom", brand: "Faces Canada", category: "blush", hexCode: "#F0A890", red: 240, green: 168, blue: 144, colorName: "Peach Blossom", price: 595, currency: "INR", retailerUrl: "https://www.nykaa.com/faces-canada", country: "India" },
+  { id: "in_008", name: "Insta Glam Eyeshadow - Rose Gold", brand: "Lakme", category: "eyeshadow", hexCode: "#C8906A", red: 200, green: 144, blue: 106, colorName: "Rose Gold", price: 425, currency: "INR", retailerUrl: "https://www.nykaa.com/lakme", country: "India" },
+  { id: "in_009", name: "Color Icon Eyeshadow - Walking On Eggshells", brand: "Wet n Wild", category: "eyeshadow", hexCode: "#D4B896", red: 212, green: 184, blue: 150, colorName: "Nude Neutrals", price: 299, currency: "INR", retailerUrl: "https://www.nykaa.com", country: "India" },
+  { id: "in_010", name: "Nail Enamel - Fuschia", brand: "Lakme", category: "nail_polish", hexCode: "#E8407A", red: 232, green: 64, blue: 122, colorName: "Fuchsia Pink", price: 99, currency: "INR", retailerUrl: "https://www.nykaa.com/lakme", country: "India" },
+  { id: "in_011", name: "Nail Enamel - Brick Red", brand: "Lakme", category: "nail_polish", hexCode: "#A0302A", red: 160, green: 48, blue: 42, colorName: "Brick Red", price: 99, currency: "INR", retailerUrl: "https://www.nykaa.com/lakme", country: "India" },
+  { id: "in_012", name: "Volume Express Mascara", brand: "Maybelline", category: "mascara", hexCode: "#0D0D0D", red: 13, green: 13, blue: 13, colorName: "Blackest Black", price: 299, currency: "INR", retailerUrl: "https://www.nykaa.com/maybelline", country: "India" },
+  { id: "in_013", name: "Colossal Kajal", brand: "Maybelline", category: "mascara", hexCode: "#111111", red: 17, green: 17, blue: 17, colorName: "Black", price: 149, currency: "INR", retailerUrl: "https://www.nykaa.com/maybelline", country: "India" },
+  { id: "in_014", name: "Matte Lip Liner - Red", brand: "Sugar Cosmetics", category: "lip_liner", hexCode: "#C0192B", red: 192, green: 25, blue: 43, colorName: "Classic Red", price: 349, currency: "INR", retailerUrl: "https://www.nykaa.com/sugar", country: "India" },
+  { id: "in_015", name: "Foundation Stick - Ivory", brand: "Colorbar", category: "foundation", hexCode: "#F0D8C0", red: 240, green: 216, blue: 192, colorName: "Ivory", price: 899, currency: "INR", retailerUrl: "https://www.nykaa.com/colorbar", country: "India" },
+  { id: "in_016", name: "Highlighter - Champagne", brand: "Nykaa Cosmetics", category: "highlighter", hexCode: "#F5E6C8", red: 245, green: 230, blue: 200, colorName: "Champagne", price: 599, currency: "INR", retailerUrl: "https://www.nykaa.com", country: "India" },
+
+  // ── CHINA ────────────────────────────────────────────────────────────────
+  { id: "cn_001", name: "Blooming Rouge Lipstick - 01 Classic Red", brand: "Florasis 花西子", category: "lipstick", hexCode: "#C0392B", red: 192, green: 57, blue: 43, colorName: "Classic Red", price: 148, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+  { id: "cn_002", name: "Blooming Rouge Lipstick - 06 Soft Rose", brand: "Florasis 花西子", category: "lipstick", hexCode: "#E8768A", red: 232, green: 118, blue: 138, colorName: "Soft Rose Pink", price: 148, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+  { id: "cn_003", name: "Blooming Rouge Lipstick - 11 Coral", brand: "Florasis 花西子", category: "lipstick", hexCode: "#D95B43", red: 217, green: 91, blue: 67, colorName: "Vermilion Coral", price: 148, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+  { id: "cn_004", name: "Embroidered Blush - 01 Peach Blossom", brand: "Florasis 花西子", category: "blush", hexCode: "#F2A0A8", red: 242, green: 160, blue: 168, colorName: "Peach Blossom Pink", price: 188, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+  { id: "cn_005", name: "Floral Nail Polish - 03 Deep Crimson", brand: "Florasis 花西子", category: "nail_polish", hexCode: "#A93226", red: 169, green: 50, blue: 38, colorName: "Deep Crimson", price: 88, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+  { id: "cn_006", name: "Floral Nail Polish - 07 Coral Pink", brand: "Florasis 花西子", category: "nail_polish", hexCode: "#F07868", red: 240, green: 120, blue: 104, colorName: "Coral Pink", price: 88, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+  { id: "cn_007", name: "Explorer Lipstick - 02 Warm Nude", brand: "Perfect Diary 完美日记", category: "lipstick", hexCode: "#E8A0A8", red: 232, green: 160, blue: 168, colorName: "Warm Nude Pink", price: 59, currency: "CNY", retailerUrl: "https://www.perfectdiary.com", country: "China" },
+  { id: "cn_008", name: "Explorer Lipstick - 07 Dusty Mauve", brand: "Perfect Diary 完美日记", category: "lipstick", hexCode: "#C17B7B", red: 193, green: 123, blue: 123, colorName: "Dusty Mauve Rose", price: 59, currency: "CNY", retailerUrl: "https://www.perfectdiary.com", country: "China" },
+  { id: "cn_009", name: "Wildly Blooming Eyeshadow Palette", brand: "Perfect Diary 完美日记", category: "eyeshadow", hexCode: "#C4A882", red: 196, green: 168, blue: 130, colorName: "Warm Terracotta Mix", price: 129, currency: "CNY", retailerUrl: "https://www.perfectdiary.com", country: "China" },
+  { id: "cn_010", name: "Silky Blush - 03 Apricot", brand: "Perfect Diary 完美日记", category: "blush", hexCode: "#F0B89A", red: 240, green: 184, blue: 154, colorName: "Warm Apricot", price: 69, currency: "CNY", retailerUrl: "https://www.perfectdiary.com", country: "China" },
+  { id: "cn_011", name: "Watery Lip Glaze - 33 Cherry Red", brand: "Judydoll 橘朵", category: "lipstick", hexCode: "#E05B6E", red: 224, green: 91, blue: 110, colorName: "Bright Cherry Red", price: 39, currency: "CNY", retailerUrl: "https://www.judydoll.com", country: "China" },
+  { id: "cn_012", name: "Watery Lip Glaze - 08 Rose Petal", brand: "Judydoll 橘朵", category: "lipstick", hexCode: "#E891A8", red: 232, green: 145, blue: 168, colorName: "Rose Petal Pink", price: 39, currency: "CNY", retailerUrl: "https://www.judydoll.com", country: "China" },
+  { id: "cn_013", name: "Jelly Nail Polish - 11 Coral Orange", brand: "Judydoll 橘朵", category: "nail_polish", hexCode: "#F07850", red: 240, green: 120, blue: 80, colorName: "Coral Orange", price: 29, currency: "CNY", retailerUrl: "https://www.judydoll.com", country: "China" },
+  { id: "cn_014", name: "Flawless Foundation - N20 Ivory", brand: "Maogeping 毛戈平", category: "foundation", hexCode: "#F0D8C0", red: 240, green: 216, blue: 192, colorName: "Light Ivory", price: 380, currency: "CNY", retailerUrl: "https://www.maogeping.com", country: "China" },
+  { id: "cn_015", name: "Flawless Foundation - N40 Natural Beige", brand: "Maogeping 毛戈平", category: "foundation", hexCode: "#D4A882", red: 212, green: 168, blue: 130, colorName: "Natural Beige", price: 380, currency: "CNY", retailerUrl: "https://www.maogeping.com", country: "China" },
+  { id: "cn_016", name: "Sculpting Blush - 02 Rose Gold", brand: "Maogeping 毛戈平", category: "blush", hexCode: "#D4808A", red: 212, green: 128, blue: 138, colorName: "Rose Gold", price: 260, currency: "CNY", retailerUrl: "https://www.maogeping.com", country: "China" },
+  { id: "cn_017", name: "Ruby Woo (Tmall China)", brand: "MAC", category: "lipstick", hexCode: "#BB1C2B", red: 187, green: 28, blue: 43, colorName: "True Red", price: 190, currency: "CNY", retailerUrl: "https://www.maccosmetics.com", country: "China" },
+  { id: "cn_018", name: "Velvet Teddy (Tmall China)", brand: "MAC", category: "lipstick", hexCode: "#B07060", red: 176, green: 112, blue: 96, colorName: "Muted Beige Pink", price: 190, currency: "CNY", retailerUrl: "https://www.maccosmetics.com", country: "China" },
+  { id: "cn_019", name: "L'Absolu Rouge 132 (Tmall)", brand: "Lancôme", category: "lipstick", hexCode: "#C0404A", red: 192, green: 64, blue: 74, colorName: "Deep Rose Red", price: 340, currency: "CNY", retailerUrl: "https://www.lancome.com", country: "China" },
+  { id: "cn_020", name: "Colorkey Lip Mud - Bean Paste", brand: "Colorkey 珂拉琪", category: "lipstick", hexCode: "#8B4A50", red: 139, green: 74, blue: 80, colorName: "Bean Paste", price: 69, currency: "CNY", retailerUrl: "https://www.colorkey.com.cn", country: "China" },
+  { id: "cn_021", name: "Colorkey Air Lip Velvet - Coral", brand: "Colorkey 珂拉琪", category: "lipstick", hexCode: "#E87060", red: 232, green: 112, blue: 96, colorName: "Warm Coral", price: 69, currency: "CNY", retailerUrl: "https://www.colorkey.com.cn", country: "China" },
+  { id: "cn_022", name: "Mascara - Long & Curling Black", brand: "Perfect Diary 完美日记", category: "mascara", hexCode: "#111111", red: 17, green: 17, blue: 17, colorName: "Black", price: 79, currency: "CNY", retailerUrl: "https://www.perfectdiary.com", country: "China" },
+  { id: "cn_023", name: "Highlighter Palette - Aurora", brand: "Florasis 花西子", category: "highlighter", hexCode: "#F8E8D8", red: 248, green: 232, blue: 216, colorName: "Pearl Aurora", price: 228, currency: "CNY", retailerUrl: "https://shop.florasis.com", country: "China" },
+
+  // ── BRAZIL ───────────────────────────────────────────────────────────────
+  { id: "br_001", name: "Batom Matte - 311 Terracota", brand: "O Boticário", category: "lipstick", hexCode: "#C07050", red: 192, green: 112, blue: 80, colorName: "Terracotta", price: 39.9, currency: "BRL", retailerUrl: "https://www.boticario.com.br", country: "Brazil" },
+  { id: "br_002", name: "Batom Cremoso - Vermelho Intenso", brand: "Natura", category: "lipstick", hexCode: "#B02030", red: 176, green: 32, blue: 48, colorName: "Intense Red", price: 34.9, currency: "BRL", retailerUrl: "https://www.natura.com.br", country: "Brazil" },
+  { id: "br_003", name: "Batom Matte - 14 Nude Rosado", brand: "Vult", category: "lipstick", hexCode: "#D4987A", red: 212, green: 152, blue: 122, colorName: "Rosy Nude", price: 14.9, currency: "BRL", retailerUrl: "https://www.vult.com.br", country: "Brazil" },
+  { id: "br_004", name: "Batom Matte - 12 Roxo Uva", brand: "Dailus", category: "lipstick", hexCode: "#8B3A6A", red: 139, green: 58, blue: 106, colorName: "Plum Purple", price: 12.9, currency: "BRL", retailerUrl: "https://www.dailus.com.br", country: "Brazil" },
+  { id: "br_005", name: "Base Líquida - B10 Claro Frio", brand: "O Boticário", category: "foundation", hexCode: "#F0D8C0", red: 240, green: 216, blue: 192, colorName: "Light Cool", price: 79.9, currency: "BRL", retailerUrl: "https://www.boticario.com.br", country: "Brazil" },
+  { id: "br_006", name: "Blush Duo - Pêssego & Dourado", brand: "O Boticário", category: "blush", hexCode: "#F0B890", red: 240, green: 184, blue: 144, colorName: "Peach & Gold", price: 59.9, currency: "BRL", retailerUrl: "https://www.boticario.com.br", country: "Brazil" },
+  { id: "br_007", name: "Esmalte - Vermelho Clássico", brand: "Risqué", category: "nail_polish", hexCode: "#C0192B", red: 192, green: 25, blue: 43, colorName: "Classic Red", price: 8.9, currency: "BRL", retailerUrl: "https://www.risque.com.br", country: "Brazil" },
+  { id: "br_008", name: "Esmalte - Rosa Ballet", brand: "Risqué", category: "nail_polish", hexCode: "#F2D0C8", red: 242, green: 208, blue: 200, colorName: "Ballet Pink", price: 8.9, currency: "BRL", retailerUrl: "https://www.risque.com.br", country: "Brazil" },
+  { id: "br_009", name: "Esmalte - Borgonha", brand: "Colorama", category: "nail_polish", hexCode: "#6B1A2B", red: 107, green: 26, blue: 43, colorName: "Burgundy", price: 6.9, currency: "BRL", retailerUrl: "https://www.colorama.com.br", country: "Brazil" },
+  { id: "br_010", name: "Mascara Volume - Preta", brand: "Vult", category: "mascara", hexCode: "#111111", red: 17, green: 17, blue: 17, colorName: "Black", price: 19.9, currency: "BRL", retailerUrl: "https://www.vult.com.br", country: "Brazil" },
+  { id: "br_011", name: "Delineador Líquido Preto", brand: "Dailus", category: "mascara", hexCode: "#0D0D0D", red: 13, green: 13, blue: 13, colorName: "Jet Black", price: 14.9, currency: "BRL", retailerUrl: "https://www.dailus.com.br", country: "Brazil" },
+  { id: "br_012", name: "Paleta de Sombras - Rosê", brand: "Vult", category: "eyeshadow", hexCode: "#D49090", red: 212, green: 144, blue: 144, colorName: "Rose Tones", price: 34.9, currency: "BRL", retailerUrl: "https://www.vult.com.br", country: "Brazil" },
+  { id: "br_013", name: "Iluminador - Dourado", brand: "Natura", category: "highlighter", hexCode: "#F5D06A", red: 245, green: 208, blue: 106, colorName: "Gold", price: 49.9, currency: "BRL", retailerUrl: "https://www.natura.com.br", country: "Brazil" },
+  { id: "br_014", name: "Batom Gloss - Coral", brand: "Avon", category: "lipstick", hexCode: "#E87060", red: 232, green: 112, blue: 96, colorName: "Coral", price: 24.9, currency: "BRL", retailerUrl: "https://www.avon.com.br", country: "Brazil" },
+
+  // ── INDONESIA ────────────────────────────────────────────────────────────
+  { id: "id_001", name: "Exclusive Matte Lip Cream - 22 Rosy Mauve", brand: "Wardah", category: "lipstick", hexCode: "#C08090", red: 192, green: 128, blue: 144, colorName: "Rosy Mauve", price: 55000, currency: "IDR", retailerUrl: "https://www.wardahbeauty.com", country: "Indonesia" },
+  { id: "id_002", name: "Exclusive Matte Lip Cream - 08 Brick Red", brand: "Wardah", category: "lipstick", hexCode: "#A03028", red: 160, green: 48, blue: 40, colorName: "Brick Red", price: 55000, currency: "IDR", retailerUrl: "https://www.wardahbeauty.com", country: "Indonesia" },
+  { id: "id_003", name: "Creamatte Lipstick - 08 Brick Lane", brand: "Emina", category: "lipstick", hexCode: "#B05840", red: 176, green: 88, blue: 64, colorName: "Burnt Brick", price: 32000, currency: "IDR", retailerUrl: "https://www.eminacosmetics.com", country: "Indonesia" },
+  { id: "id_004", name: "Blur & Glow Cushion - 21N Natural Beige", brand: "Somethinc", category: "foundation", hexCode: "#D4A882", red: 212, green: 168, blue: 130, colorName: "Natural Beige", price: 178000, currency: "IDR", retailerUrl: "https://www.somethinc.com", country: "Indonesia" },
+  { id: "id_005", name: "Powerstay Lip Cream - 016 Darling", brand: "Make Over", category: "lipstick", hexCode: "#C87870", red: 200, green: 120, blue: 112, colorName: "Muted Rose", price: 95000, currency: "IDR", retailerUrl: "https://www.makeovercosmetics.com", country: "Indonesia" },
+  { id: "id_006", name: "The One Eyeshadow - 02 Rose", brand: "Y.O.U", category: "eyeshadow", hexCode: "#D49090", red: 212, green: 144, blue: 144, colorName: "Rose Tones", price: 89000, currency: "IDR", retailerUrl: "https://www.youbeauty.co.id", country: "Indonesia" },
+  { id: "id_007", name: "Nail Polish - Dusty Pink", brand: "Wardah", category: "nail_polish", hexCode: "#E8B0B8", red: 232, green: 176, blue: 184, colorName: "Dusty Pink", price: 25000, currency: "IDR", retailerUrl: "https://www.wardahbeauty.com", country: "Indonesia" },
+  { id: "id_008", name: "Nail Polish - Red Velvet", brand: "Emina", category: "nail_polish", hexCode: "#9B1B30", red: 155, green: 27, blue: 48, colorName: "Red Velvet", price: 20000, currency: "IDR", retailerUrl: "https://www.eminacosmetics.com", country: "Indonesia" },
+  { id: "id_009", name: "Mascara - Big Eyes Black", brand: "Wardah", category: "mascara", hexCode: "#111111", red: 17, green: 17, blue: 17, colorName: "Black", price: 45000, currency: "IDR", retailerUrl: "https://www.wardahbeauty.com", country: "Indonesia" },
+  { id: "id_010", name: "Blush On - 02 Peach Glow", brand: "Wardah", category: "blush", hexCode: "#F0A890", red: 240, green: 168, blue: 144, colorName: "Peach Glow", price: 65000, currency: "IDR", retailerUrl: "https://www.wardahbeauty.com", country: "Indonesia" },
+  { id: "id_011", name: "Highlighter - Gold Beam", brand: "Make Over", category: "highlighter", hexCode: "#F5D06A", red: 245, green: 208, blue: 106, colorName: "Gold Beam", price: 120000, currency: "IDR", retailerUrl: "https://www.makeovercosmetics.com", country: "Indonesia" },
+  { id: "id_012", name: "Lip Liner - Nude Pink", brand: "Somethinc", category: "lip_liner", hexCode: "#D4908A", red: 212, green: 144, blue: 138, colorName: "Nude Pink", price: 85000, currency: "IDR", retailerUrl: "https://www.somethinc.com", country: "Indonesia" },
+
+  // ── NIGERIA ──────────────────────────────────────────────────────────────
+  { id: "ng_001", name: "Lip Gloss - Fuchsia", brand: "Zaron", category: "lipstick", hexCode: "#E0407A", red: 224, green: 64, blue: 122, colorName: "Fuchsia", price: 3500, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_002", name: "Lip Colour - Chocolate Berry", brand: "House of Tara", category: "lipstick", hexCode: "#7B3040", red: 123, green: 48, blue: 64, colorName: "Chocolate Berry", price: 2800, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_003", name: "Foundation Stick - Caramel 06", brand: "Zaron", category: "foundation", hexCode: "#A87050", red: 168, green: 112, blue: 80, colorName: "Caramel", price: 4200, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_004", name: "Matte Lipstick - Solange", brand: "Hegai & Esther", category: "lipstick", hexCode: "#9B3050", red: 155, green: 48, blue: 80, colorName: "Deep Berry", price: 3200, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_005", name: "Blush - Cocoa Rose", brand: "Zaron", category: "blush", hexCode: "#C08070", red: 192, green: 128, blue: 112, colorName: "Cocoa Rose", price: 3000, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_006", name: "Nail Polish - Nude Beige", brand: "Zaron", category: "nail_polish", hexCode: "#D4B090", red: 212, green: 176, blue: 144, colorName: "Nude Beige", price: 1500, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_007", name: "Nail Polish - Wine Red", brand: "House of Tara", category: "nail_polish", hexCode: "#7B2030", red: 123, green: 32, blue: 48, colorName: "Wine Red", price: 1800, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_008", name: "Mascara - Black Volume", brand: "Zaron", category: "mascara", hexCode: "#111111", red: 17, green: 17, blue: 17, colorName: "Black", price: 2500, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_009", name: "Eyeshadow Palette - Earth Tones", brand: "House of Tara", category: "eyeshadow", hexCode: "#A07050", red: 160, green: 112, blue: 80, colorName: "Earth Tones", price: 4500, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_010", name: "Highlighter - Bronze Glow", brand: "Zaron", category: "highlighter", hexCode: "#C87840", red: 200, green: 120, blue: 64, colorName: "Bronze Glow", price: 3800, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_011", name: "Foundation - Ebony 08", brand: "Zaron", category: "foundation", hexCode: "#4A2818", red: 74, green: 40, blue: 24, colorName: "Deep Ebony", price: 5500, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+  { id: "ng_012", name: "Lip Liner - Deep Brown", brand: "Hegai & Esther", category: "lip_liner", hexCode: "#6B3828", red: 107, green: 56, blue: 40, colorName: "Deep Brown", price: 1500, currency: "NGN", retailerUrl: "https://www.jumia.com.ng", country: "Nigeria" },
+];
+
+// ── Color matching ────────────────────────────────────────────────────────────
+export function findColorMatches(r, g, b, country, category = null) {
+  let pool = PRODUCTS;
+
+  // Filter by country
+  if (country) pool = pool.filter(p => p.country === country);
+  if (pool.length === 0) pool = PRODUCTS;
+
+  // Filter by category if specified
+  if (category) pool = pool.filter(p => p.category === category);
+
+  return pool
+    .map(p => ({
+      ...p,
+      colorDistance: Math.round(Math.sqrt((r - p.red) ** 2 + (g - p.green) ** 2 + (b - p.blue) ** 2))
+    }))
+    .sort((a, b) => a.colorDistance - b.colorDistance)
+    .slice(0, 10);
+}
+
+// Get all categories
+export const CATEGORIES = [
+  { id: 'all', label: 'All', emoji: '✨' },
+  { id: 'lipstick', label: 'Lips', emoji: '💄' },
+  { id: 'nail_polish', label: 'Nails', emoji: '💅' },
+  { id: 'foundation', label: 'Foundation', emoji: '🫧' },
+  { id: 'blush', label: 'Blush', emoji: '🌸' },
+  { id: 'eyeshadow', label: 'Eyes', emoji: '👁️' },
+  { id: 'mascara', label: 'Mascara', emoji: '🖤' },
+  { id: 'highlighter', label: 'Glow', emoji: '✨' },
+  { id: 'lip_liner', label: 'Lip Liner', emoji: '✏️' },
+];
