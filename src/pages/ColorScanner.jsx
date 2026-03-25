@@ -1,0 +1,428 @@
+import { useState, useRef, useEffect } from "react";
+
+// ── Helper functions ──────────────────────────────────────────────────────────
+function toHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
+function fromHex(hex){ const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); return m?{r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)}:null; }
+
+function colorDistance(r1,g1,b1,r2,g2,b2){
+  return Math.round(Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2));
+}
+
+function findColorMatchesLocal(r,g,b,country){
+  let pool = country ? PRODUCTS.filter(p=>p.country===country) : PRODUCTS;
+  if(pool.length===0) pool=PRODUCTS;
+  return pool
+    .map(p=>({...p, colorDistance:colorDistance(r,g,b,p.red,p.green,p.blue)}))
+    .sort((a,b)=>a.colorDistance-b.colorDistance)
+    .slice(0,10);
+}
+
+const PRODUCTS = [
+  {"id": "69c20916c526cf25f5db3d92", "name": "Florasis Blooming Rouge Lipstick - 01 Chìyàn Huāháo", "brand": "Florasis 花西子", "category": "lipstick", "hexCode": "#C0392B", "red": 192, "green": 57, "blue": 43, "colorName": "Classic Red", "price": 148, "currency": "CNY", "retailerUrl": "https://shop.florasis.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d93", "name": "Florasis Blooming Rouge Lipstick - 06 Fěnzhī Ruòlí", "brand": "Florasis 花西子", "category": "lipstick", "hexCode": "#E8768A", "red": 232, "green": 118, "blue": 138, "colorName": "Soft Rose Pink", "price": 148, "currency": "CNY", "retailerUrl": "https://shop.florasis.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d94", "name": "Florasis Blooming Rouge Lipstick - 11 Zhūshā Hóng", "brand": "Florasis 花西子", "category": "lipstick", "hexCode": "#D95B43", "red": 217, "green": 91, "blue": 67, "colorName": "Vermilion Coral", "price": 148, "currency": "CNY", "retailerUrl": "https://shop.florasis.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d95", "name": "Florasis Embroidered Blush - 01 Táohuā Fěn", "brand": "Florasis 花西子", "category": "blush", "hexCode": "#F2A0A8", "red": 242, "green": 160, "blue": 168, "colorName": "Peach Blossom Pink", "price": 188, "currency": "CNY", "retailerUrl": "https://shop.florasis.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d96", "name": "Florasis Floral Nail Polish - 03 Zhīzhū Hóng", "brand": "Florasis 花西子", "category": "nail polish", "hexCode": "#A93226", "red": 169, "green": 50, "blue": 38, "colorName": "Deep Crimson", "price": 88, "currency": "CNY", "retailerUrl": "https://shop.florasis.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d97", "name": "Perfect Diary Explorer Lipstick - 02 Nuǎn Fěn", "brand": "Perfect Diary 完美日记", "category": "lipstick", "hexCode": "#E8A0A8", "red": 232, "green": 160, "blue": 168, "colorName": "Warm Nude Pink", "price": 59, "currency": "CNY", "retailerUrl": "https://www.perfectdiary.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d98", "name": "Perfect Diary Explorer Lipstick - 07 Bèi Hóng", "brand": "Perfect Diary 完美日记", "category": "lipstick", "hexCode": "#C17B7B", "red": 193, "green": 123, "blue": 123, "colorName": "Dusty Mauve Rose", "price": 59, "currency": "CNY", "retailerUrl": "https://www.perfectdiary.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d9b", "name": "Judydoll Watery Lip Glaze - 33 Chì Táo", "brand": "Judydoll 橘朵", "category": "lipstick", "hexCode": "#E05B6E", "red": 224, "green": 91, "blue": 110, "colorName": "Bright Cherry Red", "price": 39, "currency": "CNY", "retailerUrl": "https://www.judydoll.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3d9e", "name": "Maogeping Flawless Foundation - N20 Ivory", "brand": "Maogeping 毛戈平", "category": "foundation", "hexCode": "#F0D8C0", "red": 240, "green": 216, "blue": 192, "colorName": "Light Ivory", "price": 380, "currency": "CNY", "retailerUrl": "https://www.maogeping.com", "country": "China"},
+  {"id": "69c20916c526cf25f5db3da1", "name": "MAC Retro Matte Lipstick - Ruby Woo", "brand": "MAC", "category": "lipstick", "hexCode": "#BB1C2B", "red": 187, "green": 28, "blue": 43, "colorName": "True Red", "price": 190, "currency": "CNY", "retailerUrl": "https://www.maccosmetics.com", "country": "China"},
+  {"id": "69c1f19efe5b2312e57d8a4e", "name": "Ruby Woo", "brand": "MAC", "category": "lipstick", "hexCode": "#BB1C2B", "red": 187, "green": 28, "blue": 43, "colorName": "True Red", "price": 21, "currency": "USD", "retailerUrl": "https://www.maccosmetics.com", "country": "USA"},
+  {"id": "69c1f19efe5b2312e57d8a4f", "name": "Velvet Teddy", "brand": "MAC", "category": "lipstick", "hexCode": "#B07060", "red": 176, "green": 112, "blue": 96, "colorName": "Muted Beige Pink", "price": 21, "currency": "USD", "retailerUrl": "https://www.maccosmetics.com", "country": "USA"},
+  {"id": "69c1f19efe5b2312e57d8a50", "name": "Fenty Beauty Pro Filt'r Foundation - 120W", "brand": "Fenty Beauty", "category": "foundation", "hexCode": "#E8C8A0", "red": 232, "green": 200, "blue": 160, "colorName": "Light Warm", "price": 38, "currency": "USD", "retailerUrl": "https://www.fentybeauty.com", "country": "USA"},
+  {"id": "69c1f19efe5b2312e57d8a52", "name": "NARS Blush - Orgasm", "brand": "NARS", "category": "blush", "hexCode": "#E8907A", "red": 232, "green": 144, "blue": 122, "colorName": "Peachy Pink", "price": 32, "currency": "USD", "retailerUrl": "https://www.narscosmetics.com", "country": "USA"},
+  {"id": "69c1f19efe5b2312e57d8a53", "name": "Charlotte Tilbury Matte Revolution - Pillow Talk", "brand": "Charlotte Tilbury", "category": "lipstick", "hexCode": "#D4907A", "red": 212, "green": 144, "blue": 122, "colorName": "Soft Nude Pink", "price": 34, "currency": "USD", "retailerUrl": "https://www.charlottetilbury.com", "country": "USA"},
+  {"id": "69c1f19efe5b2312e57d8a55", "name": "Lakme Absolute Argan Oil Lip Color - Dusty Rose", "brand": "Lakme", "category": "lipstick", "hexCode": "#C07878", "red": 192, "green": 120, "blue": 120, "colorName": "Dusty Rose", "price": 550, "currency": "INR", "retailerUrl": "https://www.nykaa.com", "country": "India"},
+  {"id": "69c1f19efe5b2312e57d8a57", "name": "Maybelline Fit Me Foundation - 128 Warm Nude", "brand": "Maybelline", "category": "foundation", "hexCode": "#D4A882", "red": 212, "green": 168, "blue": 130, "colorName": "Warm Nude", "price": 299, "currency": "INR", "retailerUrl": "https://www.maybelline.co.in", "country": "India"},
+  {"id": "69c1f19efe5b2312e57d8a58", "name": "Sugar Cosmetics Matte As Hell - 06 Scarlett O'Hara", "brand": "Sugar Cosmetics", "category": "lipstick", "hexCode": "#C0303A", "red": 192, "green": 48, "blue": 58, "colorName": "Deep Scarlet", "price": 499, "currency": "INR", "retailerUrl": "https://www.nykaa.com", "country": "India"},
+  {"id": "69c1f19efe5b2312e57d8a5c", "name": "Quem Disse Berenice? Batom Matte - 311 Terracota", "brand": "O Boticário", "category": "lipstick", "hexCode": "#C07050", "red": 192, "green": 112, "blue": 80, "colorName": "Terracotta", "price": 39.9, "currency": "BRL", "retailerUrl": "https://www.boticario.com.br", "country": "Brazil"},
+  {"id": "69c1f19efe5b2312e57d8a5d", "name": "Natura Una Batom Cremoso - Vermelho Intenso", "brand": "Natura", "category": "lipstick", "hexCode": "#B02030", "red": 176, "green": 32, "blue": 48, "colorName": "Intense Red", "price": 34.9, "currency": "BRL", "retailerUrl": "https://www.natura.com.br", "country": "Brazil"},
+  {"id": "69c1f19efe5b2312e57d8a62", "name": "Wardah Exclusive Matte Lip Cream - 22 Rosy Mauve", "brand": "Wardah", "category": "lipstick", "hexCode": "#C08090", "red": 192, "green": 128, "blue": 144, "colorName": "Rosy Mauve", "price": 55000, "currency": "IDR", "retailerUrl": "https://www.wardahbeauty.com", "country": "Indonesia"},
+  {"id": "69c1f19efe5b2312e57d8a63", "name": "Emina Creamatte Lipstick - 08 Brick Lane", "brand": "Emina", "category": "lipstick", "hexCode": "#B05840", "red": 176, "green": 88, "blue": 64, "colorName": "Burnt Brick", "price": 32000, "currency": "IDR", "retailerUrl": "https://www.eminacosmetics.com", "country": "Indonesia"},
+  {"id": "69c1f19efe5b2312e57d8a67", "name": "Zaron Cosmetics Lip Gloss - Fuchsia", "brand": "Zaron", "category": "lipstick", "hexCode": "#E0407A", "red": 224, "green": 64, "blue": 122, "colorName": "Fuchsia", "price": 3500, "currency": "NGN", "retailerUrl": "https://www.jumia.com.ng", "country": "Nigeria"},
+  {"id": "69c1f19efe5b2312e57d8a68", "name": "House of Tara Lip Colour - Chocolate Berry", "brand": "House of Tara", "category": "lipstick", "hexCode": "#7B3040", "red": 123, "green": 48, "blue": 64, "colorName": "Chocolate Berry", "price": 2800, "currency": "NGN", "retailerUrl": "https://www.jumia.com.ng", "country": "Nigeria"},
+];
+
+// ── Translations ──────────────────────────────────────────────────────────────
+const T = {
+  en: { appTagline:"Scan a color. Find your perfect shade.", upload:"📷 Upload", camera:"📸 Camera", pickColor:"🎨 Pick Color", uploadTapPrompt:"Tap any point on the image to pick its color", choosePhoto:"Choose Photo", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Change image", cameraPrompt:"Point at a color and capture", startCamera:"Start Camera", capture:"📍 Capture", pickerPrompt:"Use the color wheel or type a hex code", hexLabel:"Hex", personalize:"✨ Personalize", skinToneLabel:"SKIN TONE", occasionLabel:"OCCASION", shopInLabel:"SHOP IN", allCountries:"🌍 All", skinTones:{any:"Any",fair:"🤍 Fair",light:"🍑 Light",medium:"🌼 Medium",tan:"🌻 Tan",deep:"🌑 Deep"}, occasions:{any:"Any",daily:"☀️ Daily",office:"💼 Office",evening:"🌙 Evening",wedding:"💍 Wedding",festival:"🎉 Festival"}, findMatch:"💄 Find My Match", finding:"✨ Finding your match...", pickFirst:"👆 Pick a color first", scanning:"🔍 Scanning product database...", gettingAdvice:"✨ Getting beauty advice...", cameraError:"Camera not available or permission denied." },
+  hi: { appTagline:"रंग स्कैन करें। अपना परफेक्ट शेड खोजें।", upload:"📷 अपलोड", camera:"📸 कैमरा", pickColor:"🎨 रंग चुनें", uploadTapPrompt:"रंग चुनने के लिए इमेज पर कहीं भी टैप करें", choosePhoto:"फ़ोटो चुनें", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ इमेज बदलें", cameraPrompt:"किसी रंग पर कैमरा पॉइंट करें", startCamera:"कैमरा शुरू करें", capture:"📍 कैप्चर", pickerPrompt:"कलर व्हील इस्तेमाल करें या हेक्स कोड डालें", hexLabel:"हेक्स", personalize:"✨ व्यक्तिगत करें", skinToneLabel:"त्वचा का रंग", occasionLabel:"अवसर", shopInLabel:"यहाँ खरीदें", allCountries:"🌍 सभी", skinTones:{any:"कोई भी",fair:"🤍 गोरी",light:"🍑 हल्की",medium:"🌼 मध्यम",tan:"🌻 सांवली",deep:"🌑 गहरी"}, occasions:{any:"कोई भी",daily:"☀️ रोज़ाना",office:"💼 ऑफिस",evening:"🌙 शाम",wedding:"💍 शादी",festival:"🎉 त्योहार"}, findMatch:"💄 मेरा मैच खोजें", finding:"✨ मैच ढूंढ रहे हैं...", pickFirst:"👆 पहले रंग चुनें", scanning:"🔍 प्रोडक्ट स्कैन हो रहा है...", gettingAdvice:"✨ सलाह मिल रही है...", cameraError:"कैमरा उपलब्ध नहीं है।" },
+  pt: { appTagline:"Escaneie uma cor. Encontre seu tom perfeito.", upload:"📷 Enviar", camera:"📸 Câmera", pickColor:"🎨 Escolher Cor", uploadTapPrompt:"Toque em qualquer ponto da imagem para capturar a cor", choosePhoto:"Escolher Foto", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Trocar imagem", cameraPrompt:"Aponte para uma cor e capture", startCamera:"Iniciar Câmera", capture:"📍 Capturar", pickerPrompt:"Use o seletor de cor ou digite um código hex", hexLabel:"Hex", personalize:"✨ Personalizar", skinToneLabel:"TOM DE PELE", occasionLabel:"OCASIÃO", shopInLabel:"COMPRAR EM", allCountries:"🌍 Todos", skinTones:{any:"Qualquer",fair:"🤍 Clara",light:"🍑 Leve",medium:"🌼 Média",tan:"🌻 Bronzeada",deep:"🌑 Escura"}, occasions:{any:"Qualquer",daily:"☀️ Diário",office:"💼 Trabalho",evening:"🌙 Noite",wedding:"💍 Casamento",festival:"🎉 Festival"}, findMatch:"💄 Encontrar Minha Combinação", finding:"✨ Encontrando...", pickFirst:"👆 Escolha uma cor primeiro", scanning:"🔍 Varrendo produtos...", gettingAdvice:"✨ Obtendo conselho...", cameraError:"Câmera não disponível." },
+  zh: { appTagline:"扫描颜色，找到你的完美色号。", upload:"📷 上传", camera:"📸 相机", pickColor:"🎨 选色", uploadTapPrompt:"点击图片上的任意位置以提取颜色", choosePhoto:"选择照片", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ 更换图片", cameraPrompt:"将相机对准颜色并拍摄", startCamera:"开启相机", capture:"📍 拍摄", pickerPrompt:"使用调色盘或输入十六进制颜色代码", hexLabel:"色值", personalize:"✨ 个性化设置", skinToneLabel:"肤色", occasionLabel:"场合", shopInLabel:"购物地区", allCountries:"🌍 全部", skinTones:{any:"不限",fair:"🤍 白皙",light:"🍑 浅色",medium:"🌼 中等",tan:"🌻 小麦色",deep:"🌑 深色"}, occasions:{any:"不限",daily:"☀️ 日常",office:"💼 职场",evening:"🌙 夜晚",wedding:"💍 婚礼",festival:"🎉 节日"}, findMatch:"💄 找到我的匹配", finding:"✨ 正在匹配...", pickFirst:"👆 请先选择颜色", scanning:"🔍 扫描产品数据库...", gettingAdvice:"✨ 获取美妆建议...", cameraError:"相机不可用。" },
+  id: { appTagline:"Pindai warna. Temukan shade sempurnamu.", upload:"📷 Unggah", camera:"📸 Kamera", pickColor:"🎨 Pilih Warna", uploadTapPrompt:"Ketuk titik mana saja pada gambar untuk mengambil warnanya", choosePhoto:"Pilih Foto", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Ganti gambar", cameraPrompt:"Arahkan ke warna dan ambil gambar", startCamera:"Mulai Kamera", capture:"📍 Ambil", pickerPrompt:"Gunakan roda warna atau ketik kode hex", hexLabel:"Hex", personalize:"✨ Personalisasi", skinToneLabel:"WARNA KULIT", occasionLabel:"KESEMPATAN", shopInLabel:"BELANJA DI", allCountries:"🌍 Semua", skinTones:{any:"Semua",fair:"🤍 Cerah",light:"🍑 Terang",medium:"🌼 Sedang",tan:"🌻 Sawo Matang",deep:"🌑 Gelap"}, occasions:{any:"Semua",daily:"☀️ Harian",office:"💼 Kantor",evening:"🌙 Malam",wedding:"💍 Pernikahan",festival:"🎉 Festival"}, findMatch:"💄 Temukan Kecocokan Saya", finding:"✨ Mencari...", pickFirst:"👆 Pilih warna dulu", scanning:"🔍 Memindai produk...", gettingAdvice:"✨ Mendapatkan saran...", cameraError:"Kamera tidak tersedia." },
+  ng: { appTagline:"Scan your colour. Find your perfect shade!", upload:"📷 Upload", camera:"📸 Camera", pickColor:"🎨 Pick Colour", uploadTapPrompt:"Tap anywhere on the photo to grab that colour", choosePhoto:"Choose Photo", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Change photo", cameraPrompt:"Point your camera at the colour and capture am", startCamera:"Start Camera", capture:"📍 Capture", pickerPrompt:"Use the colour wheel or type the hex code", hexLabel:"Hex", personalize:"✨ Personalise", skinToneLabel:"SKIN TONE", occasionLabel:"OCCASION", shopInLabel:"SHOP IN", allCountries:"🌍 All", skinTones:{any:"Any",fair:"🤍 Fair",light:"🍑 Light",medium:"🌼 Medium",tan:"🌻 Tan",deep:"🌑 Deep"}, occasions:{any:"Any",daily:"☀️ Daily",office:"💼 Office",evening:"🌙 Evening",wedding:"💍 Wedding",festival:"🎉 Festival"}, findMatch:"💄 Find My Match", finding:"✨ Finding your match...", pickFirst:"👆 Pick a colour first", scanning:"🔍 Scanning products...", gettingAdvice:"✨ Getting beauty advice...", cameraError:"Camera no dey available." },
+};
+
+// ── Upload Tab ────────────────────────────────────────────────────────────────
+function UploadTab({onColorPicked, t}) {
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [uploadedImage, setUploadedImage] = useState(false);
+  const [pin, setPin] = useState(null);
+
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const maxW = canvas.parentElement ? (canvas.parentElement.offsetWidth || 340) : 340;
+        const scale = Math.min(maxW / img.width, 320 / img.height, 1);
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setUploadedImage(true);
+        setPin(null);
+        onColorPicked(null);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleCanvasClick(e) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
+    const pixel = canvas.getContext('2d').getImageData(
+      Math.max(0, Math.min(canvas.width - 1, x)),
+      Math.max(0, Math.min(canvas.height - 1, y)), 1, 1
+    ).data;
+    const r = pixel[0], g = pixel[1], b = pixel[2];
+    const hex = toHex(r, g, b);
+    setPin({ cx: e.clientX - rect.left, cy: e.clientY - rect.top });
+    onColorPicked({ r, g, b, hex });
+  }
+
+  function handleCanvasTouch(e) {
+    e.preventDefault();
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (touch) handleCanvasClick({ clientX: touch.clientX, clientY: touch.clientY });
+  }
+
+  function reset() {
+    setUploadedImage(false);
+    setPin(null);
+    onColorPicked(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    const canvas = canvasRef.current;
+    if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  return (
+    <div>
+      <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{display:'none'}} onChange={handleFileChange} />
+      {!uploadedImage && (
+        <div onClick={() => fileInputRef.current?.click()} onTouchEnd={e => { e.preventDefault(); fileInputRef.current?.click(); }}
+          style={{border:'2px dashed #C2185B',borderRadius:14,padding:'36px 20px',textAlign:'center',cursor:'pointer',background:'#fdf2f8',WebkitTapHighlightColor:'transparent'}}>
+          <div style={{fontSize:40}}>🖼️</div>
+          <div style={{color:'#9d174d',fontWeight:700,marginTop:8,fontSize:14}}>{t.choosePhoto}</div>
+          <div style={{color:'#aaa',fontSize:12,marginTop:4}}>{t.uploadFormats}</div>
+        </div>
+      )}
+      <div style={{display: uploadedImage ? 'block' : 'none', position:'relative'}}>
+        <canvas ref={canvasRef} onClick={handleCanvasClick} onTouchEnd={handleCanvasTouch}
+          style={{width:'100%',borderRadius:12,cursor:'crosshair',touchAction:'none',display:'block'}} />
+        {pin && (
+          <div style={{position:'absolute',left:pin.cx-11,top:pin.cy-11,width:22,height:22,borderRadius:'50%',border:'3px solid white',boxShadow:'0 0 0 2px rgba(0,0,0,0.7)',pointerEvents:'none'}} />
+        )}
+        <p style={{textAlign:'center',fontSize:13,color:'#999',marginTop:8}}>{t.uploadTapPrompt}</p>
+        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:'1px solid #ddd',borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:'#666'}}>{t.changeImage}</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Camera Tab ────────────────────────────────────────────────────────────────
+function CameraTab({onColorPicked, t}) {
+  const videoRef = useRef(null), canvasRef = useRef(null), streamRef = useRef(null);
+  const [phase, setPhase] = useState("idle");
+  const [camError, setCamError] = useState("");
+  const [frozenSrc, setFrozenSrc] = useState(null);
+  const [capturedColor, setCapturedColor] = useState(null);
+
+  function stopStream() { if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; } if (videoRef.current) videoRef.current.srcObject = null; }
+  useEffect(() => () => stopStream(), []);
+
+  async function startCamera() {
+    setCamError(""); setFrozenSrc(null); setCapturedColor(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});
+      streamRef.current = stream; setPhase("live");
+      requestAnimationFrame(() => { if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play().catch(() => {}); } });
+    } catch(err) { setCamError(t.cameraError + (err?.message ? ` (${err.message})` : "")); setPhase("idle"); }
+  }
+
+  function captureColor() {
+    const v = videoRef.current, cv = canvasRef.current;
+    if (!v || !cv || v.readyState < 2) return;
+    cv.width = v.videoWidth || 640; cv.height = v.videoHeight || 480;
+    const ctx = cv.getContext("2d"); ctx.drawImage(v, 0, 0, cv.width, cv.height);
+    const [r, g, b] = ctx.getImageData(Math.floor(cv.width/2), Math.floor(cv.height/2), 1, 1).data;
+    const hex = toHex(r, g, b);
+    const dataUrl = cv.toDataURL("image/jpeg", 0.85);
+    stopStream();
+    const col = {r, g, b, hex};
+    setFrozenSrc(dataUrl); setCapturedColor(col); onColorPicked(col); setPhase("captured");
+  }
+
+  function retake() { stopStream(); setFrozenSrc(null); setCapturedColor(null); onColorPicked(null); setPhase("idle"); }
+
+  return (
+    <div style={{textAlign:"center"}}>
+      <canvas ref={canvasRef} style={{display:"none"}} />
+      {phase === "idle" && (
+        <div>
+          <p style={{color:"#666",fontSize:13,margin:"0 0 16px"}}>{t.cameraPrompt}</p>
+          <div style={{fontSize:52,marginBottom:12}}>📸</div>
+          {camError && <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:10,padding:"10px 14px",color:"#dc2626",fontSize:12,marginBottom:14,textAlign:"left"}}>⚠️ {camError}</div>}
+          <button onClick={startCamera} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:14,padding:"13px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{t.startCamera}</button>
+        </div>
+      )}
+      {phase === "live" && (
+        <div>
+          <div style={{position:"relative",borderRadius:14,overflow:"hidden",background:"#000",lineHeight:0}}>
+            <video ref={videoRef} autoPlay playsInline muted style={{width:"100%",display:"block",borderRadius:14,maxHeight:320,objectFit:"cover"}} />
+            <div style={{position:"absolute",inset:0,pointerEvents:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{width:60,height:60,borderRadius:"50%",border:"2px solid rgba(255,255,255,0.9)",position:"absolute"}} />
+              <div style={{width:6,height:6,borderRadius:"50%",background:"white",position:"absolute"}} />
+              <div style={{position:"absolute",width:40,height:1,background:"rgba(255,255,255,0.8)"}} />
+              <div style={{position:"absolute",width:1,height:40,background:"rgba(255,255,255,0.8)"}} />
+            </div>
+          </div>
+          <div style={{display:"flex",gap:10,marginTop:12,justifyContent:"center"}}>
+            <button onClick={captureColor} onTouchEnd={e=>{e.preventDefault();captureColor();}} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:14,padding:"13px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{t.capture}</button>
+            <button onClick={retake} style={{background:"#f3f4f6",color:"#666",border:"none",borderRadius:14,padding:"13px 16px",cursor:"pointer"}}>✕</button>
+          </div>
+        </div>
+      )}
+      {phase === "captured" && frozenSrc && capturedColor && (
+        <div>
+          <p style={{color:"#666",fontSize:13,margin:"0 0 10px"}}>✅ Color captured!</p>
+          <div style={{position:"relative",borderRadius:14,overflow:"hidden",lineHeight:0,marginBottom:12}}>
+            <img src={frozenSrc} alt="captured" style={{width:"100%",display:"block",borderRadius:14,maxHeight:320,objectFit:"cover"}} />
+            <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:24,height:24,borderRadius:"50%",background:capturedColor.hex,border:"3px solid white",boxShadow:"0 0 0 2px rgba(0,0,0,0.5)",pointerEvents:"none"}} />
+          </div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:10,background:"#f9f9f9",borderRadius:12,padding:"8px 14px",marginBottom:14}}>
+            <div style={{width:28,height:28,borderRadius:"50%",background:capturedColor.hex,flexShrink:0}} />
+            <span style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:"#111"}}>{capturedColor.hex}</span>
+          </div>
+          <div><button onClick={retake} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:10,padding:"8px 20px",cursor:"pointer",fontSize:13,color:"#666",fontWeight:600}}>🔄 Retake</button></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Picker Tab ────────────────────────────────────────────────────────────────
+function PickerTab({color, onWheel, onHexType, t}) {
+  return (
+    <div style={{textAlign:"center"}}>
+      <p style={{color:"#666",fontSize:13,margin:"0 0 16px"}}>{t.pickerPrompt}</p>
+      <input type="color" value={color?.hex || "#FF6B9D"} onChange={onWheel}
+        style={{width:120,height:120,borderRadius:"50%",border:"none",cursor:"pointer",background:"none",padding:0}} />
+      <div style={{marginTop:16}}>
+        <label style={{fontSize:12,color:"#888",fontWeight:600}}>{t.hexLabel}</label>
+        <input type="text" value={color?.hex || ""} onChange={onHexType} placeholder="#FF6B9D"
+          style={{display:"block",margin:"8px auto 0",width:140,padding:"10px 14px",borderRadius:12,border:"2px solid #e5e7eb",textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700}} />
+      </div>
+    </div>
+  );
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
+export default function ColorScanner() {
+  const [lang, setLang] = useState('en');
+  const t = T[lang] || T.en;
+
+  const [tab, setTab] = useState("upload");
+  const DEFAULT_COLOR = {hex:"#FF6B9D", r:255, g:107, b:157};
+  const [color, setColor] = useState(null);
+  const [skinTone, setSkinTone] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [country, setCountry] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState("");
+  const [error, setError] = useState("");
+
+  function switchTab(id) { setTab(id); if (id === "picker") setColor(DEFAULT_COLOR); else if (id !== "camera") setColor(null); }
+  function onWheel(e) { const rgb = fromHex(e.target.value); if (rgb) setColor({hex:e.target.value.toUpperCase(), ...rgb}); }
+  function onHexType(e) { const val = e.target.value; if (/^#[0-9A-Fa-f]{6}$/.test(val)) { const rgb = fromHex(val); if (rgb) setColor({hex:val.toUpperCase(), ...rgb}); } else setColor(prev => ({...(prev||{r:0,g:0,b:0}), hex:val})); }
+
+  async function handleFindMatch() {
+    console.log('[MMM] Button clicked', color);
+    if (!color || !color.hex || !/^#[0-9A-Fa-f]{6}$/.test(color.hex) || loading) return;
+    setLoading(true); setError(''); setStep(t.scanning);
+    try {
+      console.log('[MMM] Step 1: finding color matches for', color.hex);
+      const matches = findColorMatchesLocal(color.r, color.g, color.b, country);
+      console.log('[MMM] Step 2: matches found:', matches.length);
+      setStep(t.gettingAdvice);
+
+      const prompt = 'You are a makeup expert. The user scanned color ' + color.hex + ' (R:' + color.r + ' G:' + color.g + ' B:' + color.b + '). Skin tone: ' + (skinTone||'any') + '. Occasion: ' + (occasion||'everyday') + '. Country: ' + (country||'global') + '. Give 3 sentences of warm, personalized beauty advice for this color.';
+
+      const adviceRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const adviceData = await adviceRes.json();
+      console.log('[MMM] Step 3: advice received');
+      const claudeAdvice = adviceData.content[0].text;
+
+      sessionStorage.setItem('matchResults', JSON.stringify({
+        scannedHex: color.hex, scannedRed: color.r, scannedGreen: color.g, scannedBlue: color.b,
+        matchedProducts: matches, claudeAdvice, skinTone, occasion, country, lang,
+        personaName: 'Maya', personaEmoji: '💄'
+      }));
+      console.log('[MMM] Step 4: navigating to MatchResults');
+      window.location.href = '/MatchResults';
+    } catch(err) {
+      console.error('[MMM] ERROR:', err);
+      setError(err?.message || 'Something went wrong. Please try again.');
+      setLoading(false); setStep('');
+    }
+  }
+
+  const isReady = !!(color?.hex && /^#[0-9A-Fa-f]{6}$/.test(color.hex));
+
+  const pillBtn = (id, label) => (
+    <button key={id} onClick={() => switchTab(id)} style={{flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,background:tab===id?"linear-gradient(135deg,#9d174d,#7c3aed)":"transparent",color:tab===id?"white":"#666"}}>
+      {label}
+    </button>
+  );
+
+  const countryBtn = (val, label) => (
+    <button key={val} onClick={() => setCountry(val)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:country===val?"2px solid #7c3aed":"2px solid #e5e7eb",background:country===val?"#f5f3ff":"white",color:country===val?"#7c3aed":"#555",fontSize:12,fontWeight:country===val?700:500}}>
+      {label}
+    </button>
+  );
+
+  const langBtn = (id, label) => (
+    <button key={id} onClick={() => setLang(id)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:lang===id?"2px solid #7c3aed":"2px solid #e5e7eb",background:lang===id?"#f5f3ff":"white",color:lang===id?"#7c3aed":"#555",fontSize:12,fontWeight:lang===id?700:500}}>
+      {label}
+    </button>
+  );
+
+  return (
+    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
+      <div style={{textAlign:"center",padding:"20px 16px 4px"}}>
+        <div style={{fontSize:30}}>💄</div>
+        <h1 style={{margin:"4px 0 2px",fontSize:22,fontWeight:900,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup</h1>
+        <p style={{margin:"0 0 8px",fontSize:12,color:"#9d174d",opacity:0.8}}>{t.appTagline}</p>
+      </div>
+
+      <div style={{maxWidth:480,margin:"0 auto",padding:"0 16px 48px"}}>
+
+        {/* Tab bar */}
+        <div style={{display:"flex",background:"white",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)"}}>
+          {pillBtn("upload", t.upload)}
+          {pillBtn("camera", t.camera)}
+          {pillBtn("picker", t.pickColor)}
+        </div>
+
+        {/* Tab content */}
+        <div style={{background:"white",borderRadius:20,padding:18,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14}}>
+          {tab === "upload" && <UploadTab onColorPicked={setColor} t={t} />}
+          {tab === "camera" && <CameraTab onColorPicked={setColor} t={t} />}
+          {tab === "picker" && <PickerTab color={color} onWheel={onWheel} onHexType={onHexType} t={t} />}
+        </div>
+
+        {/* Color preview */}
+        {color?.hex && /^#[0-9A-Fa-f]{6}$/.test(color.hex) && (
+          <div style={{background:"white",borderRadius:20,padding:16,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14,display:"flex",alignItems:"center",gap:16}}>
+            <div style={{width:56,height:56,borderRadius:"50%",flexShrink:0,background:color.hex,boxShadow:`0 4px 18px ${color.hex}80,inset 0 0 0 3px rgba(255,255,255,0.25)`}} />
+            <div>
+              <div style={{fontFamily:"monospace",fontSize:22,fontWeight:800,color:"#111"}}>{color.hex}</div>
+              <div style={{fontSize:13,color:"#888",marginTop:3}}>R <b style={{color:"#ef4444"}}>{color.r}</b> &nbsp; G <b style={{color:"#22c55e"}}>{color.g}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{color.b}</b></div>
+            </div>
+          </div>
+        )}
+
+        {/* Personalization */}
+        <div style={{background:"white",borderRadius:20,padding:18,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:"#374151",marginBottom:10}}>{t.personalize}</div>
+          <div style={{display:"flex",gap:10,marginBottom:14}}>
+            <div style={{flex:1}}>
+              <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:4}}>{t.skinToneLabel}</label>
+              <select value={skinTone} onChange={e=>setSkinTone(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:12,background:"white"}}>
+                <option value="">{t.skinTones.any}</option>
+                <option value="Fair">{t.skinTones.fair}</option>
+                <option value="Light">{t.skinTones.light}</option>
+                <option value="Medium">{t.skinTones.medium}</option>
+                <option value="Tan">{t.skinTones.tan}</option>
+                <option value="Deep">{t.skinTones.deep}</option>
+              </select>
+            </div>
+            <div style={{flex:1}}>
+              <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:4}}>{t.occasionLabel}</label>
+              <select value={occasion} onChange={e=>setOccasion(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:12,background:"white"}}>
+                <option value="">{t.occasions.any}</option>
+                <option value="Daily">{t.occasions.daily}</option>
+                <option value="Office">{t.occasions.office}</option>
+                <option value="Evening">{t.occasions.evening}</option>
+                <option value="Wedding">{t.occasions.wedding}</option>
+                <option value="Festival">{t.occasions.festival}</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Language */}
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>LANGUAGE</label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {langBtn("en","🇺🇸 EN")}
+              {langBtn("hi","🇮🇳 HI")}
+              {langBtn("pt","🇧🇷 PT")}
+              {langBtn("zh","🇨🇳 ZH")}
+              {langBtn("id","🇮🇩 ID")}
+              {langBtn("ng","🇳🇬 NG")}
+            </div>
+          </div>
+
+          {/* Country */}
+          <div>
+            <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>{t.shopInLabel}</label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {countryBtn("", t.allCountries)}
+              {countryBtn("USA","🇺🇸 USA")}
+              {countryBtn("India","🇮🇳 India")}
+              {countryBtn("Brazil","🇧🇷 Brazil")}
+              {countryBtn("Indonesia","🇮🇩 Indonesia")}
+              {countryBtn("Nigeria","🇳🇬 Nigeria")}
+              {countryBtn("China","🇨🇳 China")}
+            </div>
+          </div>
+        </div>
+
+        {error && <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:12,padding:"12px 16px",color:"#dc2626",fontSize:13,marginBottom:12}}>⚠️ {error}</div>}
+
+        <button onClick={handleFindMatch} disabled={!isReady || loading}
+          style={{width:"100%",padding:"17px",fontSize:16,fontWeight:800,border:"none",borderRadius:16,cursor:!isReady||loading?"not-allowed":"pointer",background:!isReady||loading?"#e5e7eb":"linear-gradient(135deg,#9d174d,#7c3aed)",color:!isReady||loading?"#aaa":"white",boxShadow:isReady&&!loading?"0 6px 24px rgba(124,58,237,0.35)":"none",transition:"all 0.2s"}}>
+          {loading ? t.finding : isReady ? t.findMatch : t.pickFirst}
+        </button>
+
+        {loading && step && <div style={{textAlign:"center",marginTop:10,color:"#7c3aed",fontSize:13,fontWeight:600}}>{step}</div>}
+      </div>
+    </div>
+  );
+}
