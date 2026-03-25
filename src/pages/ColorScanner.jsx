@@ -1,245 +1,381 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { findColorMatches, CATEGORIES } from "../products.js";
+import { trackScan, trackPageView } from "../analytics.js";
 
-const LIBRARY_KEY = 'mmm_library';
+function toHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
+function fromHex(hex){ const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); return m?{r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)}:null; }
 
-const IMAGE_SLOTS = [
-  {
-    id: 'face',
-    label: 'Face Photo',
-    emoji: '🙂',
-    hint: 'For lip color & blush try-on',
-    requirements: [
-      '✅ Face centered in frame',
-      '✅ Well lit — natural or bright indoor light',
-      '✅ No glasses or sunglasses',
-      '✅ Hair away from face',
-      '✅ Neutral expression, mouth closed',
-      '✅ Look directly at the camera',
-      '❌ No filters or heavy editing',
-      '❌ No hats or face coverings',
-    ],
-    example: '🧍 Passport-style photo works perfectly'
-  },
-  {
-    id: 'lips',
-    label: 'Lips Close-Up',
-    emoji: '💋',
-    hint: 'For precise lipstick matching',
-    requirements: [
-      '✅ Fill the frame with just your lips',
-      '✅ Well lit — no shadows across mouth',
-      '✅ Lips bare (no lipstick or gloss)',
-      '✅ Mouth slightly open or closed — both work',
-      '✅ Sharp focus, not blurry',
-      '❌ No filters or color adjustments',
-      '❌ No heavy lip liner that changes shape',
-    ],
-    example: '📏 Hold phone 20cm from your lips'
-  },
-  {
-    id: 'hands',
-    label: 'Hand Photo',
-    emoji: '💅',
-    hint: 'For nail polish color matching',
-    requirements: [
-      '✅ Single hand, palm facing down',
-      '✅ All five fingers visible and spread slightly',
-      '✅ Well lit — no shadows across nails',
-      '✅ Nails bare (no existing polish)',
-      '✅ Clean, dry hands',
-      '✅ Flat surface — rest hand on white paper for best results',
-      '❌ No rings or jewellery on fingers',
-      '❌ No filters or color adjustments',
-    ],
-    example: '📄 Rest hand on white paper in natural light'
-  },
-];
+const T = {
+  en: { appTagline:"Scan a color. Find your perfect shade.", upload:"📷 Upload", camera:"📸 Camera", pickColor:"🎨 Pick Color", uploadTapPrompt:"Tap any point on the image to pick its color", choosePhoto:"Choose Photo", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Change image", cameraPrompt:"Point at a color and capture", startCamera:"Start Camera", capture:"📍 Capture", pickerPrompt:"Use the color wheel or type a hex code", hexLabel:"Hex", personalize:"✨ Personalize", skinToneLabel:"SKIN TONE", occasionLabel:"OCCASION", categoryLabel:"CATEGORY", shopInLabel:"SHOP IN", allCountries:"🌍 All", skinTones:{any:"Any",fair:"🤍 Fair",light:"🍑 Light",medium:"🌼 Medium",tan:"🌻 Tan",deep:"🌑 Deep"}, occasions:{any:"Any",daily:"☀️ Daily",office:"💼 Office",evening:"🌙 Evening",wedding:"💍 Wedding",festival:"🎉 Festival"}, findMatch:"💄 Find My Match", finding:"✨ Finding your match...", pickFirst:"👆 Pick a color first", scanning:"🔍 Scanning product database...", gettingAdvice:"✨ Getting beauty advice...", cameraError:"Camera not available.", library:"📚 My Library" },
+  hi: { appTagline:"रंग स्कैन करें। अपना परफेक्ट शेड खोजें।", upload:"📷 अपलोड", camera:"📸 कैमरा", pickColor:"🎨 रंग चुनें", uploadTapPrompt:"रंग चुनने के लिए इमेज पर कहीं भी टैप करें", choosePhoto:"फ़ोटो चुनें", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ इमेज बदलें", cameraPrompt:"किसी रंग पर कैमरा पॉइंट करें", startCamera:"कैमरा शुरू करें", capture:"📍 कैप्चर", pickerPrompt:"कलर व्हील इस्तेमाल करें", hexLabel:"हेक्स", personalize:"✨ व्यक्तिगत करें", skinToneLabel:"त्वचा का रंग", occasionLabel:"अवसर", categoryLabel:"श्रेणी", shopInLabel:"यहाँ खरीदें", allCountries:"🌍 सभी", skinTones:{any:"कोई भी",fair:"🤍 गोरी",light:"🍑 हल्की",medium:"🌼 मध्यम",tan:"🌻 सांवली",deep:"🌑 गहरी"}, occasions:{any:"कोई भी",daily:"☀️ रोज़ाना",office:"💼 ऑफिस",evening:"🌙 शाम",wedding:"💍 शादी",festival:"🎉 त्योहार"}, findMatch:"💄 मेरा मैच खोजें", finding:"✨ मैच ढूंढ रहे हैं...", pickFirst:"👆 पहले रंग चुनें", scanning:"🔍 स्कैन हो रहा है...", gettingAdvice:"✨ सलाह मिल रही है...", cameraError:"कैमरा उपलब्ध नहीं।", library:"📚 मेरी लाइब्रेरी" },
+  pt: { appTagline:"Escaneie uma cor. Encontre seu tom perfeito.", upload:"📷 Enviar", camera:"📸 Câmera", pickColor:"🎨 Escolher Cor", uploadTapPrompt:"Toque em qualquer ponto da imagem para capturar a cor", choosePhoto:"Escolher Foto", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Trocar imagem", cameraPrompt:"Aponte para uma cor e capture", startCamera:"Iniciar Câmera", capture:"📍 Capturar", pickerPrompt:"Use o seletor de cor ou digite um hex", hexLabel:"Hex", personalize:"✨ Personalizar", skinToneLabel:"TOM DE PELE", occasionLabel:"OCASIÃO", categoryLabel:"CATEGORIA", shopInLabel:"COMPRAR EM", allCountries:"🌍 Todos", skinTones:{any:"Qualquer",fair:"🤍 Clara",light:"🍑 Leve",medium:"🌼 Média",tan:"🌻 Bronzeada",deep:"🌑 Escura"}, occasions:{any:"Qualquer",daily:"☀️ Diário",office:"💼 Trabalho",evening:"🌙 Noite",wedding:"💍 Casamento",festival:"🎉 Festival"}, findMatch:"💄 Encontrar Minha Combinação", finding:"✨ Encontrando...", pickFirst:"👆 Escolha uma cor primeiro", scanning:"🔍 Varrendo...", gettingAdvice:"✨ Obtendo conselho...", cameraError:"Câmera não disponível.", library:"📚 Minha Biblioteca" },
+  zh: { appTagline:"扫描颜色，找到你的完美色号。", upload:"📷 上传", camera:"📸 相机", pickColor:"🎨 选色", uploadTapPrompt:"点击图片上的任意位置以提取颜色", choosePhoto:"选择照片", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ 更换图片", cameraPrompt:"将相机对准颜色并拍摄", startCamera:"开启相机", capture:"📍 拍摄", pickerPrompt:"使用调色盘或输入十六进制颜色", hexLabel:"色值", personalize:"✨ 个性化设置", skinToneLabel:"肤色", occasionLabel:"场合", categoryLabel:"类别", shopInLabel:"购物地区", allCountries:"🌍 全部", skinTones:{any:"不限",fair:"🤍 白皙",light:"🍑 浅色",medium:"🌼 中等",tan:"🌻 小麦色",deep:"🌑 深色"}, occasions:{any:"不限",daily:"☀️ 日常",office:"💼 职场",evening:"🌙 夜晚",wedding:"💍 婚礼",festival:"🎉 节日"}, findMatch:"💄 找到我的匹配", finding:"✨ 正在匹配...", pickFirst:"👆 请先选择颜色", scanning:"🔍 扫描中...", gettingAdvice:"✨ 获取建议...", cameraError:"相机不可用。", library:"📚 我的收藏" },
+  id: { appTagline:"Pindai warna. Temukan shade sempurnamu.", upload:"📷 Unggah", camera:"📸 Kamera", pickColor:"🎨 Pilih Warna", uploadTapPrompt:"Ketuk titik mana saja pada gambar", choosePhoto:"Pilih Foto", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Ganti gambar", cameraPrompt:"Arahkan ke warna dan ambil", startCamera:"Mulai Kamera", capture:"📍 Ambil", pickerPrompt:"Gunakan roda warna atau ketik hex", hexLabel:"Hex", personalize:"✨ Personalisasi", skinToneLabel:"WARNA KULIT", occasionLabel:"KESEMPATAN", categoryLabel:"KATEGORI", shopInLabel:"BELANJA DI", allCountries:"🌍 Semua", skinTones:{any:"Semua",fair:"🤍 Cerah",light:"🍑 Terang",medium:"🌼 Sedang",tan:"🌻 Sawo Matang",deep:"🌑 Gelap"}, occasions:{any:"Semua",daily:"☀️ Harian",office:"💼 Kantor",evening:"🌙 Malam",wedding:"💍 Pernikahan",festival:"🎉 Festival"}, findMatch:"💄 Temukan Kecocokan", finding:"✨ Mencari...", pickFirst:"👆 Pilih warna dulu", scanning:"🔍 Memindai...", gettingAdvice:"✨ Mendapat saran...", cameraError:"Kamera tidak tersedia.", library:"📚 Perpustakaan" },
+  ng: { appTagline:"Scan your colour. Find your perfect shade!", upload:"📷 Upload", camera:"📸 Camera", pickColor:"🎨 Pick Colour", uploadTapPrompt:"Tap anywhere on the photo to grab that colour", choosePhoto:"Choose Photo", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Change photo", cameraPrompt:"Point camera at colour and capture am", startCamera:"Start Camera", capture:"📍 Capture", pickerPrompt:"Use colour wheel or type hex code", hexLabel:"Hex", personalize:"✨ Personalise", skinToneLabel:"SKIN TONE", occasionLabel:"OCCASION", categoryLabel:"CATEGORY", shopInLabel:"SHOP IN", allCountries:"🌍 All", skinTones:{any:"Any",fair:"🤍 Fair",light:"🍑 Light",medium:"🌼 Medium",tan:"🌻 Tan",deep:"🌑 Deep"}, occasions:{any:"Any",daily:"☀️ Daily",office:"💼 Office",evening:"🌙 Evening",wedding:"💍 Wedding",festival:"🎉 Festival"}, findMatch:"💄 Find My Match", finding:"✨ Finding...", pickFirst:"👆 Pick a colour first", scanning:"🔍 Scanning...", gettingAdvice:"✨ Getting advice...", cameraError:"Camera no dey available.", library:"📚 My Library" },
+};
 
-function getLibrary() {
-  try { return JSON.parse(localStorage.getItem(LIBRARY_KEY) || '{"scans":[],"images":{}}'); }
-  catch { return { scans: [], images: {} }; }
-}
+function UploadTab({onColorPicked, t}) {
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [uploadedImage, setUploadedImage] = useState(false);
+  const [pin, setPin] = useState(null);
 
-function saveLibrary(lib) {
-  localStorage.setItem(LIBRARY_KEY, JSON.stringify(lib));
-}
-
-export default function LibraryPage() {
-  const [library, setLibrary] = useState(getLibrary());
-  const [activeTab, setActiveTab] = useState('scans');
-  const [expandedSlot, setExpandedSlot] = useState(null);
-  const fileRefs = { face: useRef(), lips: useRef(), hands: useRef() };
-
-  useEffect(() => { setLibrary(getLibrary()); }, []);
-
-  function handleImageUpload(slotId, e) {
+  function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
-      const lib = getLibrary();
-      lib.images = lib.images || {};
-      lib.images[slotId] = { dataUrl: ev.target.result, name: file.name, date: new Date().toISOString() };
-      saveLibrary(lib);
-      setLibrary({ ...lib });
-      setExpandedSlot(null);
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const maxW = canvas.parentElement ? (canvas.parentElement.offsetWidth || 340) : 340;
+        const scale = Math.min(maxW / img.width, 320 / img.height, 1);
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setUploadedImage(true); setPin(null); onColorPicked(null);
+      };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  function removeImage(slotId) {
-    const lib = getLibrary();
-    delete lib.images[slotId];
-    saveLibrary(lib);
-    setLibrary({ ...lib });
+  function handleCanvasClick(e) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) * canvas.width / rect.width);
+    const y = Math.floor((e.clientY - rect.top) * canvas.height / rect.height);
+    const pixel = canvas.getContext('2d').getImageData(Math.max(0,Math.min(canvas.width-1,x)), Math.max(0,Math.min(canvas.height-1,y)), 1, 1).data;
+    const hex = toHex(pixel[0], pixel[1], pixel[2]);
+    setPin({ cx: e.clientX - rect.left, cy: e.clientY - rect.top });
+    onColorPicked({ r: pixel[0], g: pixel[1], b: pixel[2], hex });
   }
 
-  function removeScan(index) {
-    const lib = getLibrary();
-    lib.scans.splice(index, 1);
-    saveLibrary(lib);
-    setLibrary({ ...lib });
+  function handleCanvasTouch(e) {
+    e.preventDefault();
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (touch) handleCanvasClick({ clientX: touch.clientX, clientY: touch.clientY });
   }
 
-  const scans = library.scans || [];
-  const images = library.images || {};
+  function reset() {
+    setUploadedImage(false); setPin(null); onColorPicked(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    const canvas = canvasRef.current;
+    if (canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)', fontFamily: "'Segoe UI',sans-serif" }}>
-      {/* Header */}
-      <div style={{ background: 'white', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-        <div style={{ maxWidth: 560, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button onClick={() => window.location.href = '/ColorScanner'} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 10, padding: '8px 14px', cursor: 'pointer', fontSize: 13, color: '#666', fontWeight: 600 }}>← Scanner</button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 20 }}>💄</span>
-            <span style={{ fontWeight: 800, fontSize: 16, background: 'linear-gradient(135deg,#9d174d,#7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>My Library</span>
+    <div>
+      <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{display:'none'}} onChange={handleFileChange} />
+      {!uploadedImage && (
+        <div onClick={()=>fileInputRef.current?.click()} onTouchEnd={e=>{e.preventDefault();fileInputRef.current?.click();}}
+          style={{border:'2px dashed #C2185B',borderRadius:14,padding:'32px 20px',textAlign:'center',cursor:'pointer',background:'#fdf2f8'}}>
+          <div style={{fontSize:40}}>🖼️</div>
+          <div style={{color:'#9d174d',fontWeight:700,marginTop:8,fontSize:14}}>{t.choosePhoto}</div>
+          <div style={{color:'#aaa',fontSize:12,marginTop:4}}>{t.uploadFormats}</div>
+          <div style={{color:'#bbb',fontSize:11,marginTop:8,lineHeight:1.6}}>
+            Upload a photo of your outfit, a flower,<br/>packaging — any color you want to match
           </div>
-          <div style={{ width: 70 }} />
         </div>
+      )}
+      <div style={{display:uploadedImage?'block':'none',position:'relative'}}>
+        <canvas ref={canvasRef} onClick={handleCanvasClick} onTouchEnd={handleCanvasTouch}
+          style={{width:'100%',borderRadius:12,cursor:'crosshair',touchAction:'none',display:'block'}} />
+        {pin && <div style={{position:'absolute',left:pin.cx-11,top:pin.cy-11,width:22,height:22,borderRadius:'50%',border:'3px solid white',boxShadow:'0 0 0 2px rgba(0,0,0,0.7)',pointerEvents:'none'}} />}
+        <p style={{textAlign:'center',fontSize:13,color:'#999',marginTop:8}}>{t.uploadTapPrompt}</p>
+        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:'1px solid #ddd',borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:'#666'}}>{t.changeImage}</button>
+      </div>
+    </div>
+  );
+}
+
+function CameraTab({onColorPicked, t}) {
+  const videoRef = useRef(null), canvasRef = useRef(null), streamRef = useRef(null);
+  const [phase, setPhase] = useState("idle");
+  const [camError, setCamError] = useState("");
+  const [frozenSrc, setFrozenSrc] = useState(null);
+  const [capturedColor, setCapturedColor] = useState(null);
+
+  function stopStream() { if(streamRef.current){streamRef.current.getTracks().forEach(t=>t.stop());streamRef.current=null;} if(videoRef.current)videoRef.current.srcObject=null; }
+  useEffect(()=>()=>stopStream(),[]);
+
+  async function startCamera() {
+    setCamError(""); setFrozenSrc(null); setCapturedColor(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});
+      streamRef.current = stream; setPhase("live");
+      requestAnimationFrame(()=>{ if(videoRef.current){videoRef.current.srcObject=stream;videoRef.current.play().catch(()=>{});} });
+    } catch(err) { setCamError(t.cameraError+(err?.message?` (${err.message})`:""));setPhase("idle"); }
+  }
+
+  function captureColor() {
+    const v=videoRef.current,cv=canvasRef.current; if(!v||!cv||v.readyState<2)return;
+    cv.width=v.videoWidth||640; cv.height=v.videoHeight||480;
+    const ctx=cv.getContext("2d"); ctx.drawImage(v,0,0,cv.width,cv.height);
+    const [r,g,b]=ctx.getImageData(Math.floor(cv.width/2),Math.floor(cv.height/2),1,1).data;
+    const hex=toHex(r,g,b); const dataUrl=cv.toDataURL("image/jpeg",0.85);
+    stopStream(); const col={r,g,b,hex};
+    setFrozenSrc(dataUrl); setCapturedColor(col); onColorPicked(col); setPhase("captured");
+  }
+
+  function retake() { stopStream();setFrozenSrc(null);setCapturedColor(null);onColorPicked(null);setPhase("idle"); }
+
+  return (
+    <div style={{textAlign:"center"}}>
+      <canvas ref={canvasRef} style={{display:"none"}}/>
+      {phase==="idle"&&(
+        <div>
+          <p style={{color:"#666",fontSize:13,margin:"0 0 12px"}}>{t.cameraPrompt}</p>
+          <div style={{fontSize:48,marginBottom:12}}>📸</div>
+          {camError&&<div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:10,padding:"10px 14px",color:"#dc2626",fontSize:12,marginBottom:14,textAlign:"left"}}>⚠️ {camError}</div>}
+          <button onClick={startCamera} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:14,padding:"13px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{t.startCamera}</button>
+        </div>
+      )}
+      {phase==="live"&&(
+        <div>
+          <div style={{position:"relative",borderRadius:14,overflow:"hidden",background:"#000",lineHeight:0}}>
+            <video ref={videoRef} autoPlay playsInline muted style={{width:"100%",display:"block",borderRadius:14,maxHeight:320,objectFit:"cover"}}/>
+            <div style={{position:"absolute",inset:0,pointerEvents:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{width:60,height:60,borderRadius:"50%",border:"2px solid rgba(255,255,255,0.9)",position:"absolute"}}/>
+              <div style={{width:6,height:6,borderRadius:"50%",background:"white",position:"absolute"}}/>
+              <div style={{position:"absolute",width:40,height:1,background:"rgba(255,255,255,0.8)"}}/>
+              <div style={{position:"absolute",width:1,height:40,background:"rgba(255,255,255,0.8)"}}/>
+            </div>
+            <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.55)",color:"white",borderRadius:8,padding:"3px 12px",fontSize:11,whiteSpace:"nowrap"}}>🎯 Center pixel will be captured</div>
+          </div>
+          <div style={{display:"flex",gap:10,marginTop:12,justifyContent:"center"}}>
+            <button onClick={captureColor} onTouchEnd={e=>{e.preventDefault();captureColor();}} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:14,padding:"13px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{t.capture}</button>
+            <button onClick={retake} style={{background:"#f3f4f6",color:"#666",border:"none",borderRadius:14,padding:"13px 16px",cursor:"pointer"}}>✕</button>
+          </div>
+        </div>
+      )}
+      {phase==="captured"&&frozenSrc&&capturedColor&&(
+        <div>
+          <p style={{color:"#666",fontSize:13,margin:"0 0 10px"}}>✅ Color captured!</p>
+          <div style={{position:"relative",borderRadius:14,overflow:"hidden",lineHeight:0,marginBottom:12}}>
+            <img src={frozenSrc} alt="captured" style={{width:"100%",display:"block",borderRadius:14,maxHeight:320,objectFit:"cover"}}/>
+            <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:24,height:24,borderRadius:"50%",background:capturedColor.hex,border:"3px solid white",boxShadow:"0 0 0 2px rgba(0,0,0,0.5)",pointerEvents:"none"}}/>
+          </div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:10,background:"#f9f9f9",borderRadius:12,padding:"8px 14px",marginBottom:14}}>
+            <div style={{width:28,height:28,borderRadius:"50%",background:capturedColor.hex,flexShrink:0}}/>
+            <span style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:"#111"}}>{capturedColor.hex}</span>
+          </div>
+          <div><button onClick={retake} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:10,padding:"8px 20px",cursor:"pointer",fontSize:13,color:"#666",fontWeight:600}}>🔄 Retake</button></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PickerTab({color, onWheel, onHexType, t}) {
+  return (
+    <div style={{textAlign:"center"}}>
+      <p style={{color:"#666",fontSize:13,margin:"0 0 12px"}}>{t.pickerPrompt}</p>
+      <input type="color" value={color?.hex||"#FF6B9D"} onChange={onWheel}
+        style={{width:120,height:120,borderRadius:"50%",border:"none",cursor:"pointer",background:"none",padding:0}}/>
+      <div style={{marginTop:16}}>
+        <label style={{fontSize:12,color:"#888",fontWeight:600}}>{t.hexLabel}</label>
+        <input type="text" value={color?.hex||""} onChange={onHexType} placeholder="#FF6B9D"
+          style={{display:"block",margin:"8px auto 0",width:140,padding:"10px 14px",borderRadius:12,border:"2px solid #e5e7eb",textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700}}/>
+      </div>
+    </div>
+  );
+}
+
+export default function ColorScanner() {
+  const [lang, setLang] = useState('en');
+  const t = T[lang] || T.en;
+  // Default to picker tab with a default pink so button is always ready
+  const [tab, setTab] = useState("picker");
+  const DEFAULT_COLOR = {hex:"#FF6B9D",r:255,g:107,b:157};
+  const [color, setColor] = useState(DEFAULT_COLOR);
+  const [skinTone, setSkinTone] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [country, setCountry] = useState("");
+  const [category, setCategory] = useState("lipstick"); // default to lipstick
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => { trackPageView('ColorScanner'); }, []);
+
+  function switchTab(id) {
+    setTab(id);
+    if (id === "picker") setColor(DEFAULT_COLOR);
+    else if (id !== "camera") setColor(null);
+  }
+
+  function onWheel(e) { const rgb=fromHex(e.target.value); if(rgb)setColor({hex:e.target.value.toUpperCase(),...rgb}); }
+  function onHexType(e) { const val=e.target.value; if(/^#[0-9A-Fa-f]{6}$/.test(val)){const rgb=fromHex(val);if(rgb)setColor({hex:val.toUpperCase(),...rgb});}else setColor(prev=>({...(prev||{r:0,g:0,b:0}),hex:val})); }
+
+  async function handleFindMatch() {
+    if(!color||!color.hex||!/^#[0-9A-Fa-f]{6}$/.test(color.hex)||loading) return;
+    setLoading(true); setError(''); setStep(t.scanning);
+    try {
+      await trackScan({ hex: color.hex, r: color.r, g: color.g, b: color.b, skinTone, occasion, country, lang });
+      const matches = findColorMatches(color.r, color.g, color.b, country, category || null);
+      setStep(t.gettingAdvice);
+
+      const categoryNote = category ? ` Focus on ${category.replace('_',' ')} products.` : '';
+      const prompt = `You are a makeup expert named Maya. The user scanned color ${color.hex} (R:${color.r} G:${color.g} B:${color.b}). Skin tone: ${skinTone||'any'}. Occasion: ${occasion||'everyday'}. Country: ${country||'global'}.${categoryNote} Give 3 sentences of warm, personalized beauty advice.`;
+
+      const adviceRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true', 'content-type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 300, messages: [{ role: 'user', content: prompt }] })
+      });
+      const adviceData = await adviceRes.json();
+      const claudeAdvice = adviceData.content[0].text;
+
+      try {
+        const lib = JSON.parse(localStorage.getItem('mmm_library') || '{"scans":[],"images":{}}');
+        lib.scans = lib.scans || [];
+        lib.scans.push({ color, skinTone, occasion, country, category, advice: claudeAdvice, date: new Date().toISOString() });
+        if (lib.scans.length > 50) lib.scans = lib.scans.slice(-50);
+        localStorage.setItem('mmm_library', JSON.stringify(lib));
+      } catch(e) {}
+
+      sessionStorage.setItem('matchResults', JSON.stringify({
+        scannedHex: color.hex, scannedRed: color.r, scannedGreen: color.g, scannedBlue: color.b,
+        matchedProducts: matches, claudeAdvice, skinTone, occasion, country, category, lang,
+        personaName: 'Maya', personaEmoji: '💄'
+      }));
+      window.location.href = '/MatchResults';
+    } catch(err) {
+      setError(err?.message||'Something went wrong. Please try again.');
+      setLoading(false); setStep('');
+    }
+  }
+
+  const isReady = !!(color?.hex && /^#[0-9A-Fa-f]{6}$/.test(color.hex));
+
+  const pillBtn = (id, label) => (
+    <button key={id} onClick={()=>switchTab(id)} style={{flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,background:tab===id?"linear-gradient(135deg,#9d174d,#7c3aed)":"transparent",color:tab===id?"white":"#666"}}>
+      {label}
+    </button>
+  );
+
+  return (
+    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
+      <div style={{textAlign:"center",padding:"16px 16px 4px",position:"relative"}}>
+        <div style={{fontSize:28}}>💄</div>
+        <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup</h1>
+        <p style={{margin:"0 0 4px",fontSize:12,color:"#9d174d",opacity:0.8}}>{t.appTagline}</p>
+        <button onClick={()=>window.location.href='/Library'} style={{position:"absolute",top:16,right:16,background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:20,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>
+          {t.library}
+        </button>
       </div>
 
-      <div style={{ maxWidth: 560, margin: '0 auto', padding: '20px 16px 60px' }}>
+      <div style={{maxWidth:480,margin:"0 auto",padding:"0 16px 48px"}}>
         {/* Tab bar */}
-        <div style={{ display: 'flex', background: 'white', borderRadius: 16, padding: 4, marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-          {[['scans', '🎨 Scan History'], ['images', '📷 My Photos']].map(([id, label]) => (
-            <button key={id} onClick={() => setActiveTab(id)} style={{ flex: 1, padding: '10px 4px', border: 'none', borderRadius: 12, cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeTab === id ? 'linear-gradient(135deg,#9d174d,#7c3aed)' : 'transparent', color: activeTab === id ? 'white' : '#666' }}>
-              {label}
-            </button>
-          ))}
+        <div style={{display:"flex",background:"white",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)"}}>
+          {pillBtn("upload", t.upload)}
+          {pillBtn("camera", t.camera)}
+          {pillBtn("picker", t.pickColor)}
         </div>
 
-        {/* Scan History */}
-        {activeTab === 'scans' && (
-          <div>
-            {scans.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '48px 0', color: '#aaa' }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>🎨</div>
-                <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>No scans yet</p>
-                <p style={{ fontSize: 13 }}>Your scan history will appear here automatically</p>
-                <button onClick={() => window.location.href = '/ColorScanner'} style={{ marginTop: 20, background: 'linear-gradient(135deg,#9d174d,#7c3aed)', color: 'white', border: 'none', borderRadius: 14, padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                  Start Scanning
+        {/* Tab content */}
+        <div style={{background:"white",borderRadius:20,padding:18,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14}}>
+          {tab==="upload"&&<UploadTab onColorPicked={setColor} t={t}/>}
+          {tab==="camera"&&<CameraTab onColorPicked={setColor} t={t}/>}
+          {tab==="picker"&&<PickerTab color={color} onWheel={onWheel} onHexType={onHexType} t={t}/>}
+        </div>
+
+        {/* Color preview */}
+        {color?.hex&&/^#[0-9A-Fa-f]{6}$/.test(color.hex)&&(
+          <div style={{background:"white",borderRadius:20,padding:16,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14,display:"flex",alignItems:"center",gap:16}}>
+            <div style={{width:56,height:56,borderRadius:"50%",flexShrink:0,background:color.hex,boxShadow:`0 4px 18px ${color.hex}80`}}/>
+            <div>
+              <div style={{fontFamily:"monospace",fontSize:22,fontWeight:800,color:"#111"}}>{color.hex}</div>
+              <div style={{fontSize:13,color:"#888",marginTop:3}}>R <b style={{color:"#ef4444"}}>{color.r}</b> &nbsp; G <b style={{color:"#22c55e"}}>{color.g}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{color.b}</b></div>
+            </div>
+          </div>
+        )}
+
+        {/* Personalization */}
+        <div style={{background:"white",borderRadius:20,padding:18,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:"#374151",marginBottom:12}}>{t.personalize}</div>
+
+          {/* CATEGORY — most prominent, at the top */}
+          <div style={{marginBottom:16}}>
+            <label style={{display:"block",fontSize:11,color:"#888",fontWeight:700,marginBottom:8,letterSpacing:1}}>{t.categoryLabel}</label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+              {CATEGORIES.map(cat => (
+                <button key={cat.id} onClick={()=>setCategory(cat.id==='all'?'':cat.id)}
+                  style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:(category===cat.id||(cat.id==='all'&&!category))?"2px solid #9d174d":"2px solid #e5e7eb",background:(category===cat.id||(cat.id==='all'&&!category))?"linear-gradient(135deg,#fdf2f8,#f3e8ff)":"white",color:(category===cat.id||(cat.id==='all'&&!category))?"#9d174d":"#555",fontSize:12,fontWeight:(category===cat.id||(cat.id==='all'&&!category))?700:500,transition:"all 0.15s"}}>
+                  {cat.emoji} {cat.label}
                 </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {scans.slice().reverse().map((scan, i) => (
-                  <div key={i} style={{ background: 'white', borderRadius: 20, padding: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.07)', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                    <div style={{ width: 52, height: 52, borderRadius: '50%', background: scan.color?.hex, flexShrink: 0, boxShadow: `0 4px 12px ${scan.color?.hex}60` }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: 16, color: '#111' }}>{scan.color?.hex}</div>
-                      <div style={{ fontSize: 12, color: '#888', marginTop: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                        {scan.skinTone && <span style={{ background: '#fdf2f8', color: '#9d174d', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.skinTone}</span>}
-                        {scan.occasion && <span style={{ background: '#f3e8ff', color: '#7c3aed', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.occasion}</span>}
-                        {scan.country && <span style={{ background: '#ecfdf5', color: '#065f46', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.country}</span>}
-                        {scan.category && <span style={{ background: '#fff7ed', color: '#c2410c', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.category}</span>}
-                      </div>
-                      {scan.advice && <p style={{ fontSize: 12, color: '#666', marginTop: 6, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{scan.advice}</p>}
-                      <div style={{ fontSize: 11, color: '#bbb', marginTop: 4 }}>{new Date(scan.date).toLocaleDateString()}</div>
-                    </div>
-                    <button onClick={() => removeScan(scans.length - 1 - i)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#ddd', padding: 4, flexShrink: 0 }}>✕</button>
-                  </div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
           </div>
-        )}
 
-        {/* My Photos */}
-        {activeTab === 'images' && (
+          {/* Skin tone + Occasion */}
+          <div style={{display:"flex",gap:10,marginBottom:14}}>
+            <div style={{flex:1}}>
+              <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:4}}>{t.skinToneLabel}</label>
+              <select value={skinTone} onChange={e=>setSkinTone(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:12,background:"white"}}>
+                <option value="">{t.skinTones.any}</option>
+                <option value="Fair">{t.skinTones.fair}</option>
+                <option value="Light">{t.skinTones.light}</option>
+                <option value="Medium">{t.skinTones.medium}</option>
+                <option value="Tan">{t.skinTones.tan}</option>
+                <option value="Deep">{t.skinTones.deep}</option>
+              </select>
+            </div>
+            <div style={{flex:1}}>
+              <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:4}}>{t.occasionLabel}</label>
+              <select value={occasion} onChange={e=>setOccasion(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:12,background:"white"}}>
+                <option value="">{t.occasions.any}</option>
+                <option value="Daily">{t.occasions.daily}</option>
+                <option value="Office">{t.occasions.office}</option>
+                <option value="Evening">{t.occasions.evening}</option>
+                <option value="Wedding">{t.occasions.wedding}</option>
+                <option value="Festival">{t.occasions.festival}</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Language */}
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>LANGUAGE</label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {[["en","🇺🇸 EN"],["hi","🇮🇳 HI"],["pt","🇧🇷 PT"],["zh","🇨🇳 ZH"],["id","🇮🇩 ID"],["ng","🇳🇬 NG"]].map(([id,label])=>(
+                <button key={id} onClick={()=>setLang(id)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:lang===id?"2px solid #7c3aed":"2px solid #e5e7eb",background:lang===id?"#f5f3ff":"white",color:lang===id?"#7c3aed":"#555",fontSize:12,fontWeight:lang===id?700:500}}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Country */}
           <div>
-            <div style={{ background: 'linear-gradient(135deg,#fdf2f8,#f3e8ff)', border: '1px solid #f9a8d4', borderRadius: 16, padding: 16, marginBottom: 20, fontSize: 13, color: '#9d174d', lineHeight: 1.6 }}>
-              <strong>📸 Why photo quality matters:</strong> Accurate reference photos give you more precise color matches and better virtual try-on results. Follow the guidelines for each photo type below.
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {IMAGE_SLOTS.map(slot => {
-                const saved = images[slot.id];
-                const isExpanded = expandedSlot === slot.id;
-
-                return (
-                  <div key={slot.id} style={{ background: 'white', borderRadius: 20, padding: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.07)' }}>
-                    {/* Slot header */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: saved ? 'linear-gradient(135deg,#9d174d,#7c3aed)' : '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
-                        {saved ? '✅' : slot.emoji}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, color: '#111', fontSize: 15 }}>{slot.label}</div>
-                        <div style={{ fontSize: 12, color: '#aaa' }}>{slot.hint}</div>
-                      </div>
-                      {saved && (
-                        <button onClick={() => removeImage(slot.id)} style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: 10, padding: '4px 10px', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>Remove</button>
-                      )}
-                    </div>
-
-                    {/* Saved image */}
-                    {saved ? (
-                      <div>
-                        <img src={saved.dataUrl} alt={slot.label} style={{ width: '100%', borderRadius: 14, maxHeight: 220, objectFit: 'cover' }} />
-                        <div style={{ fontSize: 11, color: '#aaa', marginTop: 6, textAlign: 'center' }}>
-                          ✅ Saved {new Date(saved.date).toLocaleDateString()} · Stored on device only
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        {/* Requirements toggle */}
-                        <button onClick={() => setExpandedSlot(isExpanded ? null : slot.id)}
-                          style={{ width: '100%', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '10px 14px', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#555', textAlign: 'left', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span>📋 Photo requirements</span>
-                          <span>{isExpanded ? '▲' : '▼'}</span>
-                        </button>
-
-                        {isExpanded && (
-                          <div style={{ background: '#f9fafb', borderRadius: 12, padding: 14, marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, color: '#9d174d', fontWeight: 700, marginBottom: 8 }}>For accurate results:</div>
-                            {slot.requirements.map((req, i) => (
-                              <div key={i} style={{ fontSize: 12, color: req.startsWith('❌') ? '#dc2626' : '#374151', lineHeight: 1.8 }}>{req}</div>
-                            ))}
-                            <div style={{ marginTop: 10, fontSize: 12, color: '#7c3aed', fontWeight: 600, background: '#f3e8ff', borderRadius: 8, padding: '6px 10px' }}>
-                              💡 {slot.example}
-                            </div>
-                          </div>
-                        )}
-
-                        <div onClick={() => fileRefs[slot.id].current?.click()}
-                          style={{ border: '2px dashed #C2185B', borderRadius: 14, padding: '20px 16px', textAlign: 'center', cursor: 'pointer', background: '#fdf2f8' }}>
-                          <div style={{ fontSize: 28, marginBottom: 6 }}>📷</div>
-                          <div style={{ fontSize: 13, color: '#9d174d', fontWeight: 700 }}>Upload {slot.label}</div>
-                          <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>JPG · PNG · WEBP</div>
-                        </div>
-                      </div>
-                    )}
-                    <input ref={fileRefs[slot.id]} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(slot.id, e)} />
-                  </div>
-                );
-              })}
-            </div>
-
-            <div style={{ marginTop: 20, background: 'white', border: '1px solid #e5e7eb', borderRadius: 16, padding: 16, fontSize: 12, color: '#666', lineHeight: 1.8 }}>
-              <strong style={{ color: '#111' }}>🔒 Privacy:</strong> Your photos are stored only on your device and never uploaded to our servers. See our <a href="/Terms" style={{ color: '#7c3aed' }}>Terms & Conditions</a> for full details.
+            <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>{t.shopInLabel}</label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {[["","🌍 All"],["USA","🇺🇸 USA"],["India","🇮🇳 India"],["Brazil","🇧🇷 Brazil"],["Indonesia","🇮🇩 Indonesia"],["Nigeria","🇳🇬 Nigeria"],["China","🇨🇳 China"]].map(([val,label])=>(
+                <button key={val} onClick={()=>setCountry(val)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:country===val?"2px solid #7c3aed":"2px solid #e5e7eb",background:country===val?"#f5f3ff":"white",color:country===val?"#7c3aed":"#555",fontSize:12,fontWeight:country===val?700:500}}>
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
-        )}
+        </div>
+
+        {error&&<div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:12,padding:"12px 16px",color:"#dc2626",fontSize:13,marginBottom:12}}>⚠️ {error}</div>}
+
+        <button onClick={handleFindMatch} disabled={!isReady||loading}
+          style={{width:"100%",padding:"17px",fontSize:16,fontWeight:800,border:"none",borderRadius:16,cursor:!isReady||loading?"not-allowed":"pointer",background:!isReady||loading?"#e5e7eb":"linear-gradient(135deg,#9d174d,#7c3aed)",color:!isReady||loading?"#aaa":"white",boxShadow:isReady&&!loading?"0 6px 24px rgba(124,58,237,0.35)":"none",transition:"all 0.2s"}}>
+          {loading?t.finding:isReady?t.findMatch:t.pickFirst}
+        </button>
+
+        {loading&&step&&<div style={{textAlign:"center",marginTop:10,color:"#7c3aed",fontSize:13,fontWeight:600}}>{step}</div>}
+
+        <p style={{textAlign:"center",fontSize:11,color:"#bbb",marginTop:16}}>
+          By using this app you agree to our <a href="/Terms" style={{color:"#9d174d"}}>Terms & Conditions</a> including anonymous data collection for market research.
+        </p>
       </div>
     </div>
   );
