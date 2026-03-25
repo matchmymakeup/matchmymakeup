@@ -1,12 +1,58 @@
 import { useState, useEffect, useRef } from "react";
 
 const LIBRARY_KEY = 'mmm_library';
-const MAX_IMAGES = 3;
 
 const IMAGE_SLOTS = [
-  { id: 'face', label: 'Face', emoji: '🙂', hint: 'For lip & blush try-on' },
-  { id: 'lips', label: 'Lips', emoji: '💋', hint: 'For lipstick close-ups' },
-  { id: 'hands', label: 'Hands', emoji: '💅', hint: 'For nail polish try-on' },
+  {
+    id: 'face',
+    label: 'Face Photo',
+    emoji: '🙂',
+    hint: 'For lip color & blush try-on',
+    requirements: [
+      '✅ Face centered in frame',
+      '✅ Well lit — natural or bright indoor light',
+      '✅ No glasses or sunglasses',
+      '✅ Hair away from face',
+      '✅ Neutral expression, mouth closed',
+      '✅ Look directly at the camera',
+      '❌ No filters or heavy editing',
+      '❌ No hats or face coverings',
+    ],
+    example: '🧍 Passport-style photo works perfectly'
+  },
+  {
+    id: 'lips',
+    label: 'Lips Close-Up',
+    emoji: '💋',
+    hint: 'For precise lipstick matching',
+    requirements: [
+      '✅ Fill the frame with just your lips',
+      '✅ Well lit — no shadows across mouth',
+      '✅ Lips bare (no lipstick or gloss)',
+      '✅ Mouth slightly open or closed — both work',
+      '✅ Sharp focus, not blurry',
+      '❌ No filters or color adjustments',
+      '❌ No heavy lip liner that changes shape',
+    ],
+    example: '📏 Hold phone 20cm from your lips'
+  },
+  {
+    id: 'hands',
+    label: 'Hand Photo',
+    emoji: '💅',
+    hint: 'For nail polish color matching',
+    requirements: [
+      '✅ Single hand, palm facing down',
+      '✅ All five fingers visible and spread slightly',
+      '✅ Well lit — no shadows across nails',
+      '✅ Nails bare (no existing polish)',
+      '✅ Clean, dry hands',
+      '✅ Flat surface — rest hand on white paper for best results',
+      '❌ No rings or jewellery on fingers',
+      '❌ No filters or color adjustments',
+    ],
+    example: '📄 Rest hand on white paper in natural light'
+  },
 ];
 
 function getLibrary() {
@@ -21,6 +67,7 @@ function saveLibrary(lib) {
 export default function LibraryPage() {
   const [library, setLibrary] = useState(getLibrary());
   const [activeTab, setActiveTab] = useState('scans');
+  const [expandedSlot, setExpandedSlot] = useState(null);
   const fileRefs = { face: useRef(), lips: useRef(), hands: useRef() };
 
   useEffect(() => { setLibrary(getLibrary()); }, []);
@@ -35,6 +82,7 @@ export default function LibraryPage() {
       lib.images[slotId] = { dataUrl: ev.target.result, name: file.name, date: new Date().toISOString() };
       saveLibrary(lib);
       setLibrary({ ...lib });
+      setExpandedSlot(null);
     };
     reader.readAsDataURL(file);
   }
@@ -61,13 +109,12 @@ export default function LibraryPage() {
       {/* Header */}
       <div style={{ background: 'white', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
         <div style={{ maxWidth: 560, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button onClick={() => window.location.href = '/ColorScanner'} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 10, padding: '8px 14px', cursor: 'pointer', fontSize: 13, color: '#666', fontWeight: 600 }}>
-            ← Scanner
-          </button>
+          <button onClick={() => window.location.href = '/ColorScanner'} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 10, padding: '8px 14px', cursor: 'pointer', fontSize: 13, color: '#666', fontWeight: 600 }}>← Scanner</button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 20 }}>💄</span>
             <span style={{ fontWeight: 800, fontSize: 16, background: 'linear-gradient(135deg,#9d174d,#7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>My Library</span>
           </div>
+          <div style={{ width: 70 }} />
         </div>
       </div>
 
@@ -81,14 +128,14 @@ export default function LibraryPage() {
           ))}
         </div>
 
-        {/* Scan History Tab */}
+        {/* Scan History */}
         {activeTab === 'scans' && (
           <div>
             {scans.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '48px 0', color: '#aaa' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🎨</div>
                 <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>No scans yet</p>
-                <p style={{ fontSize: 13 }}>Your scan history will appear here</p>
+                <p style={{ fontSize: 13 }}>Your scan history will appear here automatically</p>
                 <button onClick={() => window.location.href = '/ColorScanner'} style={{ marginTop: 20, background: 'linear-gradient(135deg,#9d174d,#7c3aed)', color: 'white', border: 'none', borderRadius: 14, padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                   Start Scanning
                 </button>
@@ -100,10 +147,11 @@ export default function LibraryPage() {
                     <div style={{ width: 52, height: 52, borderRadius: '50%', background: scan.color?.hex, flexShrink: 0, boxShadow: `0 4px 12px ${scan.color?.hex}60` }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: 16, color: '#111' }}>{scan.color?.hex}</div>
-                      <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
-                        {scan.skinTone && <span style={{ background: '#fdf2f8', color: '#9d174d', borderRadius: 20, padding: '2px 8px', fontSize: 11, marginRight: 4 }}>{scan.skinTone}</span>}
-                        {scan.occasion && <span style={{ background: '#f3e8ff', color: '#7c3aed', borderRadius: 20, padding: '2px 8px', fontSize: 11, marginRight: 4 }}>{scan.occasion}</span>}
+                      <div style={{ fontSize: 12, color: '#888', marginTop: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {scan.skinTone && <span style={{ background: '#fdf2f8', color: '#9d174d', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.skinTone}</span>}
+                        {scan.occasion && <span style={{ background: '#f3e8ff', color: '#7c3aed', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.occasion}</span>}
                         {scan.country && <span style={{ background: '#ecfdf5', color: '#065f46', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.country}</span>}
+                        {scan.category && <span style={{ background: '#fff7ed', color: '#c2410c', borderRadius: 20, padding: '2px 8px', fontSize: 11 }}>{scan.category}</span>}
                       </div>
                       {scan.advice && <p style={{ fontSize: 12, color: '#666', marginTop: 6, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{scan.advice}</p>}
                       <div style={{ fontSize: 11, color: '#bbb', marginTop: 4 }}>{new Date(scan.date).toLocaleDateString()}</div>
@@ -116,36 +164,69 @@ export default function LibraryPage() {
           </div>
         )}
 
-        {/* My Photos Tab */}
+        {/* My Photos */}
         {activeTab === 'images' && (
           <div>
-            <p style={{ fontSize: 13, color: '#888', marginBottom: 16, textAlign: 'center' }}>
-              Save up to 3 reference photos for virtual try-on
-            </p>
+            <div style={{ background: 'linear-gradient(135deg,#fdf2f8,#f3e8ff)', border: '1px solid #f9a8d4', borderRadius: 16, padding: 16, marginBottom: 20, fontSize: 13, color: '#9d174d', lineHeight: 1.6 }}>
+              <strong>📸 Why photo quality matters:</strong> Accurate reference photos give you more precise color matches and better virtual try-on results. Follow the guidelines for each photo type below.
+            </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {IMAGE_SLOTS.map(slot => {
                 const saved = images[slot.id];
+                const isExpanded = expandedSlot === slot.id;
+
                 return (
                   <div key={slot.id} style={{ background: 'white', borderRadius: 20, padding: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.07)' }}>
+                    {/* Slot header */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                      <span style={{ fontSize: 24 }}>{slot.emoji}</span>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#111' }}>{slot.label} Photo</div>
+                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: saved ? 'linear-gradient(135deg,#9d174d,#7c3aed)' : '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                        {saved ? '✅' : slot.emoji}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, color: '#111', fontSize: 15 }}>{slot.label}</div>
                         <div style={{ fontSize: 12, color: '#aaa' }}>{slot.hint}</div>
                       </div>
+                      {saved && (
+                        <button onClick={() => removeImage(slot.id)} style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: 10, padding: '4px 10px', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>Remove</button>
+                      )}
                     </div>
 
+                    {/* Saved image */}
                     {saved ? (
-                      <div style={{ position: 'relative' }}>
-                        <img src={saved.dataUrl} alt={slot.label} style={{ width: '100%', borderRadius: 14, maxHeight: 200, objectFit: 'cover' }} />
-                        <button onClick={() => removeImage(slot.id)} style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                        <div style={{ fontSize: 11, color: '#aaa', marginTop: 6, textAlign: 'center' }}>Saved {new Date(saved.date).toLocaleDateString()}</div>
+                      <div>
+                        <img src={saved.dataUrl} alt={slot.label} style={{ width: '100%', borderRadius: 14, maxHeight: 220, objectFit: 'cover' }} />
+                        <div style={{ fontSize: 11, color: '#aaa', marginTop: 6, textAlign: 'center' }}>
+                          ✅ Saved {new Date(saved.date).toLocaleDateString()} · Stored on device only
+                        </div>
                       </div>
                     ) : (
-                      <div onClick={() => fileRefs[slot.id].current?.click()} style={{ border: '2px dashed #e5e7eb', borderRadius: 14, padding: '24px 16px', textAlign: 'center', cursor: 'pointer', background: '#fafafa' }}>
-                        <div style={{ fontSize: 32, marginBottom: 8 }}>📷</div>
-                        <div style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>Tap to upload {slot.label.toLowerCase()} photo</div>
-                        <div style={{ fontSize: 11, color: '#bbb', marginTop: 4 }}>JPG · PNG · WEBP</div>
+                      <div>
+                        {/* Requirements toggle */}
+                        <button onClick={() => setExpandedSlot(isExpanded ? null : slot.id)}
+                          style={{ width: '100%', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '10px 14px', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#555', textAlign: 'left', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>📋 Photo requirements</span>
+                          <span>{isExpanded ? '▲' : '▼'}</span>
+                        </button>
+
+                        {isExpanded && (
+                          <div style={{ background: '#f9fafb', borderRadius: 12, padding: 14, marginBottom: 12 }}>
+                            <div style={{ fontSize: 12, color: '#9d174d', fontWeight: 700, marginBottom: 8 }}>For accurate results:</div>
+                            {slot.requirements.map((req, i) => (
+                              <div key={i} style={{ fontSize: 12, color: req.startsWith('❌') ? '#dc2626' : '#374151', lineHeight: 1.8 }}>{req}</div>
+                            ))}
+                            <div style={{ marginTop: 10, fontSize: 12, color: '#7c3aed', fontWeight: 600, background: '#f3e8ff', borderRadius: 8, padding: '6px 10px' }}>
+                              💡 {slot.example}
+                            </div>
+                          </div>
+                        )}
+
+                        <div onClick={() => fileRefs[slot.id].current?.click()}
+                          style={{ border: '2px dashed #C2185B', borderRadius: 14, padding: '20px 16px', textAlign: 'center', cursor: 'pointer', background: '#fdf2f8' }}>
+                          <div style={{ fontSize: 28, marginBottom: 6 }}>📷</div>
+                          <div style={{ fontSize: 13, color: '#9d174d', fontWeight: 700 }}>Upload {slot.label}</div>
+                          <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>JPG · PNG · WEBP</div>
+                        </div>
                       </div>
                     )}
                     <input ref={fileRefs[slot.id]} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(slot.id, e)} />
@@ -154,8 +235,8 @@ export default function LibraryPage() {
               })}
             </div>
 
-            <div style={{ marginTop: 20, background: 'linear-gradient(135deg,#fdf2f8,#f3e8ff)', border: '1px solid #f9a8d4', borderRadius: 16, padding: 16, fontSize: 12, color: '#9d174d', lineHeight: 1.6 }}>
-              🔒 Your photos are stored privately on your device only and never uploaded to our servers. See our <a href="/terms" style={{ color: '#7c3aed' }}>Terms & Conditions</a> for our full data policy.
+            <div style={{ marginTop: 20, background: 'white', border: '1px solid #e5e7eb', borderRadius: 16, padding: 16, fontSize: 12, color: '#666', lineHeight: 1.8 }}>
+              <strong style={{ color: '#111' }}>🔒 Privacy:</strong> Your photos are stored only on your device and never uploaded to our servers. See our <a href="/Terms" style={{ color: '#7c3aed' }}>Terms & Conditions</a> for full details.
             </div>
           </div>
         )}
