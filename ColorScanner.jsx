@@ -1,3 +1,4 @@
+import UploadTab from "../components/UploadTab.jsx";
 import { useState, useRef, useEffect } from "react";
 import { findColorMatches, CATEGORIES } from "../products.js";
 import { trackScan, trackPageView } from "../analytics.js";
@@ -15,83 +16,6 @@ const T = {
   id: { appTagline:"Pindai warna. Temukan shade sempurnamu.", upload:"📷 Unggah", camera:"📸 Kamera", pickColor:"🎨 Pilih Warna", uploadTapPrompt:"Ketuk titik mana saja pada gambar untuk mengambil warnanya", choosePhoto:"Pilih Foto", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Ganti gambar", cameraPrompt:"Arahkan ke warna dan ambil gambar", startCamera:"Mulai Kamera", capture:"📍 Ambil", pickerPrompt:"Gunakan roda warna atau ketik kode hex", hexLabel:"Hex", personalize:"✨ Personalisasi", skinToneLabel:"WARNA KULIT", occasionLabel:"KESEMPATAN", categoryLabel:"KATEGORI", shopInLabel:"BELANJA DI", allCountries:"🌍 Semua", skinTones:{any:"Semua",fair:"🤍 Cerah",light:"🍑 Terang",medium:"🌼 Sedang",tan:"🌻 Sawo Matang",deep:"🌑 Gelap"}, occasions:{any:"Semua",daily:"☀️ Harian",office:"💼 Kantor",evening:"🌙 Malam",wedding:"💍 Pernikahan",festival:"🎉 Festival"}, findMatch:"💄 Temukan Kecocokan Saya", finding:"✨ Mencari...", pickFirst:"👆 Pilih warna dulu", scanning:"🔍 Memindai produk...", gettingAdvice:"✨ Mendapatkan saran...", cameraError:"Kamera tidak tersedia.", library:"📚 Perpustakaan Saya" },
   ng: { appTagline:"Scan your colour. Find your perfect shade!", upload:"📷 Upload", camera:"📸 Camera", pickColor:"🎨 Pick Colour", uploadTapPrompt:"Tap anywhere on the photo to grab that colour", choosePhoto:"Choose Photo", uploadFormats:"JPG · PNG · WEBP", changeImage:"↩ Change photo", cameraPrompt:"Point your camera at the colour and capture am", startCamera:"Start Camera", capture:"📍 Capture", pickerPrompt:"Use the colour wheel or type the hex code", hexLabel:"Hex", personalize:"✨ Personalise", skinToneLabel:"SKIN TONE", occasionLabel:"OCCASION", categoryLabel:"CATEGORY", shopInLabel:"SHOP IN", allCountries:"🌍 All", skinTones:{any:"Any",fair:"🤍 Fair",light:"🍑 Light",medium:"🌼 Medium",tan:"🌻 Tan",deep:"🌑 Deep"}, occasions:{any:"Any",daily:"☀️ Daily",office:"💼 Office",evening:"🌙 Evening",wedding:"💍 Wedding",festival:"🎉 Festival"}, findMatch:"💄 Find My Match", finding:"✨ Finding your match...", pickFirst:"👆 Pick a colour first", scanning:"🔍 Scanning products...", gettingAdvice:"✨ Getting beauty advice...", cameraError:"Camera no dey available.", library:"📚 My Library" },
 };
-
-// ── Upload Tab ────────────────────────────────────────────────────────────────
-function UploadTab({onColorPicked, t}) {
-  const canvasRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const [uploadedImage, setUploadedImage] = useState(false);
-  const [pin, setPin] = useState(null);
-
-  function handleFileChange(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      const img = new Image();
-      img.onload = function() {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const maxW = canvas.parentElement ? (canvas.parentElement.offsetWidth || 340) : 340;
-        const scale = Math.min(maxW / img.width, 320 / img.height, 1);
-        canvas.width = Math.max(1, Math.round(img.width * scale));
-        canvas.height = Math.max(1, Math.round(img.height * scale));
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        setUploadedImage(true); setPin(null); onColorPicked(null);
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function handleCanvasClick(e) {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) * canvas.width / rect.width);
-    const y = Math.floor((e.clientY - rect.top) * canvas.height / rect.height);
-    const pixel = canvas.getContext('2d').getImageData(Math.max(0,Math.min(canvas.width-1,x)), Math.max(0,Math.min(canvas.height-1,y)), 1, 1).data;
-    const hex = toHex(pixel[0], pixel[1], pixel[2]);
-    setPin({ cx: e.clientX - rect.left, cy: e.clientY - rect.top });
-    onColorPicked({ r: pixel[0], g: pixel[1], b: pixel[2], hex });
-  }
-
-  function handleCanvasTouch(e) {
-    e.preventDefault();
-    const touch = e.changedTouches && e.changedTouches[0];
-    if (touch) handleCanvasClick({ clientX: touch.clientX, clientY: touch.clientY });
-  }
-
-  function reset() {
-    setUploadedImage(false); setPin(null); onColorPicked(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    const canvas = canvasRef.current;
-    if (canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
-  }
-
-  return (
-    <div>
-      <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{display:'none'}} onChange={handleFileChange} />
-      {!uploadedImage && (
-        <div onClick={()=>fileInputRef.current?.click()} onTouchEnd={e=>{e.preventDefault();fileInputRef.current?.click();}}
-          style={{border:'2px dashed #C2185B',borderRadius:14,padding:'36px 20px',textAlign:'center',cursor:'pointer',background:'#fdf2f8'}}>
-          <div style={{fontSize:40}}>🖼️</div>
-          <div style={{color:'#9d174d',fontWeight:700,marginTop:8,fontSize:14}}>{t.choosePhoto}</div>
-          <div style={{color:'#aaa',fontSize:12,marginTop:4}}>{t.uploadFormats}</div>
-        </div>
-      )}
-      <div style={{display:uploadedImage?'block':'none',position:'relative'}}>
-        <canvas ref={canvasRef} onClick={handleCanvasClick} onTouchEnd={handleCanvasTouch}
-          style={{width:'100%',borderRadius:12,cursor:'crosshair',touchAction:'none',display:'block'}} />
-        {pin && <div style={{position:'absolute',left:pin.cx-11,top:pin.cy-11,width:22,height:22,borderRadius:'50%',border:'3px solid white',boxShadow:'0 0 0 2px rgba(0,0,0,0.7)',pointerEvents:'none'}} />}
-        <p style={{textAlign:'center',fontSize:13,color:'#999',marginTop:8}}>{t.uploadTapPrompt}</p>
-        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:'1px solid #ddd',borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:'#666'}}>{t.changeImage}</button>
-      </div>
-    </div>
-  );
-}
 
 // ── Camera Tab ────────────────────────────────────────────────────────────────
 function CameraTab({onColorPicked, t}) {
