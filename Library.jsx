@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 const LIBRARY_KEY = 'mmm_library';
 
 const IMAGE_SLOTS = [
-  { id: 'face', label: 'Face Photo', emoji: '🙂', hint: 'For lip color & blush try-on', requirements: ['✅ Face centered in frame','✅ Well lit — natural or bright light','✅ No glasses or sunglasses','✅ Hair away from face','✅ Neutral expression, look at camera','❌ No filters or heavy editing','❌ No hats or face coverings'], example: '💡 Passport-style photo works perfectly' },
+  { id: 'face', label: 'Face Photo', emoji: '🙂', hint: 'For lip color & blush try-on', requirements: ['✅ Face centered in frame','✅ Well lit — natural or bright light','✅ No glasses or sunglasses','✅ Hair away from face','✅ Neutral expression, look at camera','❌ No filters or heavy editing'], example: '💡 Passport-style photo works perfectly' },
   { id: 'lips', label: 'Lips Close-Up', emoji: '💋', hint: 'For precise lipstick matching', requirements: ['✅ Fill frame with just your lips','✅ Well lit — no shadows','✅ Bare lips (no lipstick or gloss)','✅ Sharp focus, not blurry','❌ No filters or color adjustments'], example: '💡 Hold phone 20cm from your lips' },
-  { id: 'hands', label: 'Hand Photo', emoji: '💅', hint: 'For nail polish color matching', requirements: ['✅ Single hand, palm facing down','✅ All five fingers visible and spread','✅ Well lit — no shadows on nails','✅ Bare nails (no existing polish)','✅ Rest hand on white paper','❌ No rings or jewellery','❌ No filters'], example: '💡 Rest hand on white paper in natural light' },
+  { id: 'hands', label: 'Hand Photo', emoji: '💅', hint: 'For nail polish color matching', requirements: ['✅ Single hand, palm facing down','✅ All five fingers visible and spread','✅ Well lit — no shadows on nails','✅ Bare nails (no existing polish)','✅ Rest hand on white paper','❌ No rings or jewellery'], example: '💡 Rest hand on white paper in natural light' },
 ];
 
 function getLibrary() {
@@ -93,7 +93,7 @@ export default function LibraryPage() {
               <div style={{display:'flex',flexDirection:'column',gap:12}}>
                 {scans.slice().reverse().map((scan,i)=>(
                   <div key={i} style={{background:'white',borderRadius:20,padding:16,boxShadow:'0 4px 16px rgba(0,0,0,0.07)',display:'flex',gap:14,alignItems:'flex-start'}}>
-                    <div style={{width:52,height:52,borderRadius:'50%',background:scan.color?.hex,flexShrink:0,boxShadow:`0 4px 12px ${scan.color?.hex}60`}}/>
+                    <div style={{width:52,height:52,borderRadius:'50%',background:scan.color?.hex,flexShrink:0}}/>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontFamily:'monospace',fontWeight:800,fontSize:16,color:'#111'}}>{scan.color?.hex}</div>
                       <div style={{fontSize:12,color:'#888',marginTop:4,display:'flex',gap:4,flexWrap:'wrap'}}>
@@ -104,7 +104,7 @@ export default function LibraryPage() {
                       {scan.advice&&<p style={{fontSize:12,color:'#666',marginTop:6,lineHeight:1.5,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{scan.advice}</p>}
                       <div style={{fontSize:11,color:'#bbb',marginTop:4}}>{new Date(scan.date).toLocaleDateString()}</div>
                     </div>
-                    <button onClick={()=>removeScan(scans.length-1-i)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'#ddd',padding:4,flexShrink:0}}>✕</button>
+                    <button onClick={()=>removeScan(scans.length-1-i)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'#ddd',padding:4}}>✕</button>
                   </div>
                 ))}
               </div>
