@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
+    return res.status(500).json({ error: 'API key not configured', hasKey: !!process.env.ANTHROPIC_API_KEY, envKeys: Object.keys(process.env).filter(k => k.includes('ANTHROPIC')) });
   }
 
   try {
