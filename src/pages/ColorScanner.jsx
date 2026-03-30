@@ -179,14 +179,14 @@ function PickerTab({color, onWheel, onHexType, t}) {
 
 export default function ColorScanner() {
   const navigate = useNavigate();
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState(() => sessionStorage.getItem('mmm_lang') || 'en');
   const t = T[lang] || T.en;
   const [tab, setTab] = useState("picker");
   const DEFAULT_COLOR = {hex:"#FF6B9D",r:255,g:107,b:157};
   const [color, setColor] = useState(DEFAULT_COLOR);
   const [skinTone, setSkinTone] = useState("");
   const [occasion, setOccasion] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState(() => sessionStorage.getItem('mmm_country') || "");
   const [category, setCategory] = useState("lipstick");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("");
