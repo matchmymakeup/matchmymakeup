@@ -91,8 +91,8 @@ export default function Profile() {
         <div style={{maxWidth:560,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <button onClick={()=>navigate(-1)} style={{background:'none',border:'1px solid #e5e7eb',borderRadius:10,padding:'8px 14px',cursor:'pointer',fontSize:13,color:'#666',fontWeight:600}}>← Back</button>
           <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <span style={{fontSize:20}}>🧬</span>
-            <span style={{fontWeight:800,fontSize:16,background:'linear-gradient(135deg,#9d174d,#7c3aed)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Your Beauty DNA</span>
+            <span style={{fontSize:20}}>{pct===100?'✨':'🧬'}</span>
+            <span style={{fontWeight:800,fontSize:16,background:'linear-gradient(135deg,#9d174d,#7c3aed)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>{pct===100?'Beauty DNA Complete!':'Your Beauty DNA'}</span>
           </div>
         </div>
       </div>
@@ -101,13 +101,17 @@ export default function Profile() {
         {/* Progress bar */}
         <div style={{background:'white',borderRadius:20,padding:20,boxShadow:'0 4px 20px rgba(0,0,0,0.08)',marginBottom:20}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-            <span style={{fontSize:13,fontWeight:700,color:'#1a1a1a'}}>Profile Completeness</span>
-            <span style={{fontSize:14,fontWeight:800,color:'#7c3aed'}}>{pct}%</span>
+            <span style={{fontSize:13,fontWeight:700,color:'#1a1a1a'}}>{pct===100?'Profile Complete':'Profile Completeness'}</span>
+            <span style={{fontSize:14,fontWeight:800,color:pct===100?'#16a34a':'#7c3aed'}}>{pct}%</span>
           </div>
-          <div style={{height:10,background:'#f3e8ff',borderRadius:5,overflow:'hidden'}}>
-            <div style={{height:'100%',background:'linear-gradient(135deg,#9d174d,#7c3aed)',borderRadius:5,width:`${pct}%`,transition:'width 0.5s ease'}} />
+          <div style={{height:10,background:pct===100?'#dcfce7':'#f3e8ff',borderRadius:5,overflow:'hidden'}}>
+            <div style={{height:'100%',background:pct===100?'#16a34a':'linear-gradient(135deg,#9d174d,#7c3aed)',borderRadius:5,width:`${pct}%`,transition:'width 0.5s ease'}} />
           </div>
-          <div style={{fontSize:11,color:'#888',marginTop:8}}>{totalDone} of {totalSections} sections complete — the more you share, the better Maya knows you</div>
+          {pct===100 ? (
+            <div style={{fontSize:12,color:'#16a34a',marginTop:8,fontWeight:600}}>Maya now knows your beauty profile. Your recommendations are fully personalised. ✨</div>
+          ) : (
+            <div style={{fontSize:11,color:'#888',marginTop:8}}>{totalDone} of {totalSections} sections complete — the more you share, the better Maya knows you</div>
+          )}
         </div>
 
         {/* Skin Tone (always first) */}

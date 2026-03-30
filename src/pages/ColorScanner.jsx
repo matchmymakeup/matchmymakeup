@@ -296,7 +296,7 @@ export default function ColorScanner() {
           </div>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <button onClick={()=>navigate('/Profile')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",minHeight:32}}>
-              🧬 DNA
+              {(()=>{ try { const p=JSON.parse(localStorage.getItem('mmm_profile')||'{}'); return (p.skinTone&&p.ageRange&&p.ethnicity?.length&&p.skinConcerns?.length&&p.beautyGoals?.length&&p.budget&&p.climate)?'✨ My DNA':'🧬 DNA'; } catch { return '🧬 DNA'; } })()}
             </button>
             <button onClick={()=>navigate('/Library')} style={{background:"white",color:"#7c3aed",border:"1px solid #e5e7eb",borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",minHeight:32}}>
               {t.library}
@@ -306,7 +306,7 @@ export default function ColorScanner() {
         <div style={{textAlign:"center"}}>
           <div style={{fontSize:28}}>💄</div>
           <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup</h1>
-          <p style={{margin:"0 0 4px",fontSize:12,color:"#9d174d",opacity:0.8}}>{t.appTagline}</p>
+          <p style={{margin:"0 0 4px",fontSize:12,color:"#666",lineHeight:1.4}}>Upload a photo, use your camera, or pick a color to find your perfect makeup match.</p>
           {streak.count >= 7 && (
             <div style={{fontSize:12,color:"#7c3aed",fontWeight:600,marginTop:2}}>
               Maya knows your style — 7x more personalised ✨
