@@ -1,6 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { findMoreMatches } from "../products.js";
+
+function getTrialInfo() {
+  try {
+    const start = localStorage.getItem('mmm_trial_start');
+    if (!start) return { active: false, started: false, daysLeft: 0, scansSaved: 0 };
+    const startDate = new Date(start);
+    const now = new Date();
+    const elapsed = Math.floor((now - startDate) / 86400000);
+    const daysLeft = Math.max(0, 7 - elapsed);
+    const lib = JSON.parse(localStorage.getItem('mmm_library') || '{}');
+    const scansSaved = (lib.scans || []).length;
+    return { active: daysLeft > 0, started: true, daysLeft, scansSaved, elapsed };
+  } catch { return { active: false, started: false, daysLeft: 0, scansSaved: 0 }; }
+}
+function startTrial() {
+  localStorage.setItem('mmm_trial_start', new Date().toISOString());
+}
 
 const T = {
   en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
@@ -58,6 +75,8 @@ export default function MatchResults() {
   const [skinToneBannerDismissed, setSkinToneBannerDismissed] = useState(false);
   const [ageBannerDismissed, setAgeBannerDismissed] = useState(false);
   const [bonusProducts, setBonusProducts] = useState([]);
+  const [trialInfo, setTrialInfo] = useState(getTrialInfo);
+  const shareCanvasRef = useRef(null);
 
   const profile = getProfile();
   const scanCount = getScanCount();
@@ -93,6 +112,50 @@ export default function MatchResults() {
     saveProfile({ ageRange: age });
     setShowAgeSheet(false);
     setAgeBannerDismissed(true);
+  }
+
+  function handleStartTrial() {
+    startTrial();
+    setTrialInfo(getTrialInfo());
+  }
+
+  function generateShareCard() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600; canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+    // Background gradient
+    const grad = ctx.createLinearGradient(0,0,600,400);
+    grad.addColorStop(0,'#fdf2f8'); grad.addColorStop(0.5,'#f3e8ff'); grad.addColorStop(1,'#fce7f3');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,600,400);
+    // Color swatch
+    ctx.beginPath(); ctx.arc(120,160,60,0,Math.PI*2);
+    ctx.fillStyle = record.scannedHex; ctx.fill();
+    ctx.strokeStyle = 'white'; ctx.lineWidth = 4; ctx.stroke();
+    // Shadow ring
+    ctx.beginPath(); ctx.arc(120,160,64,0,Math.PI*2);
+    ctx.strokeStyle = record.scannedHex+'40'; ctx.lineWidth = 8; ctx.stroke();
+    // Text
+    ctx.fillStyle = '#9d174d'; ctx.font = 'bold 28px Segoe UI, sans-serif';
+    ctx.fillText('My Perfect Match', 210, 120);
+    ctx.fillStyle = '#1a1a1a'; ctx.font = 'bold 36px monospace';
+    ctx.fillText(record.scannedHex, 210, 170);
+    if (allProducts[0]) {
+      ctx.fillStyle = '#7c3aed'; ctx.font = 'bold 18px Segoe UI, sans-serif';
+      ctx.fillText(`${allProducts[0].brand} — ${allProducts[0].name}`, 210, 210);
+    }
+    // Persona
+    ctx.fillStyle = '#9d174d'; ctx.font = '16px Segoe UI, sans-serif';
+    ctx.fillText(`Matched by ${personaName} ${personaEmoji}`, 210, 250);
+    // Watermark
+    ctx.fillStyle = '#c084fc'; ctx.font = 'bold 14px Segoe UI, sans-serif';
+    ctx.fillText('matchmymakeup.ai', 210, 350);
+    // Lipstick emoji area
+    ctx.font = '48px serif'; ctx.fillText('\uD83D\uDC84', 430, 340);
+    // Download
+    const link = document.createElement('a');
+    link.download = 'my-match.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 
   const t = T[lang] || T.en;
@@ -200,16 +263,43 @@ export default function MatchResults() {
           </button>
         </div>
 
-        {/* Upsell */}
+        {/* Share card button */}
+        <div style={{textAlign:"center",marginBottom:16}}>
+          <button onClick={generateShareCard} style={{background:"white",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 24px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#7c3aed"}}>
+            📤 Share My Match →
+          </button>
+        </div>
+
+        {/* Reverse trial / upsell */}
         {!upsellDismissed && (
           <div style={{position:"relative",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff)",border:"1px solid #f0abda",borderRadius:20,padding:"18px 44px 18px 18px",marginBottom:20}}>
             <button onClick={()=>setUpsellDismissed(true)} style={{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#c084fc",padding:"2px 6px"}}>✕</button>
             <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
               <div style={{fontSize:28,flexShrink:0,marginTop:2}}>✨</div>
               <div style={{flex:1}}>
-                <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>{t.upsellHeading}</div>
-                <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
-                <a href="mailto:hello@matchmymakeup.ai" style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,textDecoration:"none"}}>{t.upsellBtn}</a>
+                {!trialInfo.started ? (
+                  <>
+                    <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>{t.upsellHeading}</div>
+                    <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
+                    <button onClick={handleStartTrial} style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
+                      Try Premium Free — 7 days, no card needed →
+                    </button>
+                  </>
+                ) : trialInfo.active ? (
+                  <>
+                    <div style={{fontWeight:800,fontSize:14,color:"#7c3aed",marginBottom:4}}>🎉 Premium Trial Active</div>
+                    <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:4}}>{trialInfo.daysLeft} day{trialInfo.daysLeft!==1?'s':''} left in your free trial</div>
+                    <div style={{fontSize:11,color:"#aaa"}}>Matching against 500+ products from 100+ brands</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>Your trial ended</div>
+                    <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>Maya saved {trialInfo.scansSaved} scan{trialInfo.scansSaved!==1?'s':''} for you — keep access for $4.99/month</div>
+                    <a href="mailto:hello@matchmymakeup.ai" style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,textDecoration:"none"}}>
+                      Upgrade to Premium — $4.99/month →
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           </div>

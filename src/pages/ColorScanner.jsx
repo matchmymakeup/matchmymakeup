@@ -182,6 +182,26 @@ function PickerTab({color, onWheel, onHexType, t}) {
   );
 }
 
+function getStreak() {
+  try {
+    const data = JSON.parse(localStorage.getItem('mmm_streak') || '{}');
+    const today = new Date().toISOString().slice(0,10);
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    if (data.lastDate === today) return { count: data.count || 1, lastDate: today };
+    if (data.lastDate === yesterday) return { count: (data.count || 0), lastDate: data.lastDate };
+    return { count: 0, lastDate: null };
+  } catch { return { count: 0, lastDate: null }; }
+}
+function updateStreak() {
+  const today = new Date().toISOString().slice(0,10);
+  const streak = getStreak();
+  if (streak.lastDate === today) return streak;
+  const newCount = streak.lastDate === new Date(Date.now()-86400000).toISOString().slice(0,10) ? streak.count + 1 : 1;
+  const next = { count: newCount, lastDate: today };
+  localStorage.setItem('mmm_streak', JSON.stringify(next));
+  return next;
+}
+
 export default function ColorScanner() {
   const navigate = useNavigate();
   const [lang, setLang] = useState(() => sessionStorage.getItem('mmm_lang') || 'en');
@@ -196,6 +216,7 @@ export default function ColorScanner() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("");
   const [error, setError] = useState("");
+  const [streak, setStreak] = useState(getStreak);
 
   useEffect(() => { trackPageView('ColorScanner'); }, []);
 
@@ -237,6 +258,7 @@ export default function ColorScanner() {
         matchedProducts: matches, claudeAdvice, skinTone, occasion, country, category, lang,
         personaName: 'Maya', personaEmoji: '💄'
       }));
+      setStreak(updateStreak());
       navigate('/MatchResults');
     } catch(err) {
       setError(err?.message||'Something went wrong. Please try again.');
@@ -258,9 +280,26 @@ export default function ColorScanner() {
         <div style={{fontSize:28}}>💄</div>
         <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup</h1>
         <p style={{margin:"0 0 4px",fontSize:12,color:"#9d174d",opacity:0.8}}>{t.appTagline}</p>
-        <button onClick={()=>navigate('/Library')} style={{position:"absolute",top:16,right:16,background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:20,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>
-          {t.library}
-        </button>
+        <div style={{position:"absolute",top:12,left:12,display:"flex",flexDirection:"column",gap:6}}>
+          {streak.count >= 1 && (
+            <div style={{background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"white",borderRadius:20,padding:"4px 10px",fontSize:11,fontWeight:700}}>
+              🔥 {streak.count}-day streak
+            </div>
+          )}
+          {streak.count >= 7 && (
+            <div style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:20,padding:"4px 10px",fontSize:9,fontWeight:600,maxWidth:140}}>
+              Maya knows your style — 7x more personalised
+            </div>
+          )}
+        </div>
+        <div style={{position:"absolute",top:12,right:12,display:"flex",flexDirection:"column",gap:6}}>
+          <button onClick={()=>navigate('/Profile')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:20,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>
+            🧬 Beauty DNA
+          </button>
+          <button onClick={()=>navigate('/Library')} style={{background:"white",color:"#7c3aed",border:"1px solid #e5e7eb",borderRadius:20,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer"}}>
+            {t.library}
+          </button>
+        </div>
       </div>
 
       <div style={{maxWidth:480,margin:"0 auto",padding:"0 16px 48px"}}>
