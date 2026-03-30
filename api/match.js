@@ -1,11 +1,7 @@
-// ── DEPRECATED: Product database has moved to api/match.js (server-side) ─────
-// This file is kept for the CATEGORIES export only.
-// The PRODUCTS array below is no longer used at runtime — the source of truth
-// is the server-side copy in api/match.js. Do not import PRODUCTS or
-// findColorMatches/findMoreMatches from this file.
-// Categories: lipstick, nail_polish, foundation, mascara, blush, eyeshadow, lip_liner, highlighter
+// ── MatchMyMakeup Server-Side Product Matching ──────────────────────────────
+// Product database and matching algorithm - never exposed to browser
 
-export const PRODUCTS = [
+const PRODUCTS = [
   // ── USA ──────────────────────────────────────────────────────────────────
   // Lipstick
   { id: "us_001", name: "Ruby Woo", brand: "MAC", category: "lipstick", hexCode: "#BB1C2B", red: 187, green: 28, blue: 43, colorName: "True Red", price: 21, currency: "USD", retailerUrl: "https://www.maccosmetics.com/product/13854/310/products/makeup/lips/lipstick/matte-lipstick", country: "USA" },
@@ -179,17 +175,11 @@ export const PRODUCTS = [
   { id: "ng_p08", name: "Highlighter - Golden Girl", brand: "Black Opal", category: "highlighter", hexCode: "#E8C890", red: 232, green: 200, blue: 144, colorName: "Golden Girl", price: 6500, currency: "NGN", retailerUrl: "https://www.blackopalbeauty.com", country: "Nigeria" },
 ];
 
-// ── Color matching ────────────────────────────────────────────────────────────
-export function findColorMatches(r, g, b, country, category = null, limit = 10) {
+function findColorMatches(r, g, b, country, category = null, limit = 10) {
   let pool = PRODUCTS;
-
-  // Filter by country
   if (country) pool = pool.filter(p => p.country === country);
   if (pool.length === 0) pool = PRODUCTS;
-
-  // Filter by category if specified
   if (category) pool = pool.filter(p => p.category === category);
-
   return pool
     .map(p => ({
       ...p,
@@ -199,7 +189,7 @@ export function findColorMatches(r, g, b, country, category = null, limit = 10) 
     .slice(0, limit);
 }
 
-export function findMoreMatches(r, g, b, country, category = null, skip = 10, limit = 5) {
+function findMoreMatches(r, g, b, country, category = null, skip = 10, limit = 5) {
   let pool = PRODUCTS;
   if (country) pool = pool.filter(p => p.country === country);
   if (pool.length === 0) pool = PRODUCTS;
@@ -210,15 +200,27 @@ export function findMoreMatches(r, g, b, country, category = null, skip = 10, li
     .slice(skip, skip + limit);
 }
 
-// Get all categories
-export const CATEGORIES = [
-  { id: 'all', label: 'All', emoji: '✨' },
-  { id: 'lipstick', label: 'Lips', emoji: '💄' },
-  { id: 'nail_polish', label: 'Nails', emoji: '💅' },
-  { id: 'foundation', label: 'Foundation', emoji: '🫧' },
-  { id: 'blush', label: 'Blush', emoji: '🌸' },
-  { id: 'eyeshadow', label: 'Eyes', emoji: '👁️' },
-  { id: 'mascara', label: 'Mascara', emoji: '🖤' },
-  { id: 'highlighter', label: 'Glow', emoji: '✨' },
-  { id: 'lip_liner', label: 'Lip Liner', emoji: '✏️' },
-];
+export default function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { r, g, b, country, category, skip, limit } = req.body;
+
+    if (r === undefined || g === undefined || b === undefined) {
+      return res.status(400).json({ error: 'Missing r, g, b values' });
+    }
+
+    let matches;
+    if (skip !== undefined) {
+      matches = findMoreMatches(r, g, b, country, category, skip, limit || 5);
+    } else {
+      matches = findColorMatches(r, g, b, country, category, limit || 10);
+    }
+
+    return res.status(200).json({ matches });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+}

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { findMoreMatches } from "../products.js";
 
 function getTrialInfo() {
   try {
@@ -109,13 +108,20 @@ export default function MatchResults() {
     finally { setLoading(false); }
   }, []);
 
-  function handleSkinToneSelect(tone) {
+  async function handleSkinToneSelect(tone) {
     saveProfile({ skinTone: tone });
     setShowSkinToneSheet(false);
     setSkinToneBannerDismissed(true);
     if (record) {
-      const more = findMoreMatches(record.scannedRed, record.scannedGreen, record.scannedBlue, record.country, record.category, 10, 5);
-      setBonusProducts(more);
+      try {
+        const res = await fetch('/api/match', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ r: record.scannedRed, g: record.scannedGreen, b: record.scannedBlue, country: record.country, category: record.category, skip: 10, limit: 5 })
+        });
+        const data = await res.json();
+        if (data.matches) setBonusProducts(data.matches);
+      } catch {}
     }
   }
 

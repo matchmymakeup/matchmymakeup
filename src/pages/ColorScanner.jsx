@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { findColorMatches, CATEGORIES } from "../products.js";
+import { CATEGORIES } from "../products.js";
 import { trackScan, trackPageView } from "../analytics.js";
 
 function toHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
@@ -234,7 +234,14 @@ export default function ColorScanner() {
     setLoading(true); setError(''); setStep(t.scanning);
     try {
       await trackScan({ hex: color.hex, r: color.r, g: color.g, b: color.b, skinTone, occasion, country, lang });
-      const matches = findColorMatches(color.r, color.g, color.b, country, category || null);
+      const matchRes = await fetch('/api/match', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ r: color.r, g: color.g, b: color.b, country, category: category || null })
+      });
+      const matchData = await matchRes.json();
+      if (!matchRes.ok) throw new Error(matchData.error || 'Failed to match products');
+      const matches = matchData.matches;
       setStep(t.gettingAdvice);
       let userProfile = {};
       try { userProfile = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); } catch {}
