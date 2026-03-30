@@ -241,7 +241,7 @@ export default function ColorScanner() {
       const adviceRes = await fetch('/api/advice', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ hex: color.hex, r: color.r, g: color.g, b: color.b, skinTone, occasion, country, category, profile: userProfile })
+        body: JSON.stringify({ hex: color.hex, r: color.r, g: color.g, b: color.b, skinTone, occasion, country, category, profile: userProfile, lang })
       });
       const adviceData = await adviceRes.json();
       if (!adviceRes.ok) throw new Error(adviceData.error || 'Failed to get advice');
@@ -253,10 +253,12 @@ export default function ColorScanner() {
         if (lib.scans.length > 50) lib.scans = lib.scans.slice(-50);
         localStorage.setItem('mmm_library', JSON.stringify(lib));
       } catch(e) {}
+      const PERSONAS = {en:{name:'Maya',emoji:'💄'},hi:{name:'Priya',emoji:'🪷'},pt:{name:'Valentina',emoji:'💃'},zh:{name:'Mei',emoji:'🌸'},id:{name:'Sari',emoji:'🌺'},ng:{name:'Adaeze',emoji:'👑'},es:{name:'Isabella',emoji:'💃'},ar:{name:'Layla',emoji:'✨'},fr:{name:'Céline',emoji:'🗼'},bn:{name:'Ananya',emoji:'🌹'},sw:{name:'Amara',emoji:'🌍'}};
+      const persona = PERSONAS[lang] || PERSONAS.en;
       sessionStorage.setItem('matchResults', JSON.stringify({
         scannedHex: color.hex, scannedRed: color.r, scannedGreen: color.g, scannedBlue: color.b,
         matchedProducts: matches, claudeAdvice, skinTone, occasion, country, category, lang,
-        personaName: 'Maya', personaEmoji: '💄'
+        personaName: persona.name, personaEmoji: persona.emoji
       }));
       setStreak(updateStreak());
       navigate('/MatchResults');

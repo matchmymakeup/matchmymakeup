@@ -9,7 +9,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { hex, r, g, b, skinTone, occasion, country, category, profile } = req.body;
+    const { hex, r, g, b, skinTone, occasion, country, category, profile, lang } = req.body;
+
+    const PERSONAS = {
+      en: 'Maya', hi: 'Priya', pt: 'Valentina', zh: 'Mei', id: 'Sari', ng: 'Adaeze',
+      es: 'Isabella', ar: 'Layla', fr: 'Céline', bn: 'Ananya', sw: 'Amara',
+    };
+    const persona = PERSONAS[lang] || 'Maya';
 
     const categoryNote = category ? ` Focus on ${category.replace('_', ' ')} products.` : '';
 
@@ -26,7 +32,7 @@ export default async function handler(req, res) {
       if (parts.length > 0) profileContext = ` User beauty profile: ${parts.join('. ')}.`;
     }
 
-    const prompt = `You are a makeup expert named Maya. The user scanned color ${hex} (R:${r} G:${g} B:${b}). Skin tone: ${skinTone || 'any'}. Occasion: ${occasion || 'everyday'}. Country: ${country || 'global'}.${categoryNote}${profileContext} Give 3 sentences of warm, personalized beauty advice.`;
+    const prompt = `You are a makeup expert named ${persona}. The user scanned color ${hex} (R:${r} G:${g} B:${b}). Skin tone: ${skinTone || 'any'}. Occasion: ${occasion || 'everyday'}. Country: ${country || 'global'}.${categoryNote}${profileContext} Give 3 sentences of warm, personalized beauty advice.`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
