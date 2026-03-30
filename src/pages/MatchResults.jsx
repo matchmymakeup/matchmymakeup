@@ -124,15 +124,17 @@ export default function MatchResults() {
   }
 
   async function handleCheckout() {
+    console.log('[MatchResults] handleCheckout called');
     try {
       const res = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
       });
       const data = await res.json();
+      console.log('[MatchResults] checkout response:', data);
       if (data.url) window.location.href = data.url;
       else alert(data.error || 'Failed to start checkout');
-    } catch { alert('Something went wrong. Please try again.'); }
+    } catch (err) { console.error('[MatchResults] checkout error:', err); alert('Something went wrong. Please try again.'); }
   }
 
   function generateShareCard() {
