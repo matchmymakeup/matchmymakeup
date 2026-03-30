@@ -77,6 +77,10 @@ export default function MatchResults() {
   const [trialInfo, setTrialInfo] = useState(getTrialInfo);
   const shareCanvasRef = useRef(null);
   const [showSaveShade, setShowSaveShade] = useState(false);
+  const [savedProductIds, setSavedProductIds] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('mmm_my_products') || '[]').map(p => p.productName + p.brand)); } catch { return new Set(); }
+  });
+  const [justSaved, setJustSaved] = useState(null);
   const [shadeName, setShadeName] = useState('');
 
   const profile = getProfile();
@@ -153,6 +157,24 @@ export default function MatchResults() {
       localStorage.setItem('mmm_my_shades', JSON.stringify(shades));
     } catch {}
     setShadeName(''); setShowSaveShade(false);
+  }
+
+  function saveProductToLibrary(p) {
+    const key = p.name + p.brand;
+    if (savedProductIds.has(key)) return;
+    try {
+      const existing = JSON.parse(localStorage.getItem('mmm_my_products') || '[]');
+      existing.push({ id: Date.now(), productName: p.name, brand: p.brand, category: p.category, hex: p.hexCode, colorName: p.colorName, price: p.price, currency: p.currency, rating: 5, notes: '', dateSaved: new Date().toISOString() });
+      localStorage.setItem('mmm_my_products', JSON.stringify(existing));
+      setSavedProductIds(prev => new Set([...prev, key]));
+      setJustSaved(key);
+      setTimeout(() => setJustSaved(null), 2000);
+    } catch {}
+  }
+
+  function getShopUrl(p) {
+    if (p.retailerUrl && p.retailerUrl.startsWith('http')) return p.retailerUrl;
+    return `https://www.google.com/search?q=${encodeURIComponent(p.brand + ' ' + p.name + ' buy')}`;
   }
 
   function generateShareCard() {
@@ -364,9 +386,14 @@ export default function MatchResults() {
                     <div style={{fontSize:11,color:"#888",marginBottom:4}}>{p.colorName && <span>{p.colorName} · </span>}<span style={{textTransform:"capitalize"}}>{p.category}</span></div>
                     {p.price && <div style={{fontSize:13,fontWeight:700,color:"#7c3aed",marginBottom:6}}>{p.currency||"$"}{p.price}</div>}
                     <div style={{fontSize:10,color:"#aaa",marginBottom:8}}>{t.colorDistance}: <b style={{color:"#374151"}}>{p.colorDistance}</b></div>
-                    {p.retailerUrl && (
-                      <a href={p.retailerUrl} target="_blank" rel="noopener noreferrer" style={{display:"block",textAlign:"center",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none"}}>{t.shopNow}</a>
-                    )}
+                    <div style={{display:"flex",gap:4}}>
+                      <a href={getShopUrl(p)} target="_blank" rel="noopener noreferrer" style={{flex:1,textAlign:"center",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none",minHeight:32,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        {p.retailerUrl && p.retailerUrl.startsWith('http') ? t.shopNow : 'Search Online →'}
+                      </a>
+                      <button onClick={()=>saveProductToLibrary(p)} style={{background:savedProductIds.has(p.name+p.brand)?"#ecfdf5":"#f9fafb",border:savedProductIds.has(p.name+p.brand)?"1px solid #86efac":"1px solid #e5e7eb",borderRadius:10,padding:"4px 8px",cursor:"pointer",fontSize:10,fontWeight:700,color:savedProductIds.has(p.name+p.brand)?"#16a34a":"#888",minHeight:32,whiteSpace:"nowrap"}}>
+                        {justSaved===(p.name+p.brand) ? 'Saved! ✓' : savedProductIds.has(p.name+p.brand) ? 'Saved ✓' : '🔖 Save'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
