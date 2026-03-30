@@ -204,7 +204,7 @@ function updateStreak() {
 
 export default function ColorScanner() {
   const navigate = useNavigate();
-  const [lang, setLang] = useState(() => sessionStorage.getItem('mmm_lang') || 'en');
+  const [lang, setLang] = useState(() => sessionStorage.getItem('mmm_language') || sessionStorage.getItem('mmm_lang') || 'en');
   const t = T[lang] || T.en;
   const [tab, setTab] = useState("picker");
   const DEFAULT_COLOR = {hex:"#FF6B9D",r:255,g:107,b:157};
