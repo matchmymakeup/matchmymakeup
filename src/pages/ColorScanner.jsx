@@ -210,15 +210,14 @@ export default function ColorScanner() {
       await trackScan({ hex: color.hex, r: color.r, g: color.g, b: color.b, skinTone, occasion, country, lang });
       const matches = findColorMatches(color.r, color.g, color.b, country, category || null);
       setStep(t.gettingAdvice);
-      const categoryNote = category ? ` Focus on ${category.replace('_',' ')} products.` : '';
-      const prompt = `You are a makeup expert named Maya. The user scanned color ${color.hex} (R:${color.r} G:${color.g} B:${color.b}). Skin tone: ${skinTone||'any'}. Occasion: ${occasion||'everyday'}. Country: ${country||'global'}.${categoryNote} Give 3 sentences of warm, personalized beauty advice.`;
-      const adviceRes = await fetch('https://api.anthropic.com/v1/messages', {
+      const adviceRes = await fetch('/api/advice', {
         method: 'POST',
-        headers: { 'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true', 'content-type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 300, messages: [{ role: 'user', content: prompt }] })
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ hex: color.hex, r: color.r, g: color.g, b: color.b, skinTone, occasion, country, category })
       });
       const adviceData = await adviceRes.json();
-      const claudeAdvice = adviceData.content[0].text;
+      if (!adviceRes.ok) throw new Error(adviceData.error || 'Failed to get advice');
+      const claudeAdvice = adviceData.advice;
       try {
         const lib = JSON.parse(localStorage.getItem('mmm_library') || '{"scans":[],"images":{}}');
         lib.scans = lib.scans || [];
