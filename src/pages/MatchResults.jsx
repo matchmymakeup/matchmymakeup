@@ -119,6 +119,18 @@ export default function MatchResults() {
     setTrialInfo(getTrialInfo());
   }
 
+  async function handleCheckout() {
+    try {
+      const res = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else alert(data.error || 'Failed to start checkout');
+    } catch { alert('Something went wrong. Please try again.'); }
+  }
+
   function generateShareCard() {
     const canvas = document.createElement('canvas');
     canvas.width = 600; canvas.height = 400;
@@ -281,7 +293,7 @@ export default function MatchResults() {
                   <>
                     <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>{t.upsellHeading}</div>
                     <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
-                    <button onClick={handleStartTrial} style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
+                    <button onClick={handleCheckout} style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Try Premium Free — 7 days, no card needed →
                     </button>
                   </>
@@ -295,9 +307,9 @@ export default function MatchResults() {
                   <>
                     <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>Your trial ended</div>
                     <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>Maya saved {trialInfo.scansSaved} scan{trialInfo.scansSaved!==1?'s':''} for you — keep access for $4.99/month</div>
-                    <a href="mailto:hello@matchmymakeup.ai" style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,textDecoration:"none"}}>
+                    <button onClick={handleCheckout} style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Upgrade to Premium — $4.99/month →
-                    </a>
+                    </button>
                   </>
                 )}
               </div>
