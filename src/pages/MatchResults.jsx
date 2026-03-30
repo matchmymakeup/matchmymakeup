@@ -84,6 +84,15 @@ export default function MatchResults() {
   const showAgeBanner = scanCount >= 2 && !profile.ageRange && profile.skinTone && !ageBannerDismissed;
 
   useEffect(() => {
+    // Activate trial after successful Stripe checkout
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('session_id') && !getTrialInfo().started) {
+      startTrial();
+      setTrialInfo(getTrialInfo());
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
     try {
       const raw = sessionStorage.getItem("matchResults");
       if (!raw) { setLoading(false); return; }
@@ -112,11 +121,6 @@ export default function MatchResults() {
     saveProfile({ ageRange: age });
     setShowAgeSheet(false);
     setAgeBannerDismissed(true);
-  }
-
-  function handleStartTrial() {
-    startTrial();
-    setTrialInfo(getTrialInfo());
   }
 
   async function handleCheckout() {
