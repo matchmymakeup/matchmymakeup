@@ -77,6 +77,8 @@ export default function MatchResults() {
   const [bonusProducts, setBonusProducts] = useState([]);
   const [trialInfo, setTrialInfo] = useState(getTrialInfo);
   const shareCanvasRef = useRef(null);
+  const [showSaveShade, setShowSaveShade] = useState(false);
+  const [shadeName, setShadeName] = useState('');
 
   const profile = getProfile();
   const scanCount = getScanCount();
@@ -135,6 +137,16 @@ export default function MatchResults() {
       if (data.url) window.location.href = data.url;
       else alert(data.error || 'Failed to start checkout');
     } catch (err) { console.error('[MatchResults] checkout error:', err); alert('Something went wrong. Please try again.'); }
+  }
+
+  function handleSaveShade() {
+    if (!shadeName || !record) return;
+    try {
+      const shades = JSON.parse(localStorage.getItem('mmm_my_shades') || '[]');
+      shades.push({ id: Date.now(), name: shadeName, hex: record.scannedHex });
+      localStorage.setItem('mmm_my_shades', JSON.stringify(shades));
+    } catch {}
+    setShadeName(''); setShowSaveShade(false);
   }
 
   function generateShareCard() {
@@ -281,10 +293,13 @@ export default function MatchResults() {
           </button>
         </div>
 
-        {/* Share card button */}
-        <div style={{textAlign:"center",marginBottom:16}}>
-          <button onClick={generateShareCard} style={{background:"white",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 24px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#7c3aed"}}>
-            📤 Share My Match →
+        {/* Share + Save buttons */}
+        <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
+          <button onClick={generateShareCard} style={{background:"white",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#7c3aed",minHeight:44}}>
+            📤 Share My Match
+          </button>
+          <button onClick={()=>setShowSaveShade(true)} style={{background:"white",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#9d174d",minHeight:44}}>
+            💾 Save This Color
           </button>
         </div>
 
@@ -389,6 +404,21 @@ export default function MatchResults() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Save shade modal */}
+      {showSaveShade && record && (
+        <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={()=>setShowSaveShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)"}} />
+          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560}}>
+            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
+            <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Save This Color</h3>
+            <div style={{width:"100%",height:48,borderRadius:12,background:record.scannedHex,marginBottom:12}} />
+            <div style={{textAlign:"center",fontFamily:"monospace",fontSize:16,fontWeight:700,color:"#1a1a1a",marginBottom:16}}>{record.scannedHex}</div>
+            <input placeholder='e.g. "My everyday lip"' value={shadeName} onChange={e=>setShadeName(e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid #e5e7eb",fontSize:14,marginBottom:12}} />
+            <button onClick={handleSaveShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save to My Shades</button>
           </div>
         </div>
       )}
