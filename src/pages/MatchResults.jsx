@@ -32,7 +32,7 @@ const T = {
   sw: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
 };
 
-const COUNTRIES_LABELS = { USA:"🇺🇸 USA", India:"🇮🇳 India", Brazil:"🇧🇷 Brazil", Indonesia:"🇮🇩 Indonesia", Nigeria:"🇳🇬 Nigeria", China:"🇨🇳 China", "Latin America":"🇲🇽 Latin America", "Middle East":"🇸🇦 Middle East", France:"🇫🇷 France", Bangladesh:"🇧🇩 Bangladesh", "East Africa":"🇰🇪 East Africa" };
+const COUNTRIES_LABELS = { USA:"🇺🇸 USA", Australia:"🇦🇺 Australia", India:"🇮🇳 India", Brazil:"🇧🇷 Brazil", Indonesia:"🇮🇩 Indonesia", Nigeria:"🇳🇬 Nigeria", China:"🇨🇳 China", "Latin America":"🇲🇽 Latin America", "Middle East":"🇸🇦 Middle East", France:"🇫🇷 France", Bangladesh:"🇧🇩 Bangladesh", "East Africa":"🇰🇪 East Africa" };
 
 function formatAdvice(text) {
   if (!text) return [];

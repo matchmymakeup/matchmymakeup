@@ -34,7 +34,7 @@ export default function Home() {
             </div>
             <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                ['en','🇺🇸','English','Maya · USA'],
+                ['en','🌍','English','Maya · Global'],
                 ['hi','🇮🇳','हिन्दी','Priya · India'],
                 ['pt','🇧🇷','Português','Valentina · Brazil'],
                 ['zh','🇨🇳','中文','Mei (美) · China'],

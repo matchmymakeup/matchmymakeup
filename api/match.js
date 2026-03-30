@@ -175,9 +175,12 @@ const PRODUCTS = [
   { id: "ng_p08", name: "Highlighter - Golden Girl", brand: "Black Opal", category: "highlighter", hexCode: "#E8C890", red: 232, green: 200, blue: 144, colorName: "Golden Girl", price: 6500, currency: "NGN", retailerUrl: "https://www.blackopalbeauty.com", country: "Nigeria" },
 ];
 
+const COUNTRY_ALIASES = { 'Australia': 'USA' };
+
 function findColorMatches(r, g, b, country, category = null, limit = 10) {
   let pool = PRODUCTS;
-  if (country) pool = pool.filter(p => p.country === country);
+  const resolvedCountry = COUNTRY_ALIASES[country] || country;
+  if (resolvedCountry) pool = pool.filter(p => p.country === resolvedCountry);
   if (pool.length === 0) pool = PRODUCTS;
   if (category) pool = pool.filter(p => p.category === category);
   return pool
@@ -191,7 +194,8 @@ function findColorMatches(r, g, b, country, category = null, limit = 10) {
 
 function findMoreMatches(r, g, b, country, category = null, skip = 10, limit = 5) {
   let pool = PRODUCTS;
-  if (country) pool = pool.filter(p => p.country === country);
+  const resolvedCountry = COUNTRY_ALIASES[country] || country;
+  if (resolvedCountry) pool = pool.filter(p => p.country === resolvedCountry);
   if (pool.length === 0) pool = PRODUCTS;
   if (category) pool = pool.filter(p => p.category === category);
   return pool

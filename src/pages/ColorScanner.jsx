@@ -386,7 +386,7 @@ export default function ColorScanner() {
           <div>
             <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>{t.shopInLabel}</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-              {[["","🌍 All"],["USA","🇺🇸 USA"],["India","🇮🇳 India"],["Brazil","🇧🇷 Brazil"],["Indonesia","🇮🇩 Indonesia"],["Nigeria","🇳🇬 Nigeria"],["China","🇨🇳 China"]].map(([val,label])=>(
+              {[["","🌍 All"],["USA","🇺🇸 USA"],["Australia","🇦🇺 Australia"],["India","🇮🇳 India"],["Brazil","🇧🇷 Brazil"],["Indonesia","🇮🇩 Indonesia"],["Nigeria","🇳🇬 Nigeria"],["China","🇨🇳 China"]].map(([val,label])=>(
                 <button key={val} onClick={()=>setCountry(val)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:country===val?"2px solid #7c3aed":"2px solid #e5e7eb",background:country===val?"#f5f3ff":"white",color:country===val?"#7c3aed":"#555",fontSize:12,fontWeight:country===val?700:500}}>{label}</button>
               ))}
             </div>

@@ -32,7 +32,8 @@ export default async function handler(req, res) {
       if (parts.length > 0) profileContext = ` User beauty profile: ${parts.join('. ')}.`;
     }
 
-    const prompt = `You are a makeup expert named ${persona}. The user scanned color ${hex} (R:${r} G:${g} B:${b}). Skin tone: ${skinTone || 'any'}. Occasion: ${occasion || 'everyday'}. Country: ${country || 'global'}.${categoryNote}${profileContext} Give 3 sentences of warm, personalized beauty advice.`;
+    const countryContext = country || 'global';
+    const prompt = `You are ${persona}, a globally-minded makeup expert. The user scanned color ${hex} (R:${r} G:${g} B:${b}). Skin tone: ${skinTone || 'any'}. Occasion: ${occasion || 'everyday'}. Shopping region: ${countryContext}.${categoryNote}${profileContext} Give 3 sentences of warm, personalized beauty advice relevant to the user's region. Do not assume any specific country unless one is provided.`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
