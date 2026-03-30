@@ -2,8 +2,6 @@ import { HashRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import MatchResults from './pages/MatchResults'
 import ColorScanner from './pages/ColorScanner'
-import Library from './pages/Library'
-import Terms from './pages/Terms'
 
 function App() {
   return (
@@ -12,8 +10,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/ColorScanner" element={<ColorScanner />} />
         <Route path="/MatchResults" element={<MatchResults />} />
-        <Route path="/Library" element={<Library />} />
-        <Route path="/Terms" element={<Terms />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </HashRouter>
