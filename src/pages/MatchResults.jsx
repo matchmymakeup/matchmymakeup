@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { findMoreMatches } from "../products.js";
 
 const T = {
   en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
@@ -8,14 +9,41 @@ const T = {
   zh: { loading:"正在加载你的结果...", noResults:"未找到结果", scanFirst:"请先扫描一种颜色。", scanAgain:"← 再次扫描", yourColor:"你扫描的颜色", adviceTitle:"美妆建议", consultant:"你的专属美妆顾问", noAdvice:"请重新扫描以获取新建议！✨", matchingProducts:"匹配产品", bestMatch:"⭐ 最佳", colorDistance:"色差", shopNow:"立即购买 →", upsellHeading:"仅看到50款中的10个匹配？", upsellSub:"高级会员可从500+产品中匹配。", upsellBtn:"升级至高级版 — $4.99/月 →" },
   id: { loading:"Memuat hasil Anda...", noResults:"Tidak ada hasil", scanFirst:"Silakan pindai warna terlebih dahulu.", scanAgain:"← Pindai Lagi", yourColor:"Warna Yang Dipindai", adviceTitle:"Saran Kecantikan", consultant:"Konsultan kecantikan pribadi Anda", noAdvice:"Coba pindai lagi! ✨", matchingProducts:"Produk yang Cocok", bestMatch:"⭐ Terbaik", colorDistance:"Jarak warna", shopNow:"Belanja Sekarang →", upsellHeading:"Hanya melihat 10 dari 50 produk?", upsellSub:"Anggota premium mencocokkan dengan 500+ produk.", upsellBtn:"Upgrade ke Premium — $4,99/bulan →" },
   ng: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a colour first, abeg.", scanAgain:"← Scan Another", yourColor:"Your Scanned Colour", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Colour distance", shopNow:"Shop Now →", upsellHeading:"You dey see only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
+  es: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
+  ar: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
+  fr: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
+  bn: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
+  sw: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
 };
 
-const COUNTRIES_LABELS = { USA:"🇺🇸 USA", India:"🇮🇳 India", Brazil:"🇧🇷 Brazil", Indonesia:"🇮🇩 Indonesia", Nigeria:"🇳🇬 Nigeria", China:"🇨🇳 China" };
+const COUNTRIES_LABELS = { USA:"🇺🇸 USA", India:"🇮🇳 India", Brazil:"🇧🇷 Brazil", Indonesia:"🇮🇩 Indonesia", Nigeria:"🇳🇬 Nigeria", China:"🇨🇳 China", "Latin America":"🇲🇽 Latin America", "Middle East":"🇸🇦 Middle East", France:"🇫🇷 France", Bangladesh:"🇧🇩 Bangladesh", "East Africa":"🇰🇪 East Africa" };
 
 function formatAdvice(text) {
   if (!text) return [];
   return text.replace(/#{1,3}\s*/g,"").replace(/\*\*(.*?)\*\*/g,"$1").replace(/\*(.*?)\*/g,"$1").replace(/---+/g,"").split(/\n\n+/).map(p=>p.trim()).filter(p=>p.length>0);
 }
+
+function getProfile() {
+  try { return JSON.parse(localStorage.getItem('mmm_profile') || '{}'); } catch { return {}; }
+}
+function saveProfile(data) {
+  const p = { ...getProfile(), ...data };
+  localStorage.setItem('mmm_profile', JSON.stringify(p));
+  return p;
+}
+function getScanCount() {
+  try { const lib = JSON.parse(localStorage.getItem('mmm_library') || '{}'); return (lib.scans || []).length; } catch { return 0; }
+}
+
+const SKIN_TONES = [
+  { id:'fair', label:'🤍 Fair' },
+  { id:'light', label:'🍑 Light' },
+  { id:'medium', label:'🌼 Medium' },
+  { id:'tan', label:'🌻 Tan' },
+  { id:'deep', label:'🤎 Deep' },
+  { id:'deep+', label:'🖤 Deep+' },
+];
+const AGE_RANGES = ['Under 18','18-24','25-34','35-44','45-54','55+'];
 
 export default function MatchResults() {
   const navigate = useNavigate();
@@ -24,6 +52,17 @@ export default function MatchResults() {
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState("en");
   const [upsellDismissed, setUpsellDismissed] = useState(false);
+
+  const [showSkinToneSheet, setShowSkinToneSheet] = useState(false);
+  const [showAgeSheet, setShowAgeSheet] = useState(false);
+  const [skinToneBannerDismissed, setSkinToneBannerDismissed] = useState(false);
+  const [ageBannerDismissed, setAgeBannerDismissed] = useState(false);
+  const [bonusProducts, setBonusProducts] = useState([]);
+
+  const profile = getProfile();
+  const scanCount = getScanCount();
+  const showSkinToneBanner = !profile.skinTone && !skinToneBannerDismissed;
+  const showAgeBanner = scanCount >= 2 && !profile.ageRange && profile.skinTone && !ageBannerDismissed;
 
   useEffect(() => {
     try {
@@ -39,6 +78,22 @@ export default function MatchResults() {
     } catch(err) { console.error("[MatchResults] parse error:", err); }
     finally { setLoading(false); }
   }, []);
+
+  function handleSkinToneSelect(tone) {
+    saveProfile({ skinTone: tone });
+    setShowSkinToneSheet(false);
+    setSkinToneBannerDismissed(true);
+    if (record) {
+      const more = findMoreMatches(record.scannedRed, record.scannedGreen, record.scannedBlue, record.country, record.category, 10, 5);
+      setBonusProducts(more);
+    }
+  }
+
+  function handleAgeSelect(age) {
+    saveProfile({ ageRange: age });
+    setShowAgeSheet(false);
+    setAgeBannerDismissed(true);
+  }
 
   const t = T[lang] || T.en;
 
@@ -62,6 +117,7 @@ export default function MatchResults() {
   const adviceParagraphs = formatAdvice(record.claudeAdvice);
   const personaName = record.personaName || "Maya";
   const personaEmoji = record.personaEmoji || "💄";
+  const allProducts = [...products, ...bonusProducts];
 
   return (
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
@@ -111,6 +167,39 @@ export default function MatchResults() {
           ) : <p style={{color:"#aaa",fontSize:14,margin:0}}>{t.noAdvice}</p>}
         </div>
 
+        {/* Progressive: Skin tone banner (after 1st scan) */}
+        {showSkinToneBanner && (
+          <div style={{position:"relative",background:"linear-gradient(135deg,#fffbeb,#fef3c7)",border:"1px solid #fbbf24",borderRadius:16,padding:"14px 40px 14px 14px",marginBottom:16,cursor:"pointer"}} onClick={()=>setShowSkinToneSheet(true)}>
+            <button onClick={e=>{e.stopPropagation();setSkinToneBannerDismissed(true);}} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:14,color:"#d97706",padding:"2px 6px"}}>✕</button>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:24}}>✨</span>
+              <div>
+                <div style={{fontWeight:700,fontSize:13,color:"#92400e"}}>{personaName} found {products.length} matches. Tell us your skin tone and unlock 5 more →</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Progressive: Age range banner (after 2nd scan) */}
+        {showAgeBanner && (
+          <div style={{position:"relative",background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",border:"1px solid #86efac",borderRadius:16,padding:"14px 40px 14px 14px",marginBottom:16,cursor:"pointer"}} onClick={()=>setShowAgeSheet(true)}>
+            <button onClick={e=>{e.stopPropagation();setAgeBannerDismissed(true);}} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:14,color:"#16a34a",padding:"2px 6px"}}>✕</button>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:24}}>🎂</span>
+              <div>
+                <div style={{fontWeight:700,fontSize:13,color:"#166534"}}>Add your age range and get personalised advice from {personaName} →</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Profile link */}
+        <div style={{textAlign:"center",marginBottom:16}}>
+          <button onClick={()=>navigate('/Profile')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 20px",cursor:"pointer",fontSize:12,color:"#7c3aed",fontWeight:600}}>
+            🧬 Complete Your Beauty DNA Profile
+          </button>
+        </div>
+
         {/* Upsell */}
         {!upsellDismissed && (
           <div style={{position:"relative",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff)",border:"1px solid #f0abda",borderRadius:20,padding:"18px 44px 18px 18px",marginBottom:20}}>
@@ -127,13 +216,14 @@ export default function MatchResults() {
         )}
 
         {/* Products */}
-        {products.length > 0 && (
+        {allProducts.length > 0 && (
           <div>
-            <div style={{fontWeight:800,fontSize:16,color:"#1a1a1a",marginBottom:12}}>🎯 {products.length} {t.matchingProducts}</div>
+            <div style={{fontWeight:800,fontSize:16,color:"#1a1a1a",marginBottom:12}}>🎯 {allProducts.length} {t.matchingProducts}</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              {products.map((p,i) => (
-                <div key={i} style={{background:"white",borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column"}}>
-                  <div style={{height:80,background:p.hexCode||"#f3e8ff",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+              {allProducts.map((p,i) => (
+                <div key={p.id||i} style={{background:"white",borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column",position:"relative"}}>
+                  {i >= products.length && <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"white",textAlign:"center",fontSize:9,fontWeight:700,padding:"3px 0",letterSpacing:0.5,textTransform:"uppercase"}}>Bonus Match</div>}
+                  <div style={{height:80,background:p.hexCode||"#f3e8ff",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",marginTop:i>=products.length?18:0}}>
                     <div style={{width:52,height:52,borderRadius:"50%",background:p.hexCode||"#e9d5ff",border:"3px solid rgba(255,255,255,0.6)"}} />
                     <div style={{position:"absolute",top:6,left:6,background:i===0?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(0,0,0,0.4)",color:"white",borderRadius:8,padding:"2px 7px",fontSize:10,fontWeight:700}}>
                       {i===0?t.bestMatch:`#${i+1}`}
@@ -154,8 +244,46 @@ export default function MatchResults() {
             </div>
           </div>
         )}
-        {products.length === 0 && <div style={{textAlign:"center",padding:"32px 0",color:"#aaa",fontSize:14}}>{t.noResults}</div>}
+        {allProducts.length === 0 && <div style={{textAlign:"center",padding:"32px 0",color:"#aaa",fontSize:14}}>{t.noResults}</div>}
       </div>
+
+      {/* Skin tone bottom sheet */}
+      {showSkinToneSheet && (
+        <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={()=>setShowSkinToneSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
+          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"28px 20px 36px",width:"100%",maxWidth:560,boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
+            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 20px"}} />
+            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your skin tone?</h3>
+            <p style={{margin:"0 0 20px",fontSize:12,color:"#888",textAlign:"center"}}>This helps {personaName} find better matches for you</p>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+              {SKIN_TONES.map(st => (
+                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"16px 8px",borderRadius:16,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:14,fontWeight:600,color:"#333",textAlign:"center",transition:"all 0.15s"}}>
+                  {st.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Age range bottom sheet */}
+      {showAgeSheet && (
+        <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={()=>setShowAgeSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
+          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"28px 20px 36px",width:"100%",maxWidth:560,boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
+            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 20px"}} />
+            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your age range?</h3>
+            <p style={{margin:"0 0 20px",fontSize:12,color:"#888",textAlign:"center"}}>{personaName} will personalise advice for your age group</p>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {AGE_RANGES.map(age => (
+                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:15,fontWeight:600,color:"#333",textAlign:"left",transition:"all 0.15s"}}>
+                  {age}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

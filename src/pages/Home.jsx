@@ -56,6 +56,26 @@ export default function Home() {
                 <span style={{ fontSize: 28 }}>🇳🇬</span>
                 <div><div style={{ fontWeight: 700 }}>English (NG)</div><div style={{ fontSize: 12, color: '#888' }}>Adaeze · Nigeria</div></div>
               </button>
+              <button onClick={() => pickLanguage('es')} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16, border: '2px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 16, fontWeight: 600, color: '#1a1a1a', textAlign: 'left' }}>
+                <span style={{ fontSize: 28 }}>🇲🇽</span>
+                <div><div style={{ fontWeight: 700 }}>Español</div><div style={{ fontSize: 12, color: '#888' }}>Isabella · Latin America</div></div>
+              </button>
+              <button onClick={() => pickLanguage('ar')} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16, border: '2px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 16, fontWeight: 600, color: '#1a1a1a', textAlign: 'left' }}>
+                <span style={{ fontSize: 28 }}>🇸🇦</span>
+                <div><div style={{ fontWeight: 700 }}>العربية</div><div style={{ fontSize: 12, color: '#888' }}>Layla · Middle East</div></div>
+              </button>
+              <button onClick={() => pickLanguage('fr')} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16, border: '2px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 16, fontWeight: 600, color: '#1a1a1a', textAlign: 'left' }}>
+                <span style={{ fontSize: 28 }}>🇫🇷</span>
+                <div><div style={{ fontWeight: 700 }}>Français</div><div style={{ fontSize: 12, color: '#888' }}>Céline · France/West Africa</div></div>
+              </button>
+              <button onClick={() => pickLanguage('bn')} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16, border: '2px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 16, fontWeight: 600, color: '#1a1a1a', textAlign: 'left' }}>
+                <span style={{ fontSize: 28 }}>🇧🇩</span>
+                <div><div style={{ fontWeight: 700 }}>বাংলা</div><div style={{ fontSize: 12, color: '#888' }}>Ananya · Bangladesh</div></div>
+              </button>
+              <button onClick={() => pickLanguage('sw')} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16, border: '2px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 16, fontWeight: 600, color: '#1a1a1a', textAlign: 'left' }}>
+                <span style={{ fontSize: 28 }}>🇰🇪</span>
+                <div><div style={{ fontWeight: 700 }}>Kiswahili</div><div style={{ fontSize: 12, color: '#888' }}>Amara · East Africa</div></div>
+              </button>
             </div>
             <button onClick={() => setShowModal(false)} style={{ marginTop: 20, width: '100%', padding: '12px', background: 'none', border: '1px solid #e5e7eb', borderRadius: 12, cursor: 'pointer', color: '#999', fontSize: 13 }}>Cancel</button>
           </div>

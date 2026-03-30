@@ -115,7 +115,7 @@ export const PRODUCTS = [
 ];
 
 // ── Color matching ────────────────────────────────────────────────────────────
-export function findColorMatches(r, g, b, country, category = null) {
+export function findColorMatches(r, g, b, country, category = null, limit = 10) {
   let pool = PRODUCTS;
 
   // Filter by country
@@ -131,7 +131,18 @@ export function findColorMatches(r, g, b, country, category = null) {
       colorDistance: Math.round(Math.sqrt((r - p.red) ** 2 + (g - p.green) ** 2 + (b - p.blue) ** 2))
     }))
     .sort((a, b) => a.colorDistance - b.colorDistance)
-    .slice(0, 10);
+    .slice(0, limit);
+}
+
+export function findMoreMatches(r, g, b, country, category = null, skip = 10, limit = 5) {
+  let pool = PRODUCTS;
+  if (country) pool = pool.filter(p => p.country === country);
+  if (pool.length === 0) pool = PRODUCTS;
+  if (category) pool = pool.filter(p => p.category === category);
+  return pool
+    .map(p => ({ ...p, colorDistance: Math.round(Math.sqrt((r - p.red) ** 2 + (g - p.green) ** 2 + (b - p.blue) ** 2)) }))
+    .sort((a, b) => a.colorDistance - b.colorDistance)
+    .slice(skip, skip + limit);
 }
 
 // Get all categories
