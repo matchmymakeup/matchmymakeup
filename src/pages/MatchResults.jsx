@@ -359,13 +359,13 @@ export default function MatchResults() {
       {showSkinToneSheet && (
         <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
           <div onClick={()=>setShowSkinToneSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
-          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"28px 20px 36px",width:"100%",maxWidth:560,boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
-            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 20px"}} />
+          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
+            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
             <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your skin tone?</h3>
-            <p style={{margin:"0 0 20px",fontSize:12,color:"#888",textAlign:"center"}}>This helps {personaName} find better matches for you</p>
+            <p style={{margin:"0 0 16px",fontSize:12,color:"#888",textAlign:"center"}}>This helps {personaName} find better matches for you</p>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
               {SKIN_TONES.map(st => (
-                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"16px 8px",borderRadius:16,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:14,fontWeight:600,color:"#333",textAlign:"center",transition:"all 0.15s"}}>
+                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"14px 8px",borderRadius:16,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:14,fontWeight:600,color:"#333",textAlign:"center",minHeight:44}}>
                   {st.label}
                 </button>
               ))}
@@ -378,13 +378,13 @@ export default function MatchResults() {
       {showAgeSheet && (
         <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
           <div onClick={()=>setShowAgeSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
-          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"28px 20px 36px",width:"100%",maxWidth:560,boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
-            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 20px"}} />
+          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
+            <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
             <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your age range?</h3>
-            <p style={{margin:"0 0 20px",fontSize:12,color:"#888",textAlign:"center"}}>{personaName} will personalise advice for your age group</p>
+            <p style={{margin:"0 0 16px",fontSize:12,color:"#888",textAlign:"center"}}>{personaName} will personalise advice for your age group</p>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               {AGE_RANGES.map(age => (
-                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:15,fontWeight:600,color:"#333",textAlign:"left",transition:"all 0.15s"}}>
+                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:15,fontWeight:600,color:"#333",textAlign:"left",minHeight:44}}>
                   {age}
                 </button>
               ))}

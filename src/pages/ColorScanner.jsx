@@ -278,29 +278,33 @@ export default function ColorScanner() {
 
   return (
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{textAlign:"center",padding:"16px 16px 4px",position:"relative"}}>
-        <div style={{fontSize:28}}>💄</div>
-        <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup</h1>
-        <p style={{margin:"0 0 4px",fontSize:12,color:"#9d174d",opacity:0.8}}>{t.appTagline}</p>
-        <div style={{position:"absolute",top:12,left:12,display:"flex",flexDirection:"column",gap:6}}>
-          {streak.count >= 1 && (
-            <div style={{background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"white",borderRadius:20,padding:"4px 10px",fontSize:11,fontWeight:700}}>
-              🔥 {streak.count}-day streak
-            </div>
-          )}
-          {streak.count >= 7 && (
-            <div style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:20,padding:"4px 10px",fontSize:9,fontWeight:600,maxWidth:140}}>
-              Maya knows your style — 7x more personalised
-            </div>
-          )}
+      <div style={{padding:"12px 16px 4px"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            {streak.count >= 1 && (
+              <div style={{background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"white",borderRadius:20,padding:"4px 8px",fontSize:12,fontWeight:700}}>
+                🔥 {streak.count}
+              </div>
+            )}
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <button onClick={()=>navigate('/Profile')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",minHeight:32}}>
+              🧬 DNA
+            </button>
+            <button onClick={()=>navigate('/Library')} style={{background:"white",color:"#7c3aed",border:"1px solid #e5e7eb",borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",minHeight:32}}>
+              {t.library}
+            </button>
+          </div>
         </div>
-        <div style={{position:"absolute",top:12,right:12,display:"flex",flexDirection:"column",gap:6}}>
-          <button onClick={()=>navigate('/Profile')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:20,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>
-            🧬 Beauty DNA
-          </button>
-          <button onClick={()=>navigate('/Library')} style={{background:"white",color:"#7c3aed",border:"1px solid #e5e7eb",borderRadius:20,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer"}}>
-            {t.library}
-          </button>
+        <div style={{textAlign:"center"}}>
+          <div style={{fontSize:28}}>💄</div>
+          <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup</h1>
+          <p style={{margin:"0 0 4px",fontSize:12,color:"#9d174d",opacity:0.8}}>{t.appTagline}</p>
+          {streak.count >= 7 && (
+            <div style={{fontSize:12,color:"#7c3aed",fontWeight:600,marginTop:2}}>
+              Maya knows your style — 7x more personalised ✨
+            </div>
+          )}
         </div>
       </div>
 

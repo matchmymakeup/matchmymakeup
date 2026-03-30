@@ -56,11 +56,11 @@ export default function Profile() {
   }
 
   const pillStyle = (active) => ({
-    padding:'10px 16px',borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:600,
+    padding:'10px 14px',borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:600,
     border: active ? '2px solid #7c3aed' : '2px solid #e5e7eb',
     background: active ? '#f5f3ff' : 'white',
     color: active ? '#7c3aed' : '#555',
-    transition:'all 0.15s',
+    transition:'all 0.15s',minHeight:44,
   });
 
   function renderOptions(section) {
@@ -112,7 +112,7 @@ export default function Profile() {
 
         {/* Skin Tone (always first) */}
         <div style={{background:'white',borderRadius:20,padding:16,boxShadow:'0 4px 16px rgba(0,0,0,0.06)',marginBottom:12}}>
-          <div onClick={()=>setOpenSection(openSection==='skinTone'?null:'skinTone')} style={{display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer'}}>
+          <div onClick={()=>setOpenSection(openSection==='skinTone'?null:'skinTone')} style={{display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',minHeight:44}}>
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               {skinToneDone ? <span style={{fontSize:18}}>✅</span> : <span style={{fontSize:18}}>⬜</span>}
               <div>
@@ -137,7 +137,7 @@ export default function Profile() {
           const open = openSection === section.key;
           return (
             <div key={section.key} style={{background:'white',borderRadius:20,padding:16,boxShadow:'0 4px 16px rgba(0,0,0,0.06)',marginBottom:12}}>
-              <div onClick={()=>setOpenSection(open?null:section.key)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer'}}>
+              <div onClick={()=>setOpenSection(open?null:section.key)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',minHeight:44}}>
                 <div style={{display:'flex',alignItems:'center',gap:10}}>
                   {done ? <span style={{fontSize:18}}>✅</span> : <span style={{fontSize:18}}>⬜</span>}
                   <div>

@@ -10,7 +10,7 @@ export default function Library() {
   return (
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{background:"white",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
-        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"6px 14px",cursor:"pointer",fontSize:13,color:"#666"}}>← Scanner</button>
+        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#666",minHeight:44}}>← Scanner</button>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:20}}>💄</span>
           <span style={{fontWeight:800,fontSize:16,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>My Library</span>
@@ -43,7 +43,7 @@ export default function Library() {
                       <div style={{fontSize:11,color:"#999"}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
                     </div>
                   </div>
-                  {scan.advice&&<div style={{fontSize:12,color:"#555",lineHeight:1.5,background:"#fdf2f8",borderRadius:10,padding:"8px 12px"}}>{scan.advice}</div>}
+                  {scan.advice&&<div style={{fontSize:12,color:"#555",lineHeight:1.5,background:"#fdf2f8",borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
                 </div>
               ))}
             </div>
