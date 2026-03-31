@@ -173,8 +173,18 @@ export default function MatchResults() {
   }
 
   function getShopUrl(p) {
-    if (p.retailerUrl && p.retailerUrl.startsWith('http')) return p.retailerUrl;
-    return `https://www.google.com/search?q=${encodeURIComponent(p.brand + ' ' + p.name + ' buy')}`;
+    if (p.retailerUrl && p.retailerUrl.startsWith('http') && !p.retailerUrl.includes('google.com/search')) return p.retailerUrl;
+    const q = encodeURIComponent(p.brand + ' ' + p.name);
+    const userCountry = record?.country || '';
+    switch (userCountry) {
+      case 'USA': case 'Australia': return `https://www.sephora.com/search?keyword=${q}`;
+      case 'India': return `https://www.nykaa.com/search/result/?q=${q}`;
+      case 'Indonesia': return `https://shopee.co.id/search?keyword=${q}`;
+      case 'Nigeria': return `https://www.jumia.com.ng/catalog/?q=${q}`;
+      case 'China': return `https://s.taobao.com/search?q=${q}`;
+      case 'Brazil': return `https://www.amazon.com.br/s?k=${q}`;
+      default: return `https://www.google.com/search?q=${encodeURIComponent(p.brand + ' ' + p.name + ' buy online')}`;
+    }
   }
 
   function generateShareCard() {

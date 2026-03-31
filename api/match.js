@@ -223,6 +223,15 @@ export default function handler(req, res) {
       matches = findColorMatches(r, g, b, country, category, limit || 10);
     }
 
+    // Convert USD to AUD for Australian users
+    if (country === 'Australia') {
+      matches = matches.map(p => ({
+        ...p,
+        price: p.currency === 'USD' ? Math.round(p.price * 1.55 * 100) / 100 : p.price,
+        currency: p.currency === 'USD' ? 'AUD' : p.currency,
+      }));
+    }
+
     return res.status(200).json({ matches });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
