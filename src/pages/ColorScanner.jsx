@@ -167,16 +167,176 @@ function CameraTab({onColorPicked, t}) {
   );
 }
 
+function hsvToRgb(h,s,v){
+  const c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c;
+  let r=0,g=0,b=0;
+  if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}
+  else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}
+  return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];
+}
+function rgbToHsv(r,g,b){
+  r/=255;g/=255;b/=255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;
+  let h=0;
+  if(d!==0){if(mx===r)h=((g-b)/d+6)%6*60;else if(mx===g)h=((b-r)/d+2)*60;else h=((r-g)/d+4)*60;}
+  const s=mx===0?0:d/mx;
+  return [h,s,mx];
+}
+
 function PickerTab({color, onWheel, onHexType, t}) {
+  const svCanvasRef = useRef(null);
+  const hueCanvasRef = useRef(null);
+  const svDragging = useRef(false);
+  const hueDragging = useRef(false);
+
+  const initColor = color?.hex && /^#[0-9A-Fa-f]{6}$/.test(color.hex) ? color : {hex:"#FF6B9D",r:255,g:107,b:157};
+  const initHsv = rgbToHsv(initColor.r, initColor.g, initColor.b);
+  const hueRef = useRef(initHsv[0]);
+  const satRef = useRef(initHsv[1]);
+  const valRef = useRef(initHsv[2]);
+
+  const SV_SIZE = 240;
+  const HUE_H = 28;
+
+  function emit(h,s,v) {
+    const [r,g,b] = hsvToRgb(h,s,v);
+    const hex = toHex(r,g,b);
+    onWheel({target:{value:hex}});
+  }
+
+  function drawSV() {
+    const cv = svCanvasRef.current;
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    const w = cv.width, h = cv.height;
+    // White-to-hue horizontal gradient
+    const hueRgb = hsvToRgb(hueRef.current,1,1);
+    const hGrad = ctx.createLinearGradient(0,0,w,0);
+    hGrad.addColorStop(0,'#fff');
+    hGrad.addColorStop(1,`rgb(${hueRgb[0]},${hueRgb[1]},${hueRgb[2]})`);
+    ctx.fillStyle = hGrad;
+    ctx.fillRect(0,0,w,h);
+    // Black vertical gradient overlay
+    const vGrad = ctx.createLinearGradient(0,0,0,h);
+    vGrad.addColorStop(0,'rgba(0,0,0,0)');
+    vGrad.addColorStop(1,'#000');
+    ctx.fillStyle = vGrad;
+    ctx.fillRect(0,0,w,h);
+  }
+
+  function drawHue() {
+    const cv = hueCanvasRef.current;
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    const grad = ctx.createLinearGradient(0,0,cv.width,0);
+    for (let i=0;i<=6;i++) {
+      const [r,g,b] = hsvToRgb(i*60,1,1);
+      grad.addColorStop(i/6,`rgb(${r},${g},${b})`);
+    }
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,cv.width,cv.height);
+  }
+
+  useEffect(() => { drawSV(); drawHue(); }, []);
+
+  // Sync from external hex changes (e.g. typed input)
+  useEffect(() => {
+    if (color?.hex && /^#[0-9A-Fa-f]{6}$/.test(color.hex) && !svDragging.current && !hueDragging.current) {
+      const rgb = fromHex(color.hex);
+      if (rgb) {
+        const [h,s,v] = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        hueRef.current = h; satRef.current = s; valRef.current = v;
+        drawSV();
+      }
+    }
+  }, [color?.hex]);
+
+  function handleSV(clientX, clientY) {
+    const cv = svCanvasRef.current;
+    if (!cv) return;
+    const rect = cv.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+    satRef.current = x;
+    valRef.current = 1 - y;
+    emit(hueRef.current, satRef.current, valRef.current);
+  }
+
+  function handleHue(clientX) {
+    const cv = hueCanvasRef.current;
+    if (!cv) return;
+    const rect = cv.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    hueRef.current = x * 360;
+    drawSV();
+    emit(hueRef.current, satRef.current, valRef.current);
+  }
+
+  // Unified pointer handlers
+  function onSVDown(e) {
+    e.preventDefault();
+    svDragging.current = true;
+    const pt = e.touches ? e.touches[0] : e;
+    handleSV(pt.clientX, pt.clientY);
+  }
+  function onHueDown(e) {
+    e.preventDefault();
+    hueDragging.current = true;
+    const pt = e.touches ? e.touches[0] : e;
+    handleHue(pt.clientX);
+  }
+
+  useEffect(() => {
+    function onMove(e) {
+      const pt = e.touches ? e.touches[0] : e;
+      if (svDragging.current) { e.preventDefault(); handleSV(pt.clientX, pt.clientY); }
+      if (hueDragging.current) { e.preventDefault(); handleHue(pt.clientX); }
+    }
+    function onUp() { svDragging.current = false; hueDragging.current = false; }
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('touchend', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, []);
+
+  const svX = satRef.current * 100;
+  const svY = (1 - valRef.current) * 100;
+  const hueX = (hueRef.current / 360) * 100;
+
   return (
     <div style={{textAlign:"center"}}>
       <p style={{color:"#F5F0E8",fontSize:13,margin:"0 0 12px"}}>{t.pickerPrompt}</p>
-      <input type="color" value={color?.hex||"#FF6B9D"} onChange={onWheel}
-        style={{width:120,height:120,borderRadius:"50%",border:"none",cursor:"pointer",background:"none",padding:0}}/>
-      <div style={{marginTop:16}}>
-        <label style={{fontSize:12,color:"#888",fontWeight:600}}>{t.hexLabel}</label>
-        <input type="text" value={color?.hex||""} onChange={onHexType} placeholder="#FF6B9D"
-          style={{display:"block",margin:"8px auto 0",width:140,padding:"10px 14px",borderRadius:12,border:"2px solid #e5e7eb",textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700}}/>
+
+      {/* SV gradient square */}
+      <div style={{position:"relative",width:"100%",maxWidth:SV_SIZE,margin:"0 auto",aspectRatio:"1",borderRadius:12,overflow:"hidden",cursor:"crosshair",touchAction:"none"}}>
+        <canvas ref={svCanvasRef} width={SV_SIZE} height={SV_SIZE}
+          onMouseDown={onSVDown} onTouchStart={onSVDown}
+          style={{width:"100%",height:"100%",display:"block",borderRadius:12}} />
+        <div style={{position:"absolute",left:`${svX}%`,top:`${svY}%`,width:20,height:20,borderRadius:"50%",border:"3px solid white",boxShadow:"0 0 0 1px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none",background:color?.hex||"#FF6B9D"}} />
+      </div>
+
+      {/* Hue slider */}
+      <div style={{position:"relative",width:"100%",maxWidth:SV_SIZE,margin:"12px auto 0",height:HUE_H,borderRadius:14,overflow:"hidden",cursor:"pointer",touchAction:"none"}}>
+        <canvas ref={hueCanvasRef} width={SV_SIZE} height={HUE_H}
+          onMouseDown={onHueDown} onTouchStart={onHueDown}
+          style={{width:"100%",height:"100%",display:"block",borderRadius:14}} />
+        <div style={{position:"absolute",left:`${hueX}%`,top:"50%",width:8,height:HUE_H+4,borderRadius:4,border:"3px solid white",boxShadow:"0 0 0 1px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none"}} />
+      </div>
+
+      {/* Preview + hex */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginTop:16}}>
+        <div style={{width:44,height:44,borderRadius:"50%",background:color?.hex||"#FF6B9D",border:"3px solid rgba(255,255,255,0.2)",boxShadow:`0 4px 14px ${(color?.hex||"#FF6B9D")}60`,flexShrink:0}} />
+        <div>
+          <label style={{fontSize:12,color:"rgba(201,169,110,0.7)",fontWeight:600}}>{t.hexLabel}</label>
+          <input type="text" value={color?.hex||""} onChange={onHexType} placeholder="#FF6B9D"
+            style={{display:"block",marginTop:4,width:130,padding:"10px 14px",borderRadius:12,border:"2px solid #555",textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700,background:"#3C3C3E",color:"#F5F0E8"}}/>
+        </div>
       </div>
     </div>
   );
