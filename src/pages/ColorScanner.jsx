@@ -305,7 +305,7 @@ export default function ColorScanner() {
         </div>
         <div style={{textAlign:"center"}}>
           <div style={{fontSize:28}}>💄</div>
-          <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:10}}>™</span></h1>
+          <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:10}}>{'\u2122'}</span></h1>
           <p style={{margin:"0 0 4px",fontSize:12,color:"#F5F0E8",lineHeight:1.4}}>Upload a photo, use your camera, or pick a color to find your perfect makeup match.</p>
           {streak.count >= 7 && (
             <div style={{fontSize:12,color:"#C9A96E",fontWeight:600,marginTop:2}}>

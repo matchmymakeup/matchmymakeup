@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 function MMarkLogo() {
   return (
-    <svg width="64" height="56" viewBox="0 0 64 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="80" height="70" viewBox="0 0 64 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <polyline points="4,52 18,12 32,36 46,12 60,52" stroke="#C9A96E" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="32" cy="8" r="5" fill="#B76E79" />
     </svg>
@@ -22,8 +22,8 @@ export default function Home() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 24px 40px', boxSizing: 'border-box' }}>
         <MMarkLogo />
         <div style={{ height: 24 }} />
-        <h1 style={{ color: '#F5F0E8', fontSize: 34, fontWeight: 400, margin: '0 0 12px', textAlign: 'center', letterSpacing: 0.5 }}>
-          MatchMyMakeup<span style={{ fontSize: 14, verticalAlign: 'super', color: '#C9A96E' }}>&trade;</span>
+        <h1 style={{ color: '#F5F0E8', fontSize: 44, fontWeight: 400, margin: '0 0 12px', textAlign: 'center', letterSpacing: 0.5 }}>
+          MatchMyMakeup<span style={{ fontSize: 18, verticalAlign: 'super', color: '#C9A96E' }}>&trade;</span>
         </h1>
         <p style={{ color: '#C9A96E', textAlign: 'center', maxWidth: 320, lineHeight: 1.8, margin: '0 0 32px', fontSize: 11, fontFamily: "'Segoe UI', Helvetica, sans-serif", fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase' }}>
           AI Beauty Intelligence

@@ -257,7 +257,7 @@ export default function MatchResults() {
           <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #555",borderRadius:10,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",fontWeight:600}}>{t.scanAgain}</button>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:20}}>💄</span>
-            <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>™</span></span>
+            <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>{'\u2122'}</span></span>
           </div>
         </div>
       </div>
@@ -385,8 +385,8 @@ export default function MatchResults() {
                 <div key={p.id||i} style={{background:"#2C2C2E",borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column",position:"relative"}}>
                   {i >= products.length && <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"#1C1C1E",textAlign:"center",fontSize:9,fontWeight:700,padding:"3px 0",letterSpacing:0.5,textTransform:"uppercase"}}>Bonus Match</div>}
                   <div style={{height:80,background:p.hexCode||"#2C2C2E",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",marginTop:i>=products.length?18:0}}>
-                    <div style={{width:52,height:52,borderRadius:"50%",background:p.hexCode||"#e9d5ff",border:"3px solid rgba(255,255,255,0.6)"}} />
-                    <div style={{position:"absolute",top:6,left:6,background:i===0?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(0,0,0,0.4)",color:"#1C1C1E",borderRadius:8,padding:"2px 7px",fontSize:10,fontWeight:700}}>
+                    <div style={{width:52,height:52,borderRadius:"50%",backgroundColor:p.hexCode||"#e9d5ff",border:"3px solid rgba(255,255,255,0.6)",flexShrink:0}} />
+                    <div style={{position:"absolute",top:6,left:6,background:i===0?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(0,0,0,0.5)",color:i===0?"#1C1C1E":"#F5F0E8",borderRadius:8,padding:"2px 7px",fontSize:10,fontWeight:700}}>
                       {i===0?t.bestMatch:`#${i+1}`}
                     </div>
                   </div>
