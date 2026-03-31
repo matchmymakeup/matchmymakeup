@@ -56,3 +56,19 @@ src/
 - AUD for money, AEST for times, Australian English spelling
 - One command at a time, wait for confirmation before next step
 - Flag risks before acting, not after
+
+## Working Style (Champ)
+- Worst-case-first risk framing — don't lead with optimistic defaults
+- Give options with tradeoffs, not a single recommended answer
+- No padding, no hype, no validation-seeking
+- Explain what a change does before making it
+- Never delete or overwrite working code without flagging it first
+- If I go quiet mid-task, don't assume confirmation — ask
+
+## Hard Rules
+- API key must never appear client-side — flag immediately if seen
+- Do not touch analytics tracking code without flagging — B2B revenue implication
+- products.js is read-only — do not extend under any circumstances
+- All user-facing strings must remain translatable — no hardcoded English in JSX
+- One Supabase migration step at a time when that work begins
+- P&L and account figures are private — never log or display in shareable output
