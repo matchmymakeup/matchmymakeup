@@ -254,7 +254,7 @@ export default function MatchResults() {
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{background:"#2C2C2E",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
         <div style={{maxWidth:560,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:10,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#666",fontWeight:600}}>{t.scanAgain}</button>
+          <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #555",borderRadius:10,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",fontWeight:600}}>{t.scanAgain}</button>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:20}}>💄</span>
             <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>™</span></span>
@@ -269,8 +269,8 @@ export default function MatchResults() {
           <div style={{display:"flex",alignItems:"center",gap:16}}>
             <div style={{width:72,height:72,borderRadius:"50%",background:record.scannedHex,flexShrink:0,boxShadow:`0 6px 24px ${record.scannedHex}80`}} />
             <div>
-              <div style={{fontFamily:"monospace",fontSize:24,fontWeight:800,color:"#1a1a1a"}}>{record.scannedHex}</div>
-              <div style={{color:"#888",fontSize:12,marginTop:3}}>R <b style={{color:"#ef4444"}}>{record.scannedRed}</b> &nbsp; G <b style={{color:"#22c55e"}}>{record.scannedGreen}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{record.scannedBlue}</b></div>
+              <div style={{fontFamily:"monospace",fontSize:24,fontWeight:800,color:"#F5F0E8"}}>{record.scannedHex}</div>
+              <div style={{color:"#F5F0E8",fontSize:12,marginTop:3}}>R <b style={{color:"#ef4444"}}>{record.scannedRed}</b> &nbsp; G <b style={{color:"#22c55e"}}>{record.scannedGreen}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{record.scannedBlue}</b></div>
               {(record.skinTone||record.occasion||record.country) && (
                 <div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>
                   {record.skinTone && <span style={{background:"#2C2C2E",color:"#B76E79",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{record.skinTone}</span>}
@@ -292,7 +292,7 @@ export default function MatchResults() {
             </div>
           </div>
           {adviceParagraphs.length > 0 ? (
-            <div style={{fontSize:14,lineHeight:1.8,color:"#374151"}}>
+            <div style={{fontSize:14,lineHeight:1.8,color:"#F5F0E8"}}>
               {adviceParagraphs.map((para,i) => <p key={i} style={{margin:"0 0 10px 0"}}>{para}</p>)}
             </div>
           ) : <p style={{color:"#aaa",fontSize:14,margin:0}}>{t.noAdvice}</p>}
@@ -350,7 +350,7 @@ export default function MatchResults() {
               <div style={{flex:1}}>
                 {!trialInfo.started ? (
                   <>
-                    <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>{t.upsellHeading}</div>
+                    <div style={{fontWeight:800,fontSize:14,color:"#F5F0E8",marginBottom:4}}>{t.upsellHeading}</div>
                     <div style={{fontSize:12,color:"#999",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
                     <button onClick={handleCheckout} style={{display:"inline-block",background:"#C9A96E",color:"#1C1C1E",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Try Premium Free — 7 days, no card needed →
@@ -364,7 +364,7 @@ export default function MatchResults() {
                   </>
                 ) : (
                   <>
-                    <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>Your trial ended</div>
+                    <div style={{fontWeight:800,fontSize:14,color:"#F5F0E8",marginBottom:4}}>Your trial ended</div>
                     <div style={{fontSize:12,color:"#999",lineHeight:1.5,marginBottom:12}}>Maya saved {trialInfo.scansSaved} scan{trialInfo.scansSaved!==1?'s':''} for you — keep access for $4.99/month</div>
                     <button onClick={handleCheckout} style={{display:"inline-block",background:"#C9A96E",color:"#1C1C1E",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Upgrade to Premium — $4.99/month →
@@ -379,7 +379,7 @@ export default function MatchResults() {
         {/* Products */}
         {allProducts.length > 0 && (
           <div>
-            <div style={{fontWeight:800,fontSize:16,color:"#1a1a1a",marginBottom:12}}>🎯 {allProducts.length} {t.matchingProducts}</div>
+            <div style={{fontWeight:800,fontSize:16,color:"#F5F0E8",marginBottom:12}}>🎯 {allProducts.length} {t.matchingProducts}</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
               {allProducts.map((p,i) => (
                 <div key={p.id||i} style={{background:"#2C2C2E",borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column",position:"relative"}}>
@@ -392,10 +392,10 @@ export default function MatchResults() {
                   </div>
                   <div style={{padding:"10px 10px 12px",flex:1,display:"flex",flexDirection:"column"}}>
                     <div style={{fontSize:10,color:"#B76E79",fontWeight:700,textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>{p.brand}</div>
-                    <div style={{fontSize:12,fontWeight:700,color:"#1a1a1a",lineHeight:1.3,marginBottom:3,flex:1}}>{p.name}</div>
-                    <div style={{fontSize:11,color:"#888",marginBottom:4}}>{p.colorName && <span>{p.colorName} · </span>}<span style={{textTransform:"capitalize"}}>{p.category}</span></div>
+                    <div style={{fontSize:12,fontWeight:700,color:"#F5F0E8",lineHeight:1.3,marginBottom:3,flex:1}}>{p.name}</div>
+                    <div style={{fontSize:11,color:"rgba(201,169,110,0.7)",marginBottom:4}}>{p.colorName && <span>{p.colorName} · </span>}<span style={{textTransform:"capitalize"}}>{p.category}</span></div>
                     {p.price && <div style={{fontSize:13,fontWeight:700,color:"#C9A96E",marginBottom:6}}>{p.currency||"$"}{p.price}</div>}
-                    <div style={{fontSize:10,color:"#aaa",marginBottom:8}}>{t.colorDistance}: <b style={{color:"#374151"}}>{p.colorDistance}</b></div>
+                    <div style={{fontSize:10,color:"rgba(201,169,110,0.7)",marginBottom:8}}>{t.colorDistance}: <b style={{color:"#F5F0E8"}}>{p.colorDistance}</b></div>
                     <div style={{display:"flex",gap:4}}>
                       <a href={getShopUrl(p)} target="_blank" rel="noopener noreferrer" style={{flex:1,textAlign:"center",background:"#C9A96E",color:"#1C1C1E",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none",minHeight:32,display:"flex",alignItems:"center",justifyContent:"center"}}>
                         {p.retailerUrl && p.retailerUrl.startsWith('http') ? t.shopNow : 'Search Online →'}
@@ -419,11 +419,11 @@ export default function MatchResults() {
           <div onClick={()=>setShowSkinToneSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
           <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
             <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your skin tone?</h3>
+            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#F5F0E8",textAlign:"center"}}>What's your skin tone?</h3>
             <p style={{margin:"0 0 16px",fontSize:12,color:"#888",textAlign:"center"}}>This helps {personaName} find better matches for you</p>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
               {SKIN_TONES.map(st => (
-                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"14px 8px",borderRadius:16,border:"2px solid #444",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:600,color:"#333",textAlign:"center",minHeight:44}}>
+                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"14px 8px",borderRadius:16,border:"2px solid #444",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:600,color:"#F5F0E8",textAlign:"center",minHeight:44}}>
                   {st.label}
                 </button>
               ))}
@@ -438,11 +438,11 @@ export default function MatchResults() {
           <div onClick={()=>setShowAgeSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
           <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
             <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your age range?</h3>
+            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#F5F0E8",textAlign:"center"}}>What's your age range?</h3>
             <p style={{margin:"0 0 16px",fontSize:12,color:"#888",textAlign:"center"}}>{personaName} will personalise advice for your age group</p>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               {AGE_RANGES.map(age => (
-                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #444",background:"#2C2C2E",cursor:"pointer",fontSize:15,fontWeight:600,color:"#333",textAlign:"left",minHeight:44}}>
+                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #444",background:"#2C2C2E",cursor:"pointer",fontSize:15,fontWeight:600,color:"#F5F0E8",textAlign:"left",minHeight:44}}>
                   {age}
                 </button>
               ))}
@@ -457,10 +457,10 @@ export default function MatchResults() {
           <div onClick={()=>setShowSaveShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)"}} />
           <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560}}>
             <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-            <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Save This Color</h3>
+            <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Save This Color</h3>
             <div style={{width:"100%",height:48,borderRadius:12,background:record.scannedHex,marginBottom:12}} />
-            <div style={{textAlign:"center",fontFamily:"monospace",fontSize:16,fontWeight:700,color:"#1a1a1a",marginBottom:16}}>{record.scannedHex}</div>
-            <input placeholder='e.g. "My everyday lip"' value={shadeName} onChange={e=>setShadeName(e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid #e5e7eb",fontSize:14,marginBottom:12}} />
+            <div style={{textAlign:"center",fontFamily:"monospace",fontSize:16,fontWeight:700,color:"#F5F0E8",marginBottom:16}}>{record.scannedHex}</div>
+            <input placeholder='e.g. "My everyday lip"' value={shadeName} onChange={e=>setShadeName(e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid #555",fontSize:14,marginBottom:12,background:"#3C3C3E",color:"#F5F0E8"}} />
             <button onClick={handleSaveShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save to My Shades</button>
           </div>
         </div>

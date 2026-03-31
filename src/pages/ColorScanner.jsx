@@ -90,7 +90,7 @@ function UploadTab({onColorPicked, t}) {
           style={{width:'100%',borderRadius:12,cursor:'crosshair',touchAction:'none',display:'block'}} />
         {pin && <div style={{position:'absolute',left:pin.cx-11,top:pin.cy-11,width:22,height:22,borderRadius:'50%',border:'3px solid white',boxShadow:'0 0 0 2px rgba(0,0,0,0.7)',pointerEvents:'none'}} />}
         <p style={{textAlign:'center',fontSize:13,color:'#999',marginTop:8}}>{t.uploadTapPrompt}</p>
-        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:'1px solid #ddd',borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:'#666'}}>{t.changeImage}</button>
+        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:'1px solid #555',borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:'#F5F0E8'}}>{t.changeImage}</button>
       </div>
     </div>
   );
@@ -332,20 +332,20 @@ export default function ColorScanner() {
           <div style={{background:"#2C2C2E",borderRadius:20,padding:16,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14,display:"flex",alignItems:"center",gap:16}}>
             <div style={{width:56,height:56,borderRadius:"50%",flexShrink:0,background:color.hex,boxShadow:`0 4px 18px ${color.hex}80`}}/>
             <div>
-              <div style={{fontFamily:"monospace",fontSize:22,fontWeight:800,color:"#111"}}>{color.hex}</div>
-              <div style={{fontSize:13,color:"#888",marginTop:3}}>R <b style={{color:"#ef4444"}}>{color.r}</b> &nbsp; G <b style={{color:"#22c55e"}}>{color.g}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{color.b}</b></div>
+              <div style={{fontFamily:"monospace",fontSize:22,fontWeight:800,color:"#F5F0E8"}}>{color.hex}</div>
+              <div style={{fontSize:13,color:"#F5F0E8",marginTop:3}}>R <b style={{color:"#ef4444"}}>{color.r}</b> &nbsp; G <b style={{color:"#22c55e"}}>{color.g}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{color.b}</b></div>
             </div>
           </div>
         )}
 
         <div style={{background:"#2C2C2E",borderRadius:20,padding:18,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14}}>
-          <div style={{fontSize:13,fontWeight:700,color:"#374151",marginBottom:12}}>{t.personalize}</div>
+          <div style={{fontSize:13,fontWeight:700,color:"#F5F0E8",marginBottom:12}}>{t.personalize}</div>
           <div style={{marginBottom:16}}>
             <label style={{display:"block",fontSize:11,color:"#888",fontWeight:700,marginBottom:8,letterSpacing:1}}>{t.categoryLabel}</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
               {CATEGORIES.map(cat => (
                 <button key={cat.id} onClick={()=>setCategory(cat.id==='all'?'':cat.id)}
-                  style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:(category===cat.id||(cat.id==='all'&&!category))?"2px solid #B76E79":"2px solid #e5e7eb",background:(category===cat.id||(cat.id==='all'&&!category))?"#2C2C2E":"white",color:(category===cat.id||(cat.id==='all'&&!category))?"#B76E79":"#555",fontSize:12,fontWeight:(category===cat.id||(cat.id==='all'&&!category))?700:500}}>
+                  style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:(category===cat.id||(cat.id==='all'&&!category))?"2px solid #B76E79":"2px solid #555",background:(category===cat.id||(cat.id==='all'&&!category))?"#2C2C2E":"#3C3C3E",color:(category===cat.id||(cat.id==='all'&&!category))?"#B76E79":"#F5F0E8",fontSize:12,fontWeight:(category===cat.id||(cat.id==='all'&&!category))?700:500}}>
                   {cat.emoji} {cat.label}
                 </button>
               ))}
@@ -354,7 +354,7 @@ export default function ColorScanner() {
           <div style={{display:"flex",gap:10,marginBottom:14}}>
             <div style={{flex:1}}>
               <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:4}}>{t.skinToneLabel}</label>
-              <select value={skinTone} onChange={e=>setSkinTone(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:12,background:"#2C2C2E"}}>
+              <select value={skinTone} onChange={e=>setSkinTone(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #555",fontSize:12,background:"#3C3C3E",color:"#F5F0E8"}}>
                 <option value="">{t.skinTones.any}</option>
                 <option value="Fair">{t.skinTones.fair}</option>
                 <option value="Light">{t.skinTones.light}</option>
@@ -365,7 +365,7 @@ export default function ColorScanner() {
             </div>
             <div style={{flex:1}}>
               <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:4}}>{t.occasionLabel}</label>
-              <select value={occasion} onChange={e=>setOccasion(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:12,background:"#2C2C2E"}}>
+              <select value={occasion} onChange={e=>setOccasion(e.target.value)} style={{width:"100%",padding:"9px 10px",borderRadius:10,border:"1px solid #555",fontSize:12,background:"#3C3C3E",color:"#F5F0E8"}}>
                 <option value="">{t.occasions.any}</option>
                 <option value="Daily">{t.occasions.daily}</option>
                 <option value="Office">{t.occasions.office}</option>
@@ -379,7 +379,7 @@ export default function ColorScanner() {
             <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>LANGUAGE</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
               {[["en","🇺🇸 EN"],["hi","🇮🇳 HI"],["pt","🇧🇷 PT"],["zh","🇨🇳 ZH"],["id","🇮🇩 ID"],["ng","🇳🇬 NG"],["es","🇲🇽 ES"],["ar","🇸🇦 AR"],["fr","🇫🇷 FR"],["bn","🇧🇩 BN"],["sw","🇰🇪 SW"]].map(([id,label])=>(
-                <button key={id} onClick={()=>setLang(id)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:lang===id?"2px solid #C9A96E":"2px solid #e5e7eb",background:lang===id?"#2C2C2E":"white",color:lang===id?"#C9A96E":"#555",fontSize:12,fontWeight:lang===id?700:500}}>{label}</button>
+                <button key={id} onClick={()=>setLang(id)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:lang===id?"2px solid #C9A96E":"2px solid #555",background:lang===id?"#2C2C2E":"#3C3C3E",color:lang===id?"#C9A96E":"#F5F0E8",fontSize:12,fontWeight:lang===id?700:500}}>{label}</button>
               ))}
             </div>
           </div>
@@ -387,7 +387,7 @@ export default function ColorScanner() {
             <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>{t.shopInLabel}</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
               {[["","🌍 All"],["USA","🇺🇸 USA"],["Australia","🇦🇺 Australia"],["India","🇮🇳 India"],["Brazil","🇧🇷 Brazil"],["Indonesia","🇮🇩 Indonesia"],["Nigeria","🇳🇬 Nigeria"],["China","🇨🇳 China"]].map(([val,label])=>(
-                <button key={val} onClick={()=>setCountry(val)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:country===val?"2px solid #C9A96E":"2px solid #e5e7eb",background:country===val?"#2C2C2E":"white",color:country===val?"#C9A96E":"#555",fontSize:12,fontWeight:country===val?700:500}}>{label}</button>
+                <button key={val} onClick={()=>setCountry(val)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:country===val?"2px solid #C9A96E":"2px solid #555",background:country===val?"#2C2C2E":"#3C3C3E",color:country===val?"#C9A96E":"#F5F0E8",fontSize:12,fontWeight:country===val?700:500}}>{label}</button>
               ))}
             </div>
           </div>

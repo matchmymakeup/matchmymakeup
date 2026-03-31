@@ -96,12 +96,12 @@ export default function Library() {
     </div>
   );
 
-  const inputStyle = {width:'100%',padding:'10px 12px',borderRadius:10,border:'1px solid #e5e7eb',fontSize:14,marginBottom:8};
+  const inputStyle = {width:'100%',padding:'10px 12px',borderRadius:10,border:'1px solid #555',fontSize:14,marginBottom:8,background:'#3C3C3E',color:'#F5F0E8'};
 
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{background:"#2C2C2E",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
-        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",minHeight:44}}>← Scanner</button>
+        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #555",borderRadius:20,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",minHeight:44}}>← Scanner</button>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:20}}>💄</span>
           <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>My Library</span>
@@ -140,11 +140,11 @@ export default function Library() {
                     <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:scan.color?.hex,flexShrink:0,boxShadow:`0 2px 8px ${scan.color?.hex}60`}}/>
                       <div>
-                        <div style={{fontFamily:"monospace",fontWeight:700,fontSize:14}}>{scan.color?.hex}</div>
-                        <div style={{fontSize:12,color:"#999"}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
+                        <div style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{scan.color?.hex}</div>
+                        <div style={{fontSize:12,color:"rgba(201,169,110,0.7)"}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
                       </div>
                     </div>
-                    {scan.advice&&<div style={{fontSize:12,color:"#555",lineHeight:1.5,background:"#2C2C2E",borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
+                    {scan.advice&&<div style={{fontSize:12,color:"#F5F0E8",lineHeight:1.5,background:"#3C3C3E",borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
                   </div>
                 ))}
               </div>
@@ -164,13 +164,13 @@ export default function Library() {
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:p.hex,flexShrink:0}} />
                       <div style={{flex:1}}>
-                        <div style={{fontWeight:700,fontSize:14,color:"#1a1a1a"}}>{p.name}</div>
-                        <div style={{fontSize:12,color:"#888"}}>{p.brand} · {p.category}</div>
+                        <div style={{fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{p.name}</div>
+                        <div style={{fontSize:12,color:"rgba(201,169,110,0.7)"}}>{p.brand} · {p.category}</div>
                         <div style={{fontSize:14,color:"#fbbf24",marginTop:2}}>{stars(p.rating)}</div>
                       </div>
                       <button onClick={()=>removeProduct(p.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#ccc",padding:4}}>✕</button>
                     </div>
-                    {p.notes && <div style={{fontSize:12,color:"#F5F0E8",marginTop:8,background:"#f9fafb",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
+                    {p.notes && <div style={{fontSize:12,color:"#F5F0E8",marginTop:8,background:"#3C3C3E",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
                   </div>
                 ))}
               </div>
@@ -179,7 +179,7 @@ export default function Library() {
                   <div onClick={()=>setShowAddProduct(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
                   <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Add Product</h3>
+                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Add Product</h3>
                     <input placeholder="Product name" value={newProduct.name} onChange={e=>setNewProduct(p=>({...p,name:e.target.value}))} style={inputStyle} />
                     <input placeholder="Brand" value={newProduct.brand} onChange={e=>setNewProduct(p=>({...p,brand:e.target.value}))} style={inputStyle} />
                     <select value={newProduct.category} onChange={e=>setNewProduct(p=>({...p,category:e.target.value}))} style={inputStyle}>
@@ -216,7 +216,7 @@ export default function Library() {
                     <button onClick={()=>removeShade(s.id)} style={{position:"absolute",top:4,right:4,background:"rgba(255,255,255,0.8)",border:"none",borderRadius:"50%",width:22,height:22,cursor:"pointer",fontSize:12,color:"#999",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                     <div style={{height:64,background:s.hex}} />
                     <div style={{padding:"8px 10px"}}>
-                      <div style={{fontSize:12,fontWeight:700,color:"#1a1a1a",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
+                      <div style={{fontSize:12,fontWeight:700,color:"#F5F0E8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
                       <div style={{fontSize:11,color:"#888",fontFamily:"monospace"}}>{s.hex}</div>
                     </div>
                   </div>
@@ -227,7 +227,7 @@ export default function Library() {
                   <div onClick={()=>setShowAddShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
                   <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Save a Shade</h3>
+                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Save a Shade</h3>
                     <input placeholder='e.g. "My everyday lip"' value={newShade.name} onChange={e=>setNewShade(s=>({...s,name:e.target.value}))} style={inputStyle} />
                     <div style={{display:"flex",gap:8,marginBottom:16,alignItems:"center"}}>
                       <input type="color" value={newShade.hex} onChange={e=>setNewShade(s=>({...s,hex:e.target.value}))} style={{width:44,height:44,border:"none",borderRadius:10,cursor:"pointer"}} />
@@ -253,8 +253,8 @@ export default function Library() {
                   <div key={l.id} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
                       <div>
-                        <div style={{fontWeight:700,fontSize:14,color:"#1a1a1a"}}>{l.name}</div>
-                        <div style={{fontSize:12,color:"#888",textTransform:"capitalize"}}>{l.occasion}</div>
+                        <div style={{fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{l.name}</div>
+                        <div style={{fontSize:12,color:"rgba(201,169,110,0.7)",textTransform:"capitalize"}}>{l.occasion}</div>
                       </div>
                       <button onClick={()=>removeLook(l.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#ccc"}}>✕</button>
                     </div>
@@ -271,7 +271,7 @@ export default function Library() {
                   <div onClick={()=>setShowAddLook(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
                   <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Create a Look</h3>
+                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Create a Look</h3>
                     <input placeholder="Look name" value={newLook.name} onChange={e=>setNewLook(l=>({...l,name:e.target.value}))} style={inputStyle} />
                     <select value={newLook.occasion} onChange={e=>setNewLook(l=>({...l,occasion:e.target.value}))} style={inputStyle}>
                       {['everyday','office','evening','wedding','festival','editorial'].map(o => <option key={o} value={o}>{o}</option>)}
