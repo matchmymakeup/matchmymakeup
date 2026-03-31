@@ -14,7 +14,7 @@ export default function Home() {
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f5f0ff 0%, #ffe0f0 100%)', fontFamily: "'Segoe UI', sans-serif" }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '40px 24px', boxSizing: 'border-box' }}>
         <div style={{ fontSize: 72, lineHeight: 1, marginBottom: 16 }}>💄</div>
-        <h1 style={{ color: '#7B2D8B', fontSize: 34, fontWeight: 900, margin: '0 0 12px', textAlign: 'center' }}>MatchMyMakeup</h1>
+        <h1 style={{ color: '#7B2D8B', fontSize: 34, fontWeight: 900, margin: '0 0 12px', textAlign: 'center' }}>MatchMyMakeup<span style={{ fontSize: 14, verticalAlign: 'super' }}>&trade;</span></h1>
         <p style={{ color: '#C2185B', textAlign: 'center', maxWidth: 320, lineHeight: 1.6, margin: '0 0 40px', fontSize: 15 }}>
           Scan any color and instantly find your perfect makeup match — powered by AI.
         </p>
