@@ -193,7 +193,7 @@ export default function MatchResults() {
     const ctx = canvas.getContext('2d');
     // Background gradient
     const grad = ctx.createLinearGradient(0,0,600,400);
-    grad.addColorStop(0,'#fdf2f8'); grad.addColorStop(0.5,'#f3e8ff'); grad.addColorStop(1,'#fce7f3');
+    grad.addColorStop(0,'#2C2C2E'); grad.addColorStop(0.5,'#2C2C2E'); grad.addColorStop(1,'#fce7f3');
     ctx.fillStyle = grad; ctx.fillRect(0,0,600,400);
     // Color swatch
     ctx.beginPath(); ctx.arc(120,160,60,0,Math.PI*2);
@@ -203,19 +203,19 @@ export default function MatchResults() {
     ctx.beginPath(); ctx.arc(120,160,64,0,Math.PI*2);
     ctx.strokeStyle = record.scannedHex+'40'; ctx.lineWidth = 8; ctx.stroke();
     // Text
-    ctx.fillStyle = '#9d174d'; ctx.font = 'bold 28px Segoe UI, sans-serif';
+    ctx.fillStyle = '#B76E79'; ctx.font = 'bold 28px Segoe UI, sans-serif';
     ctx.fillText('My Perfect Match', 210, 120);
     ctx.fillStyle = '#1a1a1a'; ctx.font = 'bold 36px monospace';
     ctx.fillText(record.scannedHex, 210, 170);
     if (allProducts[0]) {
-      ctx.fillStyle = '#7c3aed'; ctx.font = 'bold 18px Segoe UI, sans-serif';
+      ctx.fillStyle = '#C9A96E'; ctx.font = 'bold 18px Segoe UI, sans-serif';
       ctx.fillText(`${allProducts[0].brand} — ${allProducts[0].name}`, 210, 210);
     }
     // Persona
-    ctx.fillStyle = '#9d174d'; ctx.font = '16px Segoe UI, sans-serif';
+    ctx.fillStyle = '#B76E79'; ctx.font = '16px Segoe UI, sans-serif';
     ctx.fillText(`Matched by ${personaName} ${personaEmoji}`, 210, 250);
     // Watermark
-    ctx.fillStyle = '#c084fc'; ctx.font = 'bold 14px Segoe UI, sans-serif';
+    ctx.fillStyle = '#C9A96E'; ctx.font = 'bold 14px Segoe UI, sans-serif';
     ctx.fillText('matchmymakeup.ai', 210, 350);
     // Lipstick emoji area
     ctx.font = '48px serif'; ctx.fillText('\uD83D\uDC84', 430, 340);
@@ -229,18 +229,18 @@ export default function MatchResults() {
   const t = T[lang] || T.en;
 
   if (loading) return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{textAlign:"center"}}><div style={{fontSize:48,marginBottom:12}}>✨</div><div style={{color:"#7c3aed",fontSize:16,fontWeight:600}}>{t.loading}</div></div>
+    <div style={{minHeight:"100vh",background:"#2C2C2E",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Segoe UI',sans-serif"}}>
+      <div style={{textAlign:"center"}}><div style={{fontSize:48,marginBottom:12}}>✨</div><div style={{color:"#C9A96E",fontSize:16,fontWeight:600}}>{t.loading}</div></div>
     </div>
   );
 
   if (!record) return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Segoe UI',sans-serif"}}>
+    <div style={{minHeight:"100vh",background:"#2C2C2E",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{textAlign:"center",padding:32,maxWidth:360}}>
         <div style={{fontSize:48,marginBottom:12}}>😢</div>
         <div style={{color:"#dc2626",marginBottom:8,fontWeight:600}}>{t.noResults}</div>
         <div style={{color:"#888",fontSize:13,marginBottom:16}}>{t.scanFirst}</div>
-        <button onClick={()=>navigate('/ColorScanner')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:14,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{t.scanAgain}</button>
+        <button onClick={()=>navigate('/ColorScanner')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{t.scanAgain}</button>
       </div>
     </div>
   );
@@ -251,20 +251,20 @@ export default function MatchResults() {
   const allProducts = [...products, ...bonusProducts];
 
   return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{background:"white",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+    <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
+      <div style={{background:"#2C2C2E",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
         <div style={{maxWidth:560,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:10,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#666",fontWeight:600}}>{t.scanAgain}</button>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:20}}>💄</span>
-            <span style={{fontWeight:800,fontSize:16,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>™</span></span>
+            <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>™</span></span>
           </div>
         </div>
       </div>
 
       <div style={{maxWidth:560,margin:"0 auto",padding:"20px 16px 60px"}}>
         {/* Scanned color */}
-        <div style={{background:"white",borderRadius:20,padding:20,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:20}}>
+        <div style={{background:"#2C2C2E",borderRadius:20,padding:20,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:20}}>
           <div style={{fontSize:11,color:"#aaa",fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:12}}>{t.yourColor}</div>
           <div style={{display:"flex",alignItems:"center",gap:16}}>
             <div style={{width:72,height:72,borderRadius:"50%",background:record.scannedHex,flexShrink:0,boxShadow:`0 6px 24px ${record.scannedHex}80`}} />
@@ -273,8 +273,8 @@ export default function MatchResults() {
               <div style={{color:"#888",fontSize:12,marginTop:3}}>R <b style={{color:"#ef4444"}}>{record.scannedRed}</b> &nbsp; G <b style={{color:"#22c55e"}}>{record.scannedGreen}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{record.scannedBlue}</b></div>
               {(record.skinTone||record.occasion||record.country) && (
                 <div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>
-                  {record.skinTone && <span style={{background:"#fdf2f8",color:"#9d174d",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{record.skinTone}</span>}
-                  {record.occasion && <span style={{background:"#f3e8ff",color:"#7c3aed",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{record.occasion}</span>}
+                  {record.skinTone && <span style={{background:"#2C2C2E",color:"#B76E79",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{record.skinTone}</span>}
+                  {record.occasion && <span style={{background:"#2C2C2E",color:"#C9A96E",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{record.occasion}</span>}
                   {record.country && <span style={{background:"#ecfdf5",color:"#065f46",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{COUNTRIES_LABELS[record.country]||record.country}</span>}
                 </div>
               )}
@@ -283,11 +283,11 @@ export default function MatchResults() {
         </div>
 
         {/* Persona advice */}
-        <div style={{background:"linear-gradient(135deg,#fdf2f8,#f3e8ff)",border:"1px solid #f9a8d4",borderRadius:20,padding:20,marginBottom:20,boxShadow:"0 4px 20px rgba(157,23,77,0.08)"}}>
+        <div style={{background:"#2C2C2E",border:"1px solid #C9A96E",borderRadius:20,padding:20,marginBottom:20,boxShadow:"0 4px 20px rgba(157,23,77,0.08)"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-            <div style={{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,#9d174d,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{personaEmoji}</div>
+            <div style={{width:44,height:44,borderRadius:"50%",background:"#C9A96E",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{personaEmoji}</div>
             <div>
-              <div style={{fontWeight:800,fontSize:15,color:"#9d174d"}}>{personaName}'s {t.adviceTitle}</div>
+              <div style={{fontWeight:800,fontSize:15,color:"#B76E79"}}>{personaName}'s {t.adviceTitle}</div>
               <div style={{fontSize:11,color:"#aaa"}}>{t.consultant}</div>
             </div>
           </div>
@@ -326,47 +326,47 @@ export default function MatchResults() {
 
         {/* Profile link */}
         <div style={{textAlign:"center",marginBottom:16}}>
-          <button onClick={()=>navigate('/Profile')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 20px",cursor:"pointer",fontSize:12,color:"#7c3aed",fontWeight:600}}>
+          <button onClick={()=>navigate('/Profile')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 20px",cursor:"pointer",fontSize:12,color:"#C9A96E",fontWeight:600}}>
             🧬 Complete Your Beauty DNA Profile
           </button>
         </div>
 
         {/* Share + Save buttons */}
         <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
-          <button onClick={generateShareCard} style={{background:"white",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#7c3aed",minHeight:44}}>
+          <button onClick={generateShareCard} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#C9A96E",minHeight:44}}>
             📤 Share My Match
           </button>
-          <button onClick={()=>setShowSaveShade(true)} style={{background:"white",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#9d174d",minHeight:44}}>
+          <button onClick={()=>setShowSaveShade(true)} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#B76E79",minHeight:44}}>
             💾 Save This Color
           </button>
         </div>
 
         {/* Reverse trial / upsell */}
         {!upsellDismissed && (
-          <div style={{position:"relative",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff)",border:"1px solid #f0abda",borderRadius:20,padding:"18px 44px 18px 18px",marginBottom:20}}>
-            <button onClick={()=>setUpsellDismissed(true)} style={{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#c084fc",padding:"2px 6px"}}>✕</button>
+          <div style={{position:"relative",background:"#2C2C2E",border:"1px solid #C9A96E",borderRadius:20,padding:"18px 44px 18px 18px",marginBottom:20}}>
+            <button onClick={()=>setUpsellDismissed(true)} style={{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#C9A96E",padding:"2px 6px"}}>✕</button>
             <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
               <div style={{fontSize:28,flexShrink:0,marginTop:2}}>✨</div>
               <div style={{flex:1}}>
                 {!trialInfo.started ? (
                   <>
                     <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>{t.upsellHeading}</div>
-                    <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
-                    <button onClick={handleCheckout} style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
+                    <div style={{fontSize:12,color:"#999",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
+                    <button onClick={handleCheckout} style={{display:"inline-block",background:"#C9A96E",color:"#1C1C1E",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Try Premium Free — 7 days, no card needed →
                     </button>
                   </>
                 ) : trialInfo.active ? (
                   <>
-                    <div style={{fontWeight:800,fontSize:14,color:"#7c3aed",marginBottom:4}}>🎉 Premium Trial Active</div>
-                    <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:4}}>{trialInfo.daysLeft} day{trialInfo.daysLeft!==1?'s':''} left in your free trial</div>
+                    <div style={{fontWeight:800,fontSize:14,color:"#C9A96E",marginBottom:4}}>🎉 Premium Trial Active</div>
+                    <div style={{fontSize:12,color:"#999",lineHeight:1.5,marginBottom:4}}>{trialInfo.daysLeft} day{trialInfo.daysLeft!==1?'s':''} left in your free trial</div>
                     <div style={{fontSize:11,color:"#aaa"}}>Matching against 500+ products from 100+ brands</div>
                   </>
                 ) : (
                   <>
                     <div style={{fontWeight:800,fontSize:14,color:"#1a1a1a",marginBottom:4}}>Your trial ended</div>
-                    <div style={{fontSize:12,color:"#7c6a8a",lineHeight:1.5,marginBottom:12}}>Maya saved {trialInfo.scansSaved} scan{trialInfo.scansSaved!==1?'s':''} for you — keep access for $4.99/month</div>
-                    <button onClick={handleCheckout} style={{display:"inline-block",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
+                    <div style={{fontSize:12,color:"#999",lineHeight:1.5,marginBottom:12}}>Maya saved {trialInfo.scansSaved} scan{trialInfo.scansSaved!==1?'s':''} for you — keep access for $4.99/month</div>
+                    <button onClick={handleCheckout} style={{display:"inline-block",background:"#C9A96E",color:"#1C1C1E",borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Upgrade to Premium — $4.99/month →
                     </button>
                   </>
@@ -382,22 +382,22 @@ export default function MatchResults() {
             <div style={{fontWeight:800,fontSize:16,color:"#1a1a1a",marginBottom:12}}>🎯 {allProducts.length} {t.matchingProducts}</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
               {allProducts.map((p,i) => (
-                <div key={p.id||i} style={{background:"white",borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column",position:"relative"}}>
-                  {i >= products.length && <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"white",textAlign:"center",fontSize:9,fontWeight:700,padding:"3px 0",letterSpacing:0.5,textTransform:"uppercase"}}>Bonus Match</div>}
-                  <div style={{height:80,background:p.hexCode||"#f3e8ff",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",marginTop:i>=products.length?18:0}}>
+                <div key={p.id||i} style={{background:"#2C2C2E",borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column",position:"relative"}}>
+                  {i >= products.length && <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"#1C1C1E",textAlign:"center",fontSize:9,fontWeight:700,padding:"3px 0",letterSpacing:0.5,textTransform:"uppercase"}}>Bonus Match</div>}
+                  <div style={{height:80,background:p.hexCode||"#2C2C2E",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",marginTop:i>=products.length?18:0}}>
                     <div style={{width:52,height:52,borderRadius:"50%",background:p.hexCode||"#e9d5ff",border:"3px solid rgba(255,255,255,0.6)"}} />
-                    <div style={{position:"absolute",top:6,left:6,background:i===0?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(0,0,0,0.4)",color:"white",borderRadius:8,padding:"2px 7px",fontSize:10,fontWeight:700}}>
+                    <div style={{position:"absolute",top:6,left:6,background:i===0?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(0,0,0,0.4)",color:"#1C1C1E",borderRadius:8,padding:"2px 7px",fontSize:10,fontWeight:700}}>
                       {i===0?t.bestMatch:`#${i+1}`}
                     </div>
                   </div>
                   <div style={{padding:"10px 10px 12px",flex:1,display:"flex",flexDirection:"column"}}>
-                    <div style={{fontSize:10,color:"#9d174d",fontWeight:700,textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>{p.brand}</div>
+                    <div style={{fontSize:10,color:"#B76E79",fontWeight:700,textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>{p.brand}</div>
                     <div style={{fontSize:12,fontWeight:700,color:"#1a1a1a",lineHeight:1.3,marginBottom:3,flex:1}}>{p.name}</div>
                     <div style={{fontSize:11,color:"#888",marginBottom:4}}>{p.colorName && <span>{p.colorName} · </span>}<span style={{textTransform:"capitalize"}}>{p.category}</span></div>
-                    {p.price && <div style={{fontSize:13,fontWeight:700,color:"#7c3aed",marginBottom:6}}>{p.currency||"$"}{p.price}</div>}
+                    {p.price && <div style={{fontSize:13,fontWeight:700,color:"#C9A96E",marginBottom:6}}>{p.currency||"$"}{p.price}</div>}
                     <div style={{fontSize:10,color:"#aaa",marginBottom:8}}>{t.colorDistance}: <b style={{color:"#374151"}}>{p.colorDistance}</b></div>
                     <div style={{display:"flex",gap:4}}>
-                      <a href={getShopUrl(p)} target="_blank" rel="noopener noreferrer" style={{flex:1,textAlign:"center",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none",minHeight:32,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      <a href={getShopUrl(p)} target="_blank" rel="noopener noreferrer" style={{flex:1,textAlign:"center",background:"#C9A96E",color:"#1C1C1E",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none",minHeight:32,display:"flex",alignItems:"center",justifyContent:"center"}}>
                         {p.retailerUrl && p.retailerUrl.startsWith('http') ? t.shopNow : 'Search Online →'}
                       </a>
                       <button onClick={()=>saveProductToLibrary(p)} style={{background:savedProductIds.has(p.name+p.brand)?"#ecfdf5":"#f9fafb",border:savedProductIds.has(p.name+p.brand)?"1px solid #86efac":"1px solid #e5e7eb",borderRadius:10,padding:"4px 8px",cursor:"pointer",fontSize:10,fontWeight:700,color:savedProductIds.has(p.name+p.brand)?"#16a34a":"#888",minHeight:32,whiteSpace:"nowrap"}}>
@@ -417,13 +417,13 @@ export default function MatchResults() {
       {showSkinToneSheet && (
         <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
           <div onClick={()=>setShowSkinToneSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
-          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
+          <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
             <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
             <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your skin tone?</h3>
             <p style={{margin:"0 0 16px",fontSize:12,color:"#888",textAlign:"center"}}>This helps {personaName} find better matches for you</p>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
               {SKIN_TONES.map(st => (
-                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"14px 8px",borderRadius:16,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:14,fontWeight:600,color:"#333",textAlign:"center",minHeight:44}}>
+                <button key={st.id} onClick={()=>handleSkinToneSelect(st.id)} style={{padding:"14px 8px",borderRadius:16,border:"2px solid #444",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:600,color:"#333",textAlign:"center",minHeight:44}}>
                   {st.label}
                 </button>
               ))}
@@ -436,13 +436,13 @@ export default function MatchResults() {
       {showAgeSheet && (
         <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
           <div onClick={()=>setShowAgeSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
-          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
+          <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,maxHeight:"85vh",overflowY:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -8px 40px rgba(0,0,0,0.15)"}}>
             <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
             <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#1a1a1a",textAlign:"center"}}>What's your age range?</h3>
             <p style={{margin:"0 0 16px",fontSize:12,color:"#888",textAlign:"center"}}>{personaName} will personalise advice for your age group</p>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               {AGE_RANGES.map(age => (
-                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #f3ecf9",background:"white",cursor:"pointer",fontSize:15,fontWeight:600,color:"#333",textAlign:"left",minHeight:44}}>
+                <button key={age} onClick={()=>handleAgeSelect(age)} style={{padding:"14px 18px",borderRadius:14,border:"2px solid #444",background:"#2C2C2E",cursor:"pointer",fontSize:15,fontWeight:600,color:"#333",textAlign:"left",minHeight:44}}>
                   {age}
                 </button>
               ))}
@@ -455,13 +455,13 @@ export default function MatchResults() {
       {showSaveShade && record && (
         <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
           <div onClick={()=>setShowSaveShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)"}} />
-          <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560}}>
+          <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560}}>
             <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
             <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Save This Color</h3>
             <div style={{width:"100%",height:48,borderRadius:12,background:record.scannedHex,marginBottom:12}} />
             <div style={{textAlign:"center",fontFamily:"monospace",fontSize:16,fontWeight:700,color:"#1a1a1a",marginBottom:16}}>{record.scannedHex}</div>
             <input placeholder='e.g. "My everyday lip"' value={shadeName} onChange={e=>setShadeName(e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid #e5e7eb",fontSize:14,marginBottom:12}} />
-            <button onClick={handleSaveShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save to My Shades</button>
+            <button onClick={handleSaveShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save to My Shades</button>
           </div>
         </div>
       )}

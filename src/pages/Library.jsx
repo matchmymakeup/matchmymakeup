@@ -17,7 +17,7 @@ function saveStore(key, data) { localStorage.setItem(key, JSON.stringify(data));
 const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner'];
 const tabBtn = (active) => ({
   flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
-  background:active?"linear-gradient(135deg,#9d174d,#7c3aed)":"transparent",color:active?"white":"#666"
+  background:active?"#C9A96E":"transparent",color:active?"white":"#666"
 });
 
 export default function Library() {
@@ -88,9 +88,9 @@ export default function Library() {
   const premiumGate = (label) => (
     <div style={{textAlign:"center",padding:"48px 20px"}}>
       <div style={{fontSize:40,marginBottom:12}}>🔒</div>
-      <div style={{fontWeight:700,fontSize:15,color:"#9d174d",marginBottom:6}}>Premium Feature</div>
+      <div style={{fontWeight:700,fontSize:15,color:"#B76E79",marginBottom:6}}>Premium Feature</div>
       <div style={{color:"#888",fontSize:13,marginBottom:20,maxWidth:260,margin:"0 auto 20px"}}>{label}</div>
-      <button onClick={()=>navigate('/MatchResults')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:16,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44}}>
+      <button onClick={()=>navigate('/MatchResults')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:16,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44}}>
         Unlock Premium →
       </button>
     </div>
@@ -99,19 +99,19 @@ export default function Library() {
   const inputStyle = {width:'100%',padding:'10px 12px',borderRadius:10,border:'1px solid #e5e7eb',fontSize:14,marginBottom:8};
 
   return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{background:"white",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
-        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#666",minHeight:44}}>← Scanner</button>
+    <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
+      <div style={{background:"#2C2C2E",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
+        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #e5e7eb",borderRadius:20,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",minHeight:44}}>← Scanner</button>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:20}}>💄</span>
-          <span style={{fontWeight:800,fontSize:16,background:"linear-gradient(135deg,#9d174d,#7c3aed)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>My Library</span>
+          <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>My Library</span>
         </div>
         <div style={{width:60}}/>
       </div>
 
       <div style={{maxWidth:480,margin:"0 auto",padding:"16px"}}>
         {/* Tabs */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",background:"white",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2}}>
           <button onClick={()=>setTab("scans")} style={tabBtn(tab==="scans")}>🎨 Scans</button>
           <button onClick={()=>setTab("products")} style={tabBtn(tab==="products")}>{isPremium?'':'🔒 '}Products</button>
           <button onClick={()=>setTab("shades")} style={tabBtn(tab==="shades")}>{isPremium?'':'🔒 '}Shades</button>
@@ -125,7 +125,7 @@ export default function Library() {
               <div style={{fontSize:48,marginBottom:16}}>🎨</div>
               <div style={{fontWeight:700,fontSize:16,color:"#999",marginBottom:8}}>No scans yet</div>
               <div style={{color:"#bbb",fontSize:13,marginBottom:24}}>Your scan history will appear here automatically</div>
-              <button onClick={()=>navigate('/ColorScanner')} style={{background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",border:"none",borderRadius:16,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Start Scanning</button>
+              <button onClick={()=>navigate('/ColorScanner')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Start Scanning</button>
             </div>
           ) : (
             <div>
@@ -136,7 +136,7 @@ export default function Library() {
               )}
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
                 {visibleScans.map((scan,i)=>(
-                  <div key={i} style={{background:"white",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+                  <div key={i} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:scan.color?.hex,flexShrink:0,boxShadow:`0 2px 8px ${scan.color?.hex}60`}}/>
                       <div>
@@ -144,7 +144,7 @@ export default function Library() {
                         <div style={{fontSize:12,color:"#999"}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
                       </div>
                     </div>
-                    {scan.advice&&<div style={{fontSize:12,color:"#555",lineHeight:1.5,background:"#fdf2f8",borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
+                    {scan.advice&&<div style={{fontSize:12,color:"#555",lineHeight:1.5,background:"#2C2C2E",borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
                   </div>
                 ))}
               </div>
@@ -156,11 +156,11 @@ export default function Library() {
         {tab==="products"&&(
           !isPremium ? premiumGate("Save products you own, rate them, and build your personal collection.") : (
             <div>
-              <button onClick={()=>setShowAddProduct(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #c084fc",background:"#faf5ff",cursor:"pointer",fontSize:14,fontWeight:700,color:"#7c3aed",marginBottom:16,minHeight:44}}>+ Add Product</button>
+              <button onClick={()=>setShowAddProduct(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Add Product</button>
               {myProducts.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Add your first product to start building your collection</div>}
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 {myProducts.map(p => (
-                  <div key={p.id} style={{background:"white",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+                  <div key={p.id} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:p.hex,flexShrink:0}} />
                       <div style={{flex:1}}>
@@ -170,14 +170,14 @@ export default function Library() {
                       </div>
                       <button onClick={()=>removeProduct(p.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#ccc",padding:4}}>✕</button>
                     </div>
-                    {p.notes && <div style={{fontSize:12,color:"#666",marginTop:8,background:"#f9fafb",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
+                    {p.notes && <div style={{fontSize:12,color:"#F5F0E8",marginTop:8,background:"#f9fafb",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
                   </div>
                 ))}
               </div>
               {showAddProduct && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddProduct(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
-                  <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
+                  <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
                     <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Add Product</h3>
                     <input placeholder="Product name" value={newProduct.name} onChange={e=>setNewProduct(p=>({...p,name:e.target.value}))} style={inputStyle} />
@@ -196,7 +196,7 @@ export default function Library() {
                       ))}</div>
                     </div>
                     <textarea placeholder="Notes (optional)" value={newProduct.notes} onChange={e=>setNewProduct(p=>({...p,notes:e.target.value}))} style={{...inputStyle,height:60,resize:"none"}} />
-                    <button onClick={addProduct} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Product</button>
+                    <button onClick={addProduct} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Product</button>
                   </div>
                 </div>
               )}
@@ -208,11 +208,11 @@ export default function Library() {
         {tab==="shades"&&(
           !isPremium ? premiumGate("Save your favourite hex codes with custom names and build a personal swatch library.") : (
             <div>
-              <button onClick={()=>setShowAddShade(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #c084fc",background:"#faf5ff",cursor:"pointer",fontSize:14,fontWeight:700,color:"#7c3aed",marginBottom:16,minHeight:44}}>+ Save a Shade</button>
+              <button onClick={()=>setShowAddShade(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Save a Shade</button>
               {myShades.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Save your first shade to start your swatch library</div>}
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
                 {myShades.map(s => (
-                  <div key={s.id} style={{background:"white",borderRadius:16,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",position:"relative"}}>
+                  <div key={s.id} style={{background:"#2C2C2E",borderRadius:16,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",position:"relative"}}>
                     <button onClick={()=>removeShade(s.id)} style={{position:"absolute",top:4,right:4,background:"rgba(255,255,255,0.8)",border:"none",borderRadius:"50%",width:22,height:22,cursor:"pointer",fontSize:12,color:"#999",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                     <div style={{height:64,background:s.hex}} />
                     <div style={{padding:"8px 10px"}}>
@@ -225,7 +225,7 @@ export default function Library() {
               {showAddShade && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
-                  <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480}}>
+                  <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
                     <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Save a Shade</h3>
                     <input placeholder='e.g. "My everyday lip"' value={newShade.name} onChange={e=>setNewShade(s=>({...s,name:e.target.value}))} style={inputStyle} />
@@ -234,7 +234,7 @@ export default function Library() {
                       <input value={newShade.hex} onChange={e=>setNewShade(s=>({...s,hex:e.target.value}))} style={{...inputStyle,marginBottom:0,flex:1}} />
                     </div>
                     <div style={{width:"100%",height:48,borderRadius:12,background:newShade.hex,marginBottom:16}} />
-                    <button onClick={addShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Shade</button>
+                    <button onClick={addShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Shade</button>
                   </div>
                 </div>
               )}
@@ -246,11 +246,11 @@ export default function Library() {
         {tab==="looks"&&(
           !isPremium ? premiumGate("Create and save makeup looks by combining your saved shades with occasion tags.") : (
             <div>
-              <button onClick={()=>setShowAddLook(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #c084fc",background:"#faf5ff",cursor:"pointer",fontSize:14,fontWeight:700,color:"#7c3aed",marginBottom:16,minHeight:44}}>+ Create a Look</button>
+              <button onClick={()=>setShowAddLook(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Create a Look</button>
               {myLooks.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Create your first look to save shade combinations</div>}
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
                 {myLooks.map(l => (
-                  <div key={l.id} style={{background:"white",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+                  <div key={l.id} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
                       <div>
                         <div style={{fontWeight:700,fontSize:14,color:"#1a1a1a"}}>{l.name}</div>
@@ -269,7 +269,7 @@ export default function Library() {
               {showAddLook && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddLook(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
-                  <div style={{position:"relative",background:"white",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
+                  <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
                     <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center"}}>Create a Look</h3>
                     <input placeholder="Look name" value={newLook.name} onChange={e=>setNewLook(l=>({...l,name:e.target.value}))} style={inputStyle} />
@@ -280,7 +280,7 @@ export default function Library() {
                     <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
                       <input type="color" value={lookShadeHex} onChange={e=>setLookShadeHex(e.target.value)} style={{width:44,height:44,border:"none",borderRadius:10,cursor:"pointer"}} />
                       <input value={lookShadeHex} onChange={e=>setLookShadeHex(e.target.value)} style={{...inputStyle,marginBottom:0,flex:1}} />
-                      <button onClick={addLookShade} style={{padding:"10px 16px",borderRadius:10,border:"none",background:"#7c3aed",color:"white",fontWeight:700,cursor:"pointer",fontSize:13,minHeight:44}}>+</button>
+                      <button onClick={addLookShade} style={{padding:"10px 16px",borderRadius:10,border:"none",background:"#C9A96E",color:"#1C1C1E",fontWeight:700,cursor:"pointer",fontSize:13,minHeight:44}}>+</button>
                     </div>
                     {newLook.shades.length > 0 && (
                       <div style={{display:"flex",gap:6,marginBottom:16}}>
@@ -290,7 +290,7 @@ export default function Library() {
                         ))}
                       </div>
                     )}
-                    <button onClick={addLook} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#9d174d,#7c3aed)",color:"white",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Look</button>
+                    <button onClick={addLook} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Look</button>
                   </div>
                 </div>
               )}

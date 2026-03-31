@@ -85,14 +85,14 @@ export default function Profile() {
   }
 
   return (
-    <div style={{minHeight:'100vh',background:'linear-gradient(135deg,#fdf2f8,#f3e8ff,#fce7f3)',fontFamily:"'Segoe UI',sans-serif"}}>
+    <div style={{minHeight:'100vh',background:'#1C1C1E',fontFamily:"'Segoe UI',sans-serif"}}>
       {/* Header */}
       <div style={{background:'white',padding:'16px',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
         <div style={{maxWidth:560,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <button onClick={()=>navigate(-1)} style={{background:'none',border:'1px solid #e5e7eb',borderRadius:10,padding:'8px 14px',cursor:'pointer',fontSize:13,color:'#666',fontWeight:600}}>← Back</button>
           <div style={{display:'flex',alignItems:'center',gap:8}}>
             <span style={{fontSize:20}}>{pct===100?'✨':'🧬'}</span>
-            <span style={{fontWeight:800,fontSize:16,background:'linear-gradient(135deg,#9d174d,#7c3aed)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>{pct===100?'Beauty DNA Complete!':'Your Beauty DNA'}</span>
+            <span style={{fontWeight:800,fontSize:16,background:'#C9A96E',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>{pct===100?'Beauty DNA Complete!':'Your Beauty DNA'}</span>
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@ export default function Profile() {
             <span style={{fontSize:14,fontWeight:800,color:pct===100?'#16a34a':'#7c3aed'}}>{pct}%</span>
           </div>
           <div style={{height:10,background:pct===100?'#dcfce7':'#f3e8ff',borderRadius:5,overflow:'hidden'}}>
-            <div style={{height:'100%',background:pct===100?'#16a34a':'linear-gradient(135deg,#9d174d,#7c3aed)',borderRadius:5,width:`${pct}%`,transition:'width 0.5s ease'}} />
+            <div style={{height:'100%',background:pct===100?'#16a34a':'#C9A96E',borderRadius:5,width:`${pct}%`,transition:'width 0.5s ease'}} />
           </div>
           {pct===100 ? (
             <div style={{fontSize:12,color:'#16a34a',marginTop:8,fontWeight:600}}>Maya now knows your beauty profile. Your recommendations are fully personalised. ✨</div>
@@ -188,7 +188,7 @@ export default function Profile() {
                 <div style={{fontSize:12,fontWeight:700,color:'#333'}}>Join Maya's Beauty Panel</div>
                 <div style={{fontSize:11,color:'#888'}}>Answer 3 questions monthly for Premium credits</div>
               </div>
-              <button onClick={()=>save('beautyPanel',!profile.beautyPanel)} style={{padding:'6px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:11,fontWeight:700,background:profile.beautyPanel?'linear-gradient(135deg,#9d174d,#7c3aed)':'#f3e8ff',color:profile.beautyPanel?'white':'#7c3aed'}}>
+              <button onClick={()=>save('beautyPanel',!profile.beautyPanel)} style={{padding:'6px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:11,fontWeight:700,background:profile.beautyPanel?'#C9A96E':'#f3e8ff',color:profile.beautyPanel?'white':'#7c3aed'}}>
                 {profile.beautyPanel?'Joined ✓':'Join'}
               </button>
             </div>
