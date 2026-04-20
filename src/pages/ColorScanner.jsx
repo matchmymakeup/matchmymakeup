@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CATEGORIES } from "../products.js";
 import { trackScan, trackPageView } from "../analytics.js";
+import { getColourName } from "../utils/colourNames.js";
 
 function toHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
 function fromHex(hex){ const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); return m?{r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)}:null; }
@@ -492,8 +493,11 @@ export default function ColorScanner() {
           <div style={{background:"#2C2C2E",borderRadius:20,padding:16,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:14,display:"flex",alignItems:"center",gap:16}}>
             <div style={{width:56,height:56,borderRadius:"50%",flexShrink:0,background:color.hex,boxShadow:`0 4px 18px ${color.hex}80`}}/>
             <div>
-              <div style={{fontFamily:"monospace",fontSize:22,fontWeight:800,color:"#F5F0E8"}}>{color.hex}</div>
-              <div style={{fontSize:13,color:"#F5F0E8",marginTop:3}}>R <b style={{color:"#ef4444"}}>{color.r}</b> &nbsp; G <b style={{color:"#22c55e"}}>{color.g}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{color.b}</b></div>
+              <div style={{fontSize:24,fontWeight:700,color:"#C9A96E",letterSpacing:0.5,marginBottom:2}}>{getColourName(color.r, color.g, color.b)}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:12,flexWrap:"wrap"}}>
+                <div style={{fontFamily:"monospace",fontSize:20,fontWeight:800,color:"#F5F0E8"}}>{color.hex}</div>
+                <div style={{fontSize:12,color:"#F5F0E8"}}>R <b style={{color:"#ef4444"}}>{color.r}</b> &nbsp; G <b style={{color:"#22c55e"}}>{color.g}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{color.b}</b></div>
+              </div>
             </div>
           </div>
         )}
