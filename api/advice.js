@@ -8,8 +8,19 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
+  // [FIX 2] Guard against missing req.body
+  if (!req.body) {
+    return res.status(400).json({ error: 'Request body is required' });
+  }
+
   try {
-    const { hex, r, g, b, skinTone, occasion, country, category, profile, lang } = req.body;
+    const { skinTone, occasion, country, category, profile, lang } = req.body;
+
+    // [FIX 1] Validate and sanitise colour inputs
+    const hex = (req.body.hex || '').replace(/[^#0-9a-fA-F]/g, '').slice(0, 7);
+    const r = Math.max(0, Math.min(255, parseInt(req.body.r) || 0));
+    const g = Math.max(0, Math.min(255, parseInt(req.body.g) || 0));
+    const b = Math.max(0, Math.min(255, parseInt(req.body.b) || 0));
 
     const PERSONAS = {
       en: { name: 'Maya', lang: 'You must respond entirely in English.', culture: 'You draw on global beauty trends and are inclusive of all backgrounds.' },
@@ -27,16 +38,18 @@ export default async function handler(req, res) {
     const p = PERSONAS[lang] || PERSONAS.en;
     const persona = p.name;
 
-    const categoryNote = category ? ` Focus on ${category.replace('_', ' ')} products.` : '';
+    // [FIX 6] Global regex so all underscores are replaced
+    const categoryNote = category ? ` Focus on ${category.replace(/_/g, ' ')} products.` : '';
 
     let profileContext = '';
     if (profile) {
       const parts = [];
       if (profile.ageRange) parts.push(`Age range: ${profile.ageRange}`);
       if (profile.skinTone) parts.push(`Skin tone: ${profile.skinTone}`);
-      if (profile.ethnicity?.length) parts.push(`Heritage: ${profile.ethnicity.join(', ')}`);
-      if (profile.skinConcerns?.length) parts.push(`Skin concerns: ${profile.skinConcerns.join(', ')}`);
-      if (profile.beautyGoals?.length) parts.push(`Beauty goals: ${profile.beautyGoals.join(', ')}`);
+      // [FIX 5] Array.isArray guards — req.body is a system boundary
+      if (Array.isArray(profile.ethnicity) && profile.ethnicity.length) parts.push(`Heritage: ${profile.ethnicity.join(', ')}`);
+      if (Array.isArray(profile.skinConcerns) && profile.skinConcerns.length) parts.push(`Skin concerns: ${profile.skinConcerns.join(', ')}`);
+      if (Array.isArray(profile.beautyGoals) && profile.beautyGoals.length) parts.push(`Beauty goals: ${profile.beautyGoals.join(', ')}`);
       if (profile.budget) parts.push(`Budget: ${profile.budget}`);
       if (profile.climate) parts.push(`Climate: ${profile.climate}`);
       if (parts.length > 0) profileContext = ` User beauty profile: ${parts.join('. ')}.`;
@@ -44,13 +57,13 @@ export default async function handler(req, res) {
 
     const countryContext = country || 'global';
     const systemPrompt = `${p.lang} You are ${persona}, a beauty expert. ${p.culture}`;
-    const userPrompt = `The user scanned color ${hex} (R:${r} G:${g} B:${b}). Skin tone: ${skinTone || 'any'}. Occasion: ${occasion || 'everyday'}. Shopping region: ${countryContext}.${categoryNote}${profileContext} Give 3 sentences of warm, personalized beauty advice.`;
+    const userPrompt = `The user scanned color ${hex} (R:${r} G:${g} B:${b}). Skin tone: ${skinTone || 'any'}. Occasion: ${occasion || 'everyday'}. Shopping region: ${countryContext}.${categoryNote}${profileContext} Give exactly 2 sentences of warm, confident, editorial beauty advice. Be concise and luxurious — like a Vogue beauty editor, not a blog post. Maximum 50 words total.`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
+        'anthropic-version': '2023-06-01', // [FIX 7] Dated — review for newer version when updating SDK
         'content-type': 'application/json',
       },
       body: JSON.stringify({
@@ -61,13 +74,21 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
-
+    // [FIX 3] Handle non-JSON error bodies without throwing
     if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'Anthropic API error' });
+      const errData = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ error: errData.error?.message || `Anthropic API error (${response.status})` });
     }
 
-    return res.status(200).json({ advice: data.content[0].text });
+    const data = await response.json();
+
+    // [FIX 4] Defensive check — empty or unexpected response shape
+    const advice = data.content?.[0]?.text;
+    if (!advice) {
+      return res.status(502).json({ error: 'Empty response from AI' });
+    }
+
+    return res.status(200).json({ advice });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }
