@@ -330,14 +330,11 @@ function PickerTab({color, onWheel, onHexType, t}) {
         <div style={{position:"absolute",left:`${hueX}%`,top:"50%",width:8,height:HUE_H+4,borderRadius:4,border:"3px solid white",boxShadow:"0 0 0 1px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none"}} />
       </div>
 
-      {/* Preview + hex */}
-      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginTop:16}}>
-        <div style={{width:44,height:44,borderRadius:"50%",background:color?.hex||"#FF6B9D",border:"3px solid rgba(255,255,255,0.2)",boxShadow:`0 4px 14px ${(color?.hex||"#FF6B9D")}60`,flexShrink:0}} />
-        <div>
-          <label style={{fontSize:12,color:"rgba(201,169,110,0.7)",fontWeight:600}}>{t.hexLabel}</label>
-          <input type="text" value={color?.hex||""} onChange={onHexType} placeholder="#FF6B9D"
-            style={{display:"block",marginTop:4,width:130,padding:"10px 14px",borderRadius:12,border:"2px solid #555",textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700,background:"#3C3C3E",color:"#F5F0E8"}}/>
-        </div>
+      {/* Hex input */}
+      <div style={{textAlign:"center",marginTop:16}}>
+        <label style={{fontSize:12,color:"rgba(201,169,110,0.7)",fontWeight:600}}>{t.hexLabel}</label>
+        <input type="text" value={color?.hex||""} onChange={onHexType} placeholder="#FF6B9D"
+          style={{display:"block",margin:"4px auto 0",width:180,padding:"10px 14px",borderRadius:12,border:"2px solid #555",textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700,background:"#3C3C3E",color:"#F5F0E8"}}/>
       </div>
     </div>
   );
