@@ -180,38 +180,44 @@ export default function MatchResults() {
   }
 
   const SHARE_PLATFORMS = {
-    whatsapp: { label: 'WhatsApp', icon: '💬', color: '#25D366' },
-    instagram: { label: 'Instagram', icon: '📸', color: '#E1306C' },
-    telegram: { label: 'Telegram', icon: '✈️', color: '#0088cc' },
-    facebook: { label: 'Messenger', icon: '💭', color: '#0084FF' },
-    wechat: { label: 'WeChat', icon: '🟢', color: '#07C160' },
-    weibo: { label: 'Weibo', icon: '🔴', color: '#E6162D' },
-    qq: { label: 'QQ', icon: '🐧', color: '#12B7F5' },
-    tiktok: { label: 'TikTok', icon: '🎵', color: '#333' },
-    sms: { label: 'SMS', icon: '💬', color: '#555' },
-    line: { label: 'Line', icon: '💚', color: '#00C300' },
-    viber: { label: 'Viber', icon: '💜', color: '#7360F2' },
-    copy: { label: 'Copy Link', icon: '🔗', color: '#666' },
+    whatsapp: { label: 'WhatsApp', icon: '💬' },
+    instagram: { label: 'Instagram', icon: '📸' },
+    telegram: { label: 'Telegram', icon: '✈️' },
+    facebook: { label: 'Facebook', icon: '👍' },
+    messenger: { label: 'Messenger', icon: '💭' },
+    wechat: { label: 'WeChat', icon: '🟢' },
+    weibo: { label: 'Weibo', icon: '🔴' },
+    qq: { label: 'QQ', icon: '🐧' },
+    douyin: { label: 'Douyin', icon: '🎵' },
+    xiaohongshu: { label: '小红书', icon: '📕' },
+    tiktok: { label: 'TikTok', icon: '🎵' },
+    snapchat: { label: 'Snapchat', icon: '👻' },
+    pinterest: { label: 'Pinterest', icon: '📌' },
+    sms: { label: 'SMS', icon: '💬' },
+    line: { label: 'Line', icon: '💚' },
+    viber: { label: 'Viber', icon: '💜' },
+    sharechat: { label: 'ShareChat', icon: '💛' },
+    youtube: { label: 'YouTube', icon: '▶️' },
+    copy: { label: 'Copy Link', icon: '🔗' },
   };
 
   const COUNTRY_SHARE_MAP = {
-    India: ['whatsapp','instagram','telegram'],
-    Indonesia: ['whatsapp','line','instagram'],
-    Brazil: ['whatsapp','instagram','tiktok'],
-    Nigeria: ['whatsapp','instagram','facebook'],
-    Philippines: ['facebook','viber','whatsapp'],
-    'South Africa': ['whatsapp','instagram','facebook'],
-    China: ['wechat','weibo','qq'],
-    USA: ['instagram','tiktok','sms'],
-    Australia: ['instagram','whatsapp','sms'],
+    India: ['whatsapp','instagram','telegram','facebook','youtube','sharechat','copy'],
+    Indonesia: ['whatsapp','instagram','line','tiktok','facebook','telegram','copy'],
+    Brazil: ['whatsapp','instagram','tiktok','facebook','telegram','copy'],
+    Nigeria: ['whatsapp','instagram','facebook','telegram','tiktok','copy'],
+    Philippines: ['facebook','messenger','viber','whatsapp','instagram','tiktok','copy'],
+    'South Africa': ['whatsapp','instagram','facebook','telegram','tiktok','copy'],
+    China: ['wechat','weibo','qq','douyin','xiaohongshu','copy'],
+    USA: ['instagram','tiktok','snapchat','pinterest','sms','whatsapp','copy'],
+    Australia: ['instagram','whatsapp','tiktok','facebook','sms','copy'],
   };
 
   function getSharePlatforms() {
     let userCountry = record?.country || '';
     try { const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); if (p.country) userCountry = p.country; } catch {}
-    const platforms = COUNTRY_SHARE_MAP[userCountry] || ['whatsapp','instagram','copy'];
+    const platforms = [...(COUNTRY_SHARE_MAP[userCountry] || ['whatsapp','instagram','telegram','facebook','tiktok','copy'])];
     if (!platforms.includes('copy')) platforms.push('copy');
-    // Surface preferred platform first
     try {
       const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}');
       if (p.sharePreference && platforms.includes(p.sharePreference)) {
@@ -227,25 +233,30 @@ export default function MatchResults() {
     const shareText = `I found my perfect makeup match! ${hex} via MatchMyMakeup 💄 matchmymakeup.ai`;
     const shareUrl = 'https://matchmymakeup.ai';
     const encoded = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const copyAndNotify = (key, text) => {
+      navigator.clipboard?.writeText(text || shareText).then(() => { setShareCopied(key); setTimeout(() => setShareCopied(null), 2500); });
+    };
     switch (platform) {
       case 'whatsapp': window.open(`https://wa.me/?text=${encoded}`, '_blank'); break;
-      case 'telegram': window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encoded}`, '_blank'); break;
-      case 'facebook': window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(shareUrl)}`, '_blank'); break;
+      case 'telegram': window.open(`https://t.me/share/url?url=${encodedUrl}&text=${encoded}`, '_blank'); break;
+      case 'facebook': window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank'); break;
+      case 'messenger': window.open(`https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=291494419107518`, '_blank'); break;
       case 'sms': window.open(`sms:?body=${encoded}`, '_self'); break;
       case 'viber': window.open(`viber://forward?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_self'); break;
-      case 'line': window.open(`https://line.me/R/share?text=${encoded}`, '_blank'); break;
-      case 'instagram':
-        navigator.clipboard?.writeText(shareText).then(() => { setShareCopied('instagram'); setTimeout(() => setShareCopied(null), 2000); });
-        window.open('https://www.instagram.com/', '_blank'); break;
-      case 'wechat':
-      case 'weibo':
-      case 'qq':
-      case 'tiktok':
-        navigator.clipboard?.writeText(shareText).then(() => { setShareCopied(platform); setTimeout(() => setShareCopied(null), 2000); });
-        break;
-      case 'copy':
-        navigator.clipboard?.writeText(shareUrl).then(() => { setShareCopied('copy'); setTimeout(() => setShareCopied(null), 2000); });
-        break;
+      case 'line': window.open(`https://social-plugins.line.me/lineit/share?url=${encodedUrl}`, '_blank'); break;
+      case 'snapchat': window.open(`https://www.snapchat.com/scan?attachmentUrl=${encodedUrl}`, '_blank'); break;
+      case 'pinterest': window.open(`https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encoded}`, '_blank'); break;
+      case 'qq': window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${encodedUrl}`, '_blank'); break;
+      case 'weibo': window.open(`https://service.weibo.com/share/share.php?url=${encodedUrl}&title=${encoded}`, '_blank'); break;
+      case 'instagram': copyAndNotify('instagram'); window.open('https://www.instagram.com/', '_blank'); break;
+      case 'youtube': copyAndNotify('youtube'); window.open('https://www.youtube.com/', '_blank'); break;
+      case 'wechat': copyAndNotify('wechat'); break;
+      case 'tiktok': copyAndNotify('tiktok'); break;
+      case 'douyin': copyAndNotify('douyin'); break;
+      case 'xiaohongshu': copyAndNotify('xiaohongshu'); break;
+      case 'sharechat': copyAndNotify('sharechat'); window.open('https://sharechat.com/', '_blank'); break;
+      case 'copy': copyAndNotify('copy', shareUrl); break;
     }
   }
 
@@ -549,7 +560,7 @@ export default function MatchResults() {
                 return (
                   <button key={key} onClick={()=>handleSharePlatform(key)} style={{display:"flex",alignItems:"center",gap:10,padding:"14px 16px",borderRadius:14,border:"1px solid #333",background:"#2C2C2E",cursor:"pointer",minHeight:48}}>
                     <span style={{fontSize:20}}>{p.icon}</span>
-                    <span style={{fontSize:13,fontWeight:700,color:isCopied?"#16a34a":"#F5F0E8"}}>{isCopied?(key==='copy'?'Copied!':'Copied — paste in '+p.label):p.label}</span>
+                    <span style={{fontSize:13,fontWeight:700,color:isCopied?"#16a34a":"#F5F0E8"}}>{isCopied?(key==='copy'?'Copied!':key==='xiaohongshu'?'Copied — paste in 小红书':'Copied — paste in '+p.label):p.label}</span>
                   </button>
                 );
               })}
