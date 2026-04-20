@@ -86,6 +86,8 @@ export default function MatchResults() {
     try { return new Set(JSON.parse(localStorage.getItem('mmm_my_products') || '[]').map(p => p.productName + p.brand)); } catch { return new Set(); }
   });
   const [justSaved, setJustSaved] = useState(null);
+  const [showShareSheet, setShowShareSheet] = useState(false);
+  const [shareCopied, setShareCopied] = useState(null);
   const [shadeName, setShadeName] = useState('');
 
   const profile = getProfile();
@@ -175,6 +177,76 @@ export default function MatchResults() {
       setJustSaved(key);
       setTimeout(() => setJustSaved(null), 2000);
     } catch {}
+  }
+
+  const SHARE_PLATFORMS = {
+    whatsapp: { label: 'WhatsApp', icon: '💬', color: '#25D366' },
+    instagram: { label: 'Instagram', icon: '📸', color: '#E1306C' },
+    telegram: { label: 'Telegram', icon: '✈️', color: '#0088cc' },
+    facebook: { label: 'Messenger', icon: '💭', color: '#0084FF' },
+    wechat: { label: 'WeChat', icon: '🟢', color: '#07C160' },
+    weibo: { label: 'Weibo', icon: '🔴', color: '#E6162D' },
+    qq: { label: 'QQ', icon: '🐧', color: '#12B7F5' },
+    tiktok: { label: 'TikTok', icon: '🎵', color: '#333' },
+    sms: { label: 'SMS', icon: '💬', color: '#555' },
+    line: { label: 'Line', icon: '💚', color: '#00C300' },
+    viber: { label: 'Viber', icon: '💜', color: '#7360F2' },
+    copy: { label: 'Copy Link', icon: '🔗', color: '#666' },
+  };
+
+  const COUNTRY_SHARE_MAP = {
+    India: ['whatsapp','instagram','telegram'],
+    Indonesia: ['whatsapp','line','instagram'],
+    Brazil: ['whatsapp','instagram','tiktok'],
+    Nigeria: ['whatsapp','instagram','facebook'],
+    Philippines: ['facebook','viber','whatsapp'],
+    'South Africa': ['whatsapp','instagram','facebook'],
+    China: ['wechat','weibo','qq'],
+    USA: ['instagram','tiktok','sms'],
+    Australia: ['instagram','whatsapp','sms'],
+  };
+
+  function getSharePlatforms() {
+    let userCountry = record?.country || '';
+    try { const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); if (p.country) userCountry = p.country; } catch {}
+    const platforms = COUNTRY_SHARE_MAP[userCountry] || ['whatsapp','instagram','copy'];
+    if (!platforms.includes('copy')) platforms.push('copy');
+    // Surface preferred platform first
+    try {
+      const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}');
+      if (p.sharePreference && platforms.includes(p.sharePreference)) {
+        const idx = platforms.indexOf(p.sharePreference);
+        if (idx > 0) { platforms.splice(idx, 1); platforms.unshift(p.sharePreference); }
+      }
+    } catch {}
+    return platforms;
+  }
+
+  function handleSharePlatform(platform) {
+    const hex = record?.scannedHex || '';
+    const shareText = `I found my perfect makeup match! ${hex} via MatchMyMakeup 💄 matchmymakeup.ai`;
+    const shareUrl = 'https://matchmymakeup.ai';
+    const encoded = encodeURIComponent(shareText);
+    switch (platform) {
+      case 'whatsapp': window.open(`https://wa.me/?text=${encoded}`, '_blank'); break;
+      case 'telegram': window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encoded}`, '_blank'); break;
+      case 'facebook': window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(shareUrl)}`, '_blank'); break;
+      case 'sms': window.open(`sms:?body=${encoded}`, '_self'); break;
+      case 'viber': window.open(`viber://forward?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_self'); break;
+      case 'line': window.open(`https://line.me/R/share?text=${encoded}`, '_blank'); break;
+      case 'instagram':
+        navigator.clipboard?.writeText(shareText).then(() => { setShareCopied('instagram'); setTimeout(() => setShareCopied(null), 2000); });
+        window.open('https://www.instagram.com/', '_blank'); break;
+      case 'wechat':
+      case 'weibo':
+      case 'qq':
+      case 'tiktok':
+        navigator.clipboard?.writeText(shareText).then(() => { setShareCopied(platform); setTimeout(() => setShareCopied(null), 2000); });
+        break;
+      case 'copy':
+        navigator.clipboard?.writeText(shareUrl).then(() => { setShareCopied('copy'); setTimeout(() => setShareCopied(null), 2000); });
+        break;
+    }
   }
 
   function getShopUrl(p) {
@@ -343,12 +415,9 @@ export default function MatchResults() {
 
         {/* Share + Save buttons */}
         <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
-          <button onClick={generateShareCard} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#C9A96E",minHeight:44}}>
-            📤 Share My Match
+          <button onClick={()=>setShowShareSheet(true)} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#C9A96E",minHeight:44}}>
+            📤 Share My Match →
           </button>
-          <a href={`https://wa.me/?text=${encodeURIComponent('I found my perfect makeup match with MatchMyMakeup! ' + record.scannedHex + ' - matchmymakeup.ai')}`} target="_blank" rel="noopener noreferrer" style={{background:"#25D366",border:"none",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"white",minHeight:44,textDecoration:"none",display:"flex",alignItems:"center"}}>
-            💬 WhatsApp
-          </a>
           <button onClick={()=>setShowSaveShade(true)} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#B76E79",minHeight:44}}>
             💾 Save This Color
           </button>
@@ -460,6 +529,34 @@ export default function MatchResults() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share sheet modal */}
+      {showShareSheet && record && (
+        <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={()=>setShowShareSheet(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)"}} />
+          <div style={{position:"relative",background:"#1C1C1E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:560,boxShadow:"0 -8px 40px rgba(0,0,0,0.3)"}}>
+            <div style={{width:40,height:4,background:"#555",borderRadius:2,margin:"0 auto 16px"}} />
+            <h3 style={{margin:"0 0 6px",fontSize:18,fontWeight:800,color:"#F5F0E8",textAlign:"center"}}>Share My Match</h3>
+            <p style={{margin:"0 0 20px",fontSize:12,color:"#888",textAlign:"center"}}>Choose a platform to share your colour match</p>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+              {getSharePlatforms().map(key => {
+                const p = SHARE_PLATFORMS[key];
+                if (!p) return null;
+                const isCopied = shareCopied === key;
+                return (
+                  <button key={key} onClick={()=>handleSharePlatform(key)} style={{display:"flex",alignItems:"center",gap:10,padding:"14px 16px",borderRadius:14,border:"1px solid #333",background:"#2C2C2E",cursor:"pointer",minHeight:48}}>
+                    <span style={{fontSize:20}}>{p.icon}</span>
+                    <span style={{fontSize:13,fontWeight:700,color:isCopied?"#16a34a":"#F5F0E8"}}>{isCopied?(key==='copy'?'Copied!':'Copied — paste in '+p.label):p.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <button onClick={()=>{generateShareCard();setShowShareSheet(false);}} style={{width:"100%",padding:"14px",borderRadius:14,border:"1px solid #C9A96E",background:"transparent",color:"#C9A96E",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>
+              📥 Download Share Card
+            </button>
           </div>
         </div>
       )}

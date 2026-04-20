@@ -160,6 +160,17 @@ export default function Profile() {
           );
         })}
 
+        {/* My Preferences */}
+        <div style={{background:'#2C2C2E',borderRadius:20,padding:16,boxShadow:'0 4px 16px rgba(0,0,0,0.06)',marginBottom:12}}>
+          <div style={{fontWeight:700,fontSize:14,color:'#F5F0E8',marginBottom:12}}>My Preferences</div>
+          <div style={{fontSize:12,color:'#888',marginBottom:10}}>Preferred sharing platform</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+            {[['whatsapp','💬 WhatsApp'],['instagram','📸 Instagram'],['wechat','🟢 WeChat'],['telegram','✈️ Telegram'],['facebook','💭 Messenger'],['copy','🔗 Copy Link']].map(([id,label])=>(
+              <button key={id} onClick={()=>save('sharePreference',id)} style={pillStyle(profile.sharePreference===id)}>{label}</button>
+            ))}
+          </div>
+        </div>
+
         {/* Data-for-value bonus */}
         <div style={{background:'#2C2C2E',border:'1px solid #C9A96E',borderRadius:20,padding:20,marginTop:20}}>
           <div style={{fontSize:15,fontWeight:800,color:'#F5F0E8',marginBottom:8}}>🎁 Bonus Rewards</div>
