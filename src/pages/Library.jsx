@@ -14,7 +14,7 @@ function loadStore(key, fallback) {
 }
 function saveStore(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
-const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner'];
+const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour'];
 const tabBtn = (active) => ({
   flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
   background:active?"#C9A96E":"transparent",color:active?"white":"#666"
@@ -111,11 +111,14 @@ export default function Library() {
 
       <div style={{maxWidth:480,margin:"0 auto",padding:"16px"}}>
         {/* Tabs */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2}}>
-          <button onClick={()=>setTab("scans")} style={tabBtn(tab==="scans")}>🎨 Scans</button>
-          <button onClick={()=>setTab("products")} style={tabBtn(tab==="products")}>{isPremium?'':'🔒 '}Products</button>
-          <button onClick={()=>setTab("shades")} style={tabBtn(tab==="shades")}>{isPremium?'':'🔒 '}Shades</button>
-          <button onClick={()=>setTab("looks")} style={tabBtn(tab==="looks")}>{isPremium?'':'🔒 '}Looks</button>
+        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
+          <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
+          <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap",minWidth:0}}>{isPremium?'':'🔒 '}Products</button>
+          <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap",minWidth:0}}>{isPremium?'':'🔒 '}Shades</button>
+          <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap",minWidth:0}}>{isPremium?'':'🔒 '}Looks</button>
+          <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap",minWidth:0}}>👗 Outfit</button>
+          <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap",minWidth:0}}>👠 Shoes</button>
+          <button onClick={()=>setTab("hair")} style={{...tabBtn(tab==="hair"),whiteSpace:"nowrap",minWidth:0}}>💇 Hair</button>
         </div>
 
         {/* SCAN HISTORY */}
@@ -296,6 +299,72 @@ export default function Library() {
               )}
             </div>
           )
+        )}
+
+        {/* MATCH MY OUTFIT — Premium+ */}
+        {tab==="outfit"&&(
+          <div style={{textAlign:"center",padding:"32px 16px"}}>
+            <div style={{background:"#2C2C2E",borderRadius:20,padding:"32px 20px",border:"1px solid rgba(201,169,110,0.2)"}}>
+              <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+              <div style={{fontSize:10,color:"#C9A96E",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
+              <div style={{fontWeight:800,fontSize:18,color:"#F5F0E8",marginBottom:8}}>Match My Outfit</div>
+              <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Upload photos of your outfits and get makeup recommendations that perfectly complement your look</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
+                {['Casual','Office','Evening'].map(label => (
+                  <div key={label} style={{background:"#3C3C3E",borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
+                    <div style={{fontSize:28,marginBottom:6}}>📷</div>
+                    <div style={{fontSize:11,color:"#666",fontWeight:600}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+              <button style={{background:"linear-gradient(135deg,#C9A96E,#B8956A)",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:"0 4px 16px rgba(201,169,110,0.3)"}}>
+                Upgrade to Premium+
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* MATCH MY SHOES — Premium+ */}
+        {tab==="shoes"&&(
+          <div style={{textAlign:"center",padding:"32px 16px"}}>
+            <div style={{background:"#2C2C2E",borderRadius:20,padding:"32px 20px",border:"1px solid rgba(201,169,110,0.2)"}}>
+              <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+              <div style={{fontSize:10,color:"#C9A96E",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
+              <div style={{fontWeight:800,fontSize:18,color:"#F5F0E8",marginBottom:8}}>Match My Shoes</div>
+              <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Photograph your shoe collection and find nail polish and lip colours that match perfectly</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
+                {['Heels','Sneakers','Boots'].map(label => (
+                  <div key={label} style={{background:"#3C3C3E",borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
+                    <div style={{fontSize:28,marginBottom:6}}>👠</div>
+                    <div style={{fontSize:11,color:"#666",fontWeight:600}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+              <button style={{background:"linear-gradient(135deg,#C9A96E,#B8956A)",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:"0 4px 16px rgba(201,169,110,0.3)"}}>
+                Upgrade to Premium+
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* MATCH MY HAIR — Premium+ */}
+        {tab==="hair"&&(
+          <div style={{textAlign:"center",padding:"32px 16px"}}>
+            <div style={{background:"#2C2C2E",borderRadius:20,padding:"32px 20px",border:"1px solid rgba(201,169,110,0.2)"}}>
+              <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+              <div style={{fontSize:10,color:"#C9A96E",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
+              <div style={{fontWeight:800,fontSize:18,color:"#F5F0E8",marginBottom:8}}>Match My Hair</div>
+              <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Scan your hair colour or choose a new shade and get perfectly coordinated makeup looks</div>
+              <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:24,flexWrap:"wrap"}}>
+                {['#1C1C1E','#3B1F0A','#8B6914','#C8A951','#D4A76A','#8B3A3A'].map(hex => (
+                  <div key={hex} style={{width:40,height:40,borderRadius:"50%",background:hex,border:"2px solid #555",boxShadow:`0 2px 8px ${hex}40`}} />
+                ))}
+              </div>
+              <button style={{background:"linear-gradient(135deg,#C9A96E,#B8956A)",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:"0 4px 16px rgba(201,169,110,0.3)"}}>
+                Upgrade to Premium+
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

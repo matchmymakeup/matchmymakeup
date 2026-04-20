@@ -214,8 +214,10 @@ export function findMoreMatches(r, g, b, country, category = null, skip = 10, li
 export const CATEGORIES = [
   { id: 'all', label: 'All', emoji: '✨' },
   { id: 'lipstick', label: 'Lips', emoji: '💄' },
+  { id: 'foundation', label: 'Foundation', emoji: '✨' },
+  { id: 'eyeliner', label: 'Eyeliner', emoji: '👁️' },
   { id: 'nail_polish', label: 'Nails', emoji: '💅' },
-  { id: 'foundation', label: 'Foundation', emoji: '🫧' },
+  { id: 'hair_colour', label: 'Hair Colour', emoji: '💇' },
   { id: 'blush', label: 'Blush', emoji: '🌸' },
   { id: 'eyeshadow', label: 'Eyes', emoji: '👁️' },
   { id: 'mascara', label: 'Mascara', emoji: '🖤' },
