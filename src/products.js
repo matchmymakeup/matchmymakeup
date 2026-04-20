@@ -221,6 +221,9 @@ export const CATEGORIES = [
   { id: 'blush', label: 'Blush', emoji: '🌸' },
   { id: 'eyeshadow', label: 'Eyes', emoji: '👁️' },
   { id: 'mascara', label: 'Mascara', emoji: '🖤' },
+  { id: 'concealer', label: 'Concealer', emoji: '🫧' },
+  { id: 'tinted_sunscreen', label: 'SPF Tint', emoji: '☀️' },
+  { id: 'mineral_powder', label: 'Mineral Cover', emoji: '✨' },
   { id: 'highlighter', label: 'Glow', emoji: '✨' },
   { id: 'lip_liner', label: 'Lip Liner', emoji: '✏️' },
 ];

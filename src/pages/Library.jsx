@@ -14,7 +14,7 @@ function loadStore(key, fallback) {
 }
 function saveStore(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
-const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour'];
+const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour','concealer','tinted_sunscreen','mineral_powder'];
 const tabBtn = (active) => ({
   flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
   background:active?"#C9A96E":"transparent",color:active?"white":"#666"
