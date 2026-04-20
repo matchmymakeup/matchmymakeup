@@ -181,7 +181,9 @@ export default function MatchResults() {
       case 'USA': case 'Australia': return `https://www.sephora.com/search?keyword=${q}`;
       case 'India': return `https://www.nykaa.com/search/result/?q=${q}`;
       case 'Indonesia': return `https://shopee.co.id/search?keyword=${q}`;
+      case 'Philippines': return `https://shopee.ph/search?keyword=${q}`;
       case 'Nigeria': return `https://www.jumia.com.ng/catalog/?q=${q}`;
+      case 'South Africa': return `https://www.takealot.com/all?qsearch=${q}`;
       case 'China': return `https://s.taobao.com/search?q=${q}`;
       case 'Brazil': return `https://www.amazon.com.br/s?k=${q}`;
       default: return `https://www.google.com/search?q=${encodeURIComponent(p.brand + ' ' + p.name + ' buy online')}`;
@@ -340,6 +342,9 @@ export default function MatchResults() {
           <button onClick={generateShareCard} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#C9A96E",minHeight:44}}>
             📤 Share My Match
           </button>
+          <a href={`https://wa.me/?text=${encodeURIComponent('I found my perfect makeup match with MatchMyMakeup! ' + record.scannedHex + ' - matchmymakeup.ai')}`} target="_blank" rel="noopener noreferrer" style={{background:"#25D366",border:"none",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"white",minHeight:44,textDecoration:"none",display:"flex",alignItems:"center"}}>
+            💬 WhatsApp
+          </a>
           <button onClick={()=>setShowSaveShade(true)} style={{background:"#2C2C2E",border:"1px solid #e5e7eb",borderRadius:20,padding:"10px 20px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#B76E79",minHeight:44}}>
             💾 Save This Color
           </button>

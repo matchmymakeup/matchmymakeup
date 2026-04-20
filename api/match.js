@@ -308,7 +308,7 @@ const PRODUCTS = [
   { id: "mp_012", name: "Po Compacto Mineral Natural", brand: "Vult", category: "mineral_powder", hexCode: "#D4A76A", red: 212, green: 167, blue: 106, colorName: "Natural", price: 45, currency: "BRL", retailerUrl: "https://www.google.com/search?q=Vult+Po+Compacto+Mineral+Natural+buy", country: "Brazil" },
 ];
 
-const COUNTRY_ALIASES = { 'Australia': 'USA' };
+const COUNTRY_ALIASES = { 'Australia': 'USA', 'Philippines': 'Indonesia', 'South Africa': 'Nigeria' };
 
 function findColorMatches(r, g, b, country, category = null, limit = 10) {
   let pool = PRODUCTS;
@@ -356,12 +356,26 @@ export default function handler(req, res) {
       matches = findColorMatches(r, g, b, country, category, limit || 10);
     }
 
-    // Convert USD to AUD for Australian users
+    // Convert currencies for aliased countries
     if (country === 'Australia') {
       matches = matches.map(p => ({
         ...p,
         price: p.currency === 'USD' ? Math.round(p.price * 1.55 * 100) / 100 : p.price,
         currency: p.currency === 'USD' ? 'AUD' : p.currency,
+      }));
+    }
+    if (country === 'Philippines') {
+      matches = matches.map(p => ({
+        ...p,
+        price: p.currency === 'IDR' ? Math.round(p.price / 234 * 100) / 100 : p.price,
+        currency: p.currency === 'IDR' ? 'PHP' : p.currency,
+      }));
+    }
+    if (country === 'South Africa') {
+      matches = matches.map(p => ({
+        ...p,
+        price: p.currency === 'NGN' ? Math.round(p.price / 85 * 100) / 100 : p.price,
+        currency: p.currency === 'NGN' ? 'ZAR' : p.currency,
       }));
     }
 

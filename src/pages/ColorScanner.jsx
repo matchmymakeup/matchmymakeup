@@ -1,3 +1,5 @@
+// NOTE: All UI in this file must render correctly at 360px viewport width
+// for budget Android phones in India, Nigeria and Brazil.
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CATEGORIES } from "../products.js";
@@ -547,7 +549,7 @@ export default function ColorScanner() {
           <div>
             <label style={{display:"block",fontSize:11,color:"#888",fontWeight:600,marginBottom:8}}>{t.shopInLabel}</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-              {[["","🌍 All"],["USA","🇺🇸 USA"],["Australia","🇦🇺 Australia"],["India","🇮🇳 India"],["Brazil","🇧🇷 Brazil"],["Indonesia","🇮🇩 Indonesia"],["Nigeria","🇳🇬 Nigeria"],["China","🇨🇳 China"]].map(([val,label])=>(
+              {[["","🌍 All"],["USA","🇺🇸 USA"],["Australia","🇦🇺 Australia"],["India","🇮🇳 India"],["Brazil","🇧🇷 Brazil"],["Indonesia","🇮🇩 Indonesia"],["Philippines","🇵🇭 Philippines"],["Nigeria","🇳🇬 Nigeria"],["South Africa","🇿🇦 South Africa"],["China","🇨🇳 China"]].map(([val,label])=>(
                 <button key={val} onClick={()=>setCountry(val)} style={{padding:"8px 14px",borderRadius:20,cursor:"pointer",border:country===val?"2px solid #C9A96E":"2px solid #555",background:country===val?"#2C2C2E":"#3C3C3E",color:country===val?"#C9A96E":"#F5F0E8",fontSize:12,fontWeight:country===val?700:500}}>{label}</button>
               ))}
             </div>
