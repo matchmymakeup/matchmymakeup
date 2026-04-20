@@ -53,6 +53,10 @@ export default function Home() {
             ['fr','🇫🇷','Français','Céline · France/West Africa'],
             ['bn','🇧🇩','বাংলা','Ananya · Bangladesh'],
             ['sw','🇰🇪','Kiswahili','Amara · East Africa'],
+            ['tl','🇵🇭','Filipino','Gabriela · Philippines'],
+            ['en-za','🇿🇦','English (ZA)','Maya · South Africa'],
+            ['af','🇿🇦','Afrikaans','Liezel · Suid-Afrika'],
+            ['zu','🇿🇦','isiZulu','Nomvula · iNingizimu Afrika'],
           ].map(([code, flag, name, sub]) => (
             <button key={code} onClick={() => pickLanguage(code)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12, border: '1px solid #444', background: '#2C2C2E', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#F5F0E8', textAlign: 'left', minHeight: 44, flexShrink: 0, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}>
               <span style={{ fontSize: 22 }}>{flag}</span>
