@@ -374,9 +374,11 @@ export default function MatchResults() {
           <div style={{display:"flex",alignItems:"center",gap:16}}>
             <div style={{width:72,height:72,borderRadius:"50%",background:record.scannedHex,flexShrink:0,boxShadow:`0 6px 24px ${record.scannedHex}80`}} />
             <div>
-              <div style={{fontSize:18,fontWeight:700,color:"#C9A96E",letterSpacing:0.5,marginBottom:2}}>{getColourName(record.scannedRed, record.scannedGreen, record.scannedBlue)}</div>
-              <div style={{fontFamily:"monospace",fontSize:20,fontWeight:800,color:"#F5F0E8"}}>{record.scannedHex}</div>
-              <div style={{color:"#F5F0E8",fontSize:12,marginTop:3}}>R <b style={{color:"#ef4444"}}>{record.scannedRed}</b> &nbsp; G <b style={{color:"#22c55e"}}>{record.scannedGreen}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{record.scannedBlue}</b></div>
+              <div style={{fontSize:28,fontWeight:700,color:"#C9A96E",letterSpacing:0.5,marginBottom:4}}>{getColourName(record.scannedRed, record.scannedGreen, record.scannedBlue)}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:12,flexWrap:"wrap"}}>
+                <div style={{fontFamily:"monospace",fontSize:20,fontWeight:800,color:"#F5F0E8"}}>{record.scannedHex}</div>
+                <div style={{color:"#F5F0E8",fontSize:12}}>R <b style={{color:"#ef4444"}}>{record.scannedRed}</b> &nbsp; G <b style={{color:"#22c55e"}}>{record.scannedGreen}</b> &nbsp; B <b style={{color:"#3b82f6"}}>{record.scannedBlue}</b></div>
+              </div>
               {(record.skinTone||record.occasion||record.country) && (
                 <div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>
                   {record.skinTone && <span style={{background:"#2C2C2E",color:"#B76E79",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:600}}>{record.skinTone}</span>}
