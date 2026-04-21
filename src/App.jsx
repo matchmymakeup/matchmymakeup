@@ -4,6 +4,7 @@ import MatchResults from './pages/MatchResults';
 import ColorScanner from './pages/ColorScanner';
 import Library from './pages/Library';
 import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/MatchResults" element={<MatchResults />} />
         <Route path="/Library" element={<Library />} />
         <Route path="/Terms" element={<Terms />} />
+        <Route path="/Privacy" element={<Privacy />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/Home" replace />} />
       </Routes>

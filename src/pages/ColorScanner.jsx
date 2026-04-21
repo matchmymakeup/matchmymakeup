@@ -570,7 +570,7 @@ export default function ColorScanner() {
         {loading&&step&&<div style={{textAlign:"center",marginTop:10,color:"#C9A96E",fontSize:13,fontWeight:600}}>{step}</div>}
 
         <p style={{textAlign:"center",fontSize:11,color:"#bbb",marginTop:16}}>
-          By using this app you agree to our <span onClick={()=>navigate('/Terms')} style={{color:"#B76E79",cursor:"pointer"}}>Terms & Conditions</span> including anonymous data collection for market research.
+          By using this app you agree to our <span onClick={()=>navigate('/Terms')} style={{color:"#B76E79",cursor:"pointer"}}>Terms & Conditions</span> and <span onClick={()=>navigate('/Privacy')} style={{color:"#B76E79",cursor:"pointer"}}>Privacy Policy</span>.
         </p>
       </div>
     </div>

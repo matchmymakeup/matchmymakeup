@@ -1,3 +1,10 @@
+/**
+ * MatchMyMakeup™ — AI Beauty Intelligence Platform
+ * © 2026 Craig Pretorius trading as MatchMyMakeup. All rights reserved.
+ * ABN 64 378 129 621 · Trademark TM #2640607
+ * Unauthorised copying, reverse engineering, or distribution is prohibited.
+ */
+
 import Stripe from 'stripe';
 
 export default async function handler(req, res) {

@@ -1,3 +1,10 @@
+/**
+ * MatchMyMakeup™ — AI Beauty Intelligence Platform
+ * © 2026 Craig Pretorius trading as MatchMyMakeup. All rights reserved.
+ * ABN 64 378 129 621 · Trademark TM #2640607
+ * Unauthorised copying, reverse engineering, or distribution is prohibited.
+ */
+
 // ── MatchMyMakeup Server-Side Product Matching ──────────────────────────────
 // Product database and matching algorithm - never exposed to browser
 
@@ -337,9 +344,44 @@ function findMoreMatches(r, g, b, country, category = null, skip = 10, limit = 5
     .slice(skip, skip + limit);
 }
 
+const rateLimitMap = new Map();
+function checkRateLimit(ip, limit = 30) {
+  const now = Date.now();
+  const windowMs = 60000;
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  const entry = rateLimitMap.get(ip);
+  if (now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= limit) return false;
+  entry.count++;
+  return true;
+}
+
+const ALLOWED_ORIGINS = ['https://matchmymakeup.ai', 'https://www.matchmymakeup.ai', 'http://localhost:5173', 'http://localhost:3000'];
+const VALID_COUNTRIES = ['','USA','Australia','India','Brazil','Indonesia','Nigeria','China','Philippines','South Africa'];
+const VALID_CATEGORIES = ['','lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour','concealer','tinted_sunscreen','mineral_powder'];
+
 export default function handler(req, res) {
+  // CORS
+  const origin = req.headers.origin;
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGINS.includes(origin) ? origin : 'https://matchmymakeup.ai');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting
+  const ip = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  if (!checkRateLimit(ip, 30)) {
+    return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
   }
 
   try {
@@ -348,6 +390,14 @@ export default function handler(req, res) {
     if (r === undefined || g === undefined || b === undefined) {
       return res.status(400).json({ error: 'Missing r, g, b values' });
     }
+
+    // Input validation
+    const rr = parseInt(r), gg = parseInt(g), bb = parseInt(b);
+    if (isNaN(rr) || isNaN(gg) || isNaN(bb) || rr < 0 || rr > 255 || gg < 0 || gg > 255 || bb < 0 || bb > 255) {
+      return res.status(400).json({ error: 'Invalid input' });
+    }
+    if (country && !VALID_COUNTRIES.includes(country)) return res.status(400).json({ error: 'Invalid input' });
+    if (category && !VALID_CATEGORIES.includes(category)) return res.status(400).json({ error: 'Invalid input' });
 
     let matches;
     if (skip !== undefined) {

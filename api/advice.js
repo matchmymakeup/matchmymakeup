@@ -1,6 +1,49 @@
+/**
+ * MatchMyMakeup™ — AI Beauty Intelligence Platform
+ * © 2026 Craig Pretorius trading as MatchMyMakeup. All rights reserved.
+ * ABN 64 378 129 621 · Trademark TM #2640607
+ * Unauthorised copying, reverse engineering, or distribution is prohibited.
+ */
+
+const rateLimitMap = new Map();
+function checkRateLimit(ip, limit = 30) {
+  const now = Date.now();
+  const windowMs = 60000;
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  const entry = rateLimitMap.get(ip);
+  if (now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= limit) return false;
+  entry.count++;
+  return true;
+}
+
+const ALLOWED_ORIGINS = ['https://matchmymakeup.ai', 'https://www.matchmymakeup.ai', 'http://localhost:5173', 'http://localhost:3000'];
+const VALID_LANGS = ['en','hi','pt','zh','id','ng','es','ar','fr','bn','sw','tl','af','zu','en-za'];
+const VALID_COUNTRIES = ['','USA','Australia','India','Brazil','Indonesia','Nigeria','China','Philippines','South Africa'];
+const VALID_CATEGORIES = ['','lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour','concealer','tinted_sunscreen','mineral_powder'];
+
 export default async function handler(req, res) {
+  // CORS
+  const origin = req.headers.origin;
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGINS.includes(origin) ? origin : 'https://matchmymakeup.ai');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting
+  const ip = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  if (!checkRateLimit(ip, 30)) {
+    return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -8,7 +51,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
-  // [FIX 2] Guard against missing req.body
   if (!req.body) {
     return res.status(400).json({ error: 'Request body is required' });
   }
@@ -16,11 +58,15 @@ export default async function handler(req, res) {
   try {
     const { skinTone, occasion, country, category, profile, lang } = req.body;
 
-    // [FIX 1] Validate and sanitise colour inputs
+    // Input validation
     const hex = (req.body.hex || '').replace(/[^#0-9a-fA-F]/g, '').slice(0, 7);
+    if (hex && !/^#?[0-9A-Fa-f]{6}$/.test(hex)) return res.status(400).json({ error: 'Invalid input' });
     const r = Math.max(0, Math.min(255, parseInt(req.body.r) || 0));
     const g = Math.max(0, Math.min(255, parseInt(req.body.g) || 0));
     const b = Math.max(0, Math.min(255, parseInt(req.body.b) || 0));
+    if (lang && !VALID_LANGS.includes(lang)) return res.status(400).json({ error: 'Invalid input' });
+    if (country && !VALID_COUNTRIES.includes(country)) return res.status(400).json({ error: 'Invalid input' });
+    if (category && !VALID_CATEGORIES.includes(category)) return res.status(400).json({ error: 'Invalid input' });
 
     const PERSONAS = {
       en: { name: 'Maya', lang: 'You must respond entirely in English.', culture: 'You draw on global beauty trends and are inclusive of all backgrounds.' },
