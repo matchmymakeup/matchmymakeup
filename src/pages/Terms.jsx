@@ -37,7 +37,7 @@ export default function Terms() {
         <h3 style={h3Style}>8. Contact</h3>
         <p style={{color:"#ccc"}}>Craig Pretorius trading as MatchMyMakeup · ABN 64 378 129 621 · Queensland, Australia · legal@matchmymakeup.ai</p>
 
-        <button onClick={()=>navigate(-1)} style={{marginTop:24,background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer"}}>← Back to App</button>
+        <button onClick={()=>navigate('/')} style={{marginTop:24,background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer"}}>← Back to App</button>
       </div>
     </div>
   );
