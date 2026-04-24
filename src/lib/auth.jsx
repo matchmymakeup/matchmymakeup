@@ -44,3 +44,15 @@ export function AuthProvider({ children }) {
 export function useUser() {
   return useContext(AuthContext)
 }
+
+// Messages match substrings of Supabase v2 English error responses.
+// Non-English locales or future Supabase string changes require updating these.
+export function sanitizeError(error) {
+  const msg = error?.message || ''
+  if (/User already registered/i.test(msg)) return 'This email is already registered. Try logging in instead.'
+  if (/Invalid login credentials/i.test(msg)) return 'Invalid email or password.'
+  if (/Email not confirmed/i.test(msg)) return 'Please check your email and confirm your account first.'
+  if (/rate limit/i.test(msg)) return 'Too many attempts. Please wait a few minutes and try again.'
+  console.error('[auth] unhandled supabase error:', error)
+  return 'Something went wrong. Please try again.'
+}

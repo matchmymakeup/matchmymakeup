@@ -34,7 +34,15 @@ export default function AuthCallback() {
             navigate('/LogIn', { replace: true })
           }, 1500)
         } else {
-          navigate('/Home', { replace: true })
+          // type=recovery is our convention set by resetPasswordForEmail's
+          // redirectTo — NOT a Supabase-defined param. We append it ourselves
+          // to distinguish recovery exchanges from regular sign-in/magic-link.
+          const type = new URLSearchParams(window.location.search).get('type')
+          if (type === 'recovery') {
+            navigate('/ResetPassword/Confirm', { replace: true })
+          } else {
+            navigate('/Home', { replace: true })
+          }
         }
       })
     }

@@ -10,6 +10,8 @@ import Profile from './pages/Profile';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
 import AuthCallback from './pages/AuthCallback';
+import ResetPassword from './pages/ResetPassword';
+import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/LogIn" element={<LogIn />} />
           <Route path="/AuthCallback" element={<AuthCallback />} />
+          <Route path="/ResetPassword" element={<ResetPassword />} />
+          <Route path="/ResetPassword/Confirm" element={<ResetPasswordConfirm />} />
           <Route path="*" element={<Navigate to="/Home" replace />} />
         </Routes>
       </BrowserRouter>
