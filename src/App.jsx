@@ -9,6 +9,7 @@ import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
+import AuthCallback from './pages/AuthCallback';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/Profile" element={<Profile />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/LogIn" element={<LogIn />} />
+          <Route path="/AuthCallback" element={<AuthCallback />} />
           <Route path="*" element={<Navigate to="/Home" replace />} />
         </Routes>
       </BrowserRouter>
