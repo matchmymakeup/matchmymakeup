@@ -3,3 +3,8 @@ dist
 .env
 .env*.local
 .ai-context/
+.vercel
+.env.local.backup
+.env.vercel-dev
+.env*.backup
+.DS_Store
