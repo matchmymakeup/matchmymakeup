@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { CATEGORIES } from "../products.js";
 import { trackScan, trackPageView } from "../analytics.js";
 import { getColourName } from "../utils/colourNames.js";
+import { saveScan, getStreak, saveStreak } from "../lib/storage";
 
 function toHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
 function fromHex(hex){ const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); return m?{r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)}:null; }
@@ -346,26 +347,6 @@ function PickerTab({color, onWheel, onHexType, t}) {
   );
 }
 
-function getStreak() {
-  try {
-    const data = JSON.parse(localStorage.getItem('mmm_streak') || '{}');
-    const today = new Date().toISOString().slice(0,10);
-    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
-    if (data.lastDate === today) return { count: data.count || 1, lastDate: today };
-    if (data.lastDate === yesterday) return { count: (data.count || 0), lastDate: data.lastDate };
-    return { count: 0, lastDate: null };
-  } catch { return { count: 0, lastDate: null }; }
-}
-function updateStreak() {
-  const today = new Date().toISOString().slice(0,10);
-  const streak = getStreak();
-  if (streak.lastDate === today) return streak;
-  const newCount = streak.lastDate === new Date(Date.now()-86400000).toISOString().slice(0,10) ? streak.count + 1 : 1;
-  const next = { count: newCount, lastDate: today };
-  localStorage.setItem('mmm_streak', JSON.stringify(next));
-  return next;
-}
-
 export default function ColorScanner() {
   const navigate = useNavigate();
   const [lang, setLang] = useState(() => sessionStorage.getItem('mmm_language') || sessionStorage.getItem('mmm_lang') || 'en');
@@ -380,9 +361,15 @@ export default function ColorScanner() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("");
   const [error, setError] = useState("");
-  const [streak, setStreak] = useState(getStreak);
+  const [streak, setStreak] = useState({ current_streak: 0, last_scan_date: null });
 
   useEffect(() => { trackPageView('ColorScanner'); }, []);
+
+  useEffect(() => {
+    let active = true
+    getStreak().then(s => { if (active) setStreak(s) })
+    return () => { active = false }
+  }, []);
 
   function switchTab(id) {
     setTab(id);
@@ -418,12 +405,18 @@ export default function ColorScanner() {
       if (!adviceRes.ok) throw new Error(adviceData.error || 'Failed to get advice');
       const claudeAdvice = adviceData.advice;
       try {
-        const lib = JSON.parse(localStorage.getItem('mmm_library') || '{"scans":[],"images":{}}');
-        lib.scans = lib.scans || [];
-        lib.scans.push({ color, skinTone, occasion, country, category, advice: claudeAdvice, date: new Date().toISOString() });
-        if (lib.scans.length > 50) lib.scans = lib.scans.slice(-50);
-        localStorage.setItem('mmm_library', JSON.stringify(lib));
-      } catch(e) {}
+        await saveScan({
+          color_hex: color.hex,
+          skin_tone: skinTone,
+          occasion,
+          country,
+          category,
+          advice: claudeAdvice,
+          created_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error('[ColorScanner] saveScan failed:', err);
+      }
       const PERSONAS = {en:{name:'Maya',emoji:'💄'},hi:{name:'Priya',emoji:'🪷'},pt:{name:'Valentina',emoji:'💃'},zh:{name:'Mei',emoji:'🌸'},id:{name:'Sari',emoji:'🌺'},ng:{name:'Adaeze',emoji:'👑'},es:{name:'Isabella',emoji:'💃'},ar:{name:'Layla',emoji:'✨'},fr:{name:'Céline',emoji:'🗼'},bn:{name:'Ananya',emoji:'🌹'},sw:{name:'Amara',emoji:'🌍'},tl:{name:'Gabriela',emoji:'🌺'},'en-za':{name:'Maya',emoji:'💄'},af:{name:'Liezel',emoji:'🌸'},zu:{name:'Nomvula',emoji:'👑'}};
       const persona = PERSONAS[lang] || PERSONAS.en;
       sessionStorage.setItem('matchResults', JSON.stringify({
@@ -431,7 +424,25 @@ export default function ColorScanner() {
         matchedProducts: matches, claudeAdvice, skinTone, occasion, country, category, lang,
         personaName: persona.name, personaEmoji: persona.emoji
       }));
-      setStreak(updateStreak());
+      try {
+        const today = new Date().toISOString().slice(0,10);
+        const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+        const current = await getStreak();
+        let next;
+        if (current.last_scan_date === today) {
+          next = current;
+        } else if (current.last_scan_date === yesterday) {
+          next = { current_streak: (current.current_streak || 0) + 1, last_scan_date: today };
+        } else {
+          next = { current_streak: 1, last_scan_date: today };
+        }
+        if (next !== current) {
+          await saveStreak(next);
+        }
+        setStreak(next);
+      } catch (err) {
+        console.error('[ColorScanner] streak update failed:', err);
+      }
       navigate('/MatchResults');
     } catch(err) {
       setError(err?.message||'Something went wrong. Please try again.');
@@ -452,9 +463,9 @@ export default function ColorScanner() {
       <div style={{padding:"12px 16px 4px"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
           <div style={{display:"flex",alignItems:"center",gap:4}}>
-            {streak.count >= 1 && (
+            {streak.current_streak >= 1 && (
               <div style={{background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"#1C1C1E",borderRadius:20,padding:"4px 8px",fontSize:12,fontWeight:700}}>
-                🔥 {streak.count}
+                🔥 {streak.current_streak}
               </div>
             )}
           </div>
@@ -471,7 +482,7 @@ export default function ColorScanner() {
           <div style={{fontSize:28}}>💄</div>
           <h1 style={{margin:"4px 0 2px",fontSize:20,fontWeight:900,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:10}}>{'\u2122'}</span></h1>
           <p style={{margin:"0 0 4px",fontSize:12,color:"#F5F0E8",lineHeight:1.4}}>Upload a photo, use your camera, or pick a color to find your perfect makeup match.</p>
-          {streak.count >= 7 && (
+          {streak.current_streak >= 7 && (
             <div style={{fontSize:12,color:"#C9A96E",fontWeight:600,marginTop:2}}>
               Maya knows your style — 7x more personalised ✨
             </div>
