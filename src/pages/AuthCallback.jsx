@@ -10,34 +10,38 @@ export default function AuthCallback() {
   const navigate = useNavigate()
   const [message, setMessage] = useState('Signing you in…')
   // Ref guards against React StrictMode double-invoke firing the single-use
-  // PKCE code twice in dev. Production builds don't double-invoke.
+  // OTP token twice in dev. Production builds don't double-invoke.
+  // The ref alone is sufficient — an `active` flag pattern was tried and
+  // removed: StrictMode's between-mount cleanup set active=false before
+  // the verifyOtp Promise resolved, causing the .then() to silently bail.
+  // Session state propagates via onAuthStateChange in AuthProvider regardless
+  // of which mount is active, so navigate() works even after StrictMode's
+  // first cleanup.
   const exchangeStarted = useRef(false)
 
   useEffect(() => {
     if (exchangeStarted.current) return
     exchangeStarted.current = true
 
-    let active = true
     let timeoutId = null
 
-    const code = new URL(window.location.href).searchParams.get('code')
-    if (!code) {
+    const params = new URLSearchParams(window.location.search)
+    const tokenHash = params.get('token_hash')
+    const type = params.get('type')
+
+    if (!tokenHash || !type) {
       navigate('/LogIn', { replace: true })
     } else {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (!active) return
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type }).then(({ error }) => {
         if (error) {
-          console.error('[auth] code exchange failed:', error)
+          console.error('[auth] verifyOtp failed:', error)
           setMessage('Login link invalid or expired. Redirecting…')
           timeoutId = setTimeout(() => {
-            if (!active) return
             navigate('/LogIn', { replace: true })
           }, 1500)
         } else {
-          // type=recovery is our convention set by resetPasswordForEmail's
-          // redirectTo — NOT a Supabase-defined param. We append it ourselves
-          // to distinguish recovery exchanges from regular sign-in/magic-link.
-          const type = new URLSearchParams(window.location.search).get('type')
+          // type is Supabase-defined for email links — recovery → reset
+          // password form; everything else (signup, magiclink) → Home.
           if (type === 'recovery') {
             navigate('/ResetPassword/Confirm', { replace: true })
           } else {
@@ -48,7 +52,6 @@ export default function AuthCallback() {
     }
 
     return () => {
-      active = false
       if (timeoutId) clearTimeout(timeoutId)
     }
   }, [navigate])

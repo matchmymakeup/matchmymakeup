@@ -12,9 +12,9 @@ if (!url || !key) {
 // making the target URL visible on every first-load during rollout.
 console.log('[supabase] connected to', url)
 
-// detectSessionInUrl: false — AuthCallback.jsx manually exchanges the PKCE code
-// for deterministic error handling. Auto-detection would race the manual
-// exchange. No other code path consumes URL auth params.
+// detectSessionInUrl: false — AuthCallback.jsx manually verifies the email-link
+// token (verifyOtp) for deterministic error handling. Auto-detection would race
+// the manual verification. No other code path consumes URL auth params.
 export const supabase = createClient(url, key, {
   auth: { detectSessionInUrl: false },
 })
