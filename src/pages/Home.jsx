@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import { useUser } from "../lib/auth";
 
 function MMarkLogo() {
   return (
@@ -11,6 +13,13 @@ function MMarkLogo() {
 
 export default function Home() {
   const navigate = useNavigate();
+  const { session } = useUser();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    // onAuthStateChange fires → AuthProvider updates → this re-renders with
+    // "Log in" instead of "Log out". User stays on Home (public route).
+  }
 
   function pickLanguage(code) {
     try { sessionStorage.setItem('mmm_language', code); } catch {}
@@ -18,7 +27,14 @@ export default function Home() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#1C1C1E', fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <div style={{ minHeight: '100vh', background: '#1C1C1E', fontFamily: "Georgia, 'Times New Roman', serif", position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 16, right: 24, zIndex: 10 }}>
+        {session ? (
+          <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#C9A96E', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}>Log out</button>
+        ) : (
+          <Link to="/LogIn" style={{ color: '#C9A96E', fontSize: 13, fontWeight: 600, textDecoration: 'none', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}>Log in</Link>
+        )}
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 24px 40px', boxSizing: 'border-box' }}>
         <MMarkLogo />
         <div style={{ height: 24 }} />
