@@ -76,13 +76,23 @@ export default function Library() {
   }
 
   useEffect(() => {
-    loadAll();
+    let cancelled = false;
+
+    // Wait for session hydration before first read to avoid race with storage.js cache
+    supabase.auth.getSession().then(() => {
+      if (!cancelled) loadAll();
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         loadAll();
       }
     });
-    return () => subscription.unsubscribe();
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function addProduct() {
