@@ -1,23 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getColourName } from "../utils/colourNames.js";
-
-function getTrialInfo() {
-  try {
-    const start = localStorage.getItem('mmm_trial_start');
-    if (!start) return { active: false, started: false, daysLeft: 0, scansSaved: 0 };
-    const startDate = new Date(start);
-    const now = new Date();
-    const elapsed = Math.floor((now - startDate) / 86400000);
-    const daysLeft = Math.max(0, 7 - elapsed);
-    const lib = JSON.parse(localStorage.getItem('mmm_library') || '{}');
-    const scansSaved = (lib.scans || []).length;
-    return { active: daysLeft > 0, started: true, daysLeft, scansSaved, elapsed };
-  } catch { return { active: false, started: false, daysLeft: 0, scansSaved: 0 }; }
-}
-function startTrial() {
-  localStorage.setItem('mmm_trial_start', new Date().toISOString());
-}
+import { getProfile, saveProfile, getSavedProducts, saveProduct, getSavedShades, saveShade } from "../lib/storage";
+import { getTrialInfo, startTrial } from "../lib/trial";
 
 const T = {
   en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
@@ -44,14 +29,6 @@ function formatAdvice(text) {
   return text.replace(/#{1,3}\s*/g,"").replace(/\*\*(.*?)\*\*/g,"$1").replace(/\*(.*?)\*/g,"$1").replace(/---+/g,"").split(/\n\n+/).map(p=>p.trim()).filter(p=>p.length>0);
 }
 
-function getProfile() {
-  try { return JSON.parse(localStorage.getItem('mmm_profile') || '{}'); } catch { return {}; }
-}
-function saveProfile(data) {
-  const p = { ...getProfile(), ...data };
-  localStorage.setItem('mmm_profile', JSON.stringify(p));
-  return p;
-}
 function getScanCount() {
   try { const lib = JSON.parse(localStorage.getItem('mmm_library') || '{}'); return (lib.scans || []).length; } catch { return 0; }
 }
@@ -79,21 +56,21 @@ export default function MatchResults() {
   const [skinToneBannerDismissed, setSkinToneBannerDismissed] = useState(false);
   const [ageBannerDismissed, setAgeBannerDismissed] = useState(false);
   const [bonusProducts, setBonusProducts] = useState([]);
-  const [trialInfo, setTrialInfo] = useState(getTrialInfo);
+  const [trialInfo, setTrialInfo] = useState(getTrialInfo());
   const shareCanvasRef = useRef(null);
   const [showSaveShade, setShowSaveShade] = useState(false);
-  const [savedProductIds, setSavedProductIds] = useState(() => {
-    try { return new Set(JSON.parse(localStorage.getItem('mmm_my_products') || '[]').map(p => p.productName + p.brand)); } catch { return new Set(); }
-  });
+  const [savedProductIds, setSavedProductIds] = useState(new Set());
   const [justSaved, setJustSaved] = useState(null);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [shareCopied, setShareCopied] = useState(null);
   const [shadeName, setShadeName] = useState('');
 
-  const profile = getProfile();
+  const [profile, setProfile] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mmm_profile') || '{}') } catch { return {} }
+  });
   const scanCount = getScanCount();
-  const showSkinToneBanner = !profile.skinTone && !skinToneBannerDismissed;
-  const showAgeBanner = scanCount >= 2 && !profile.ageRange && profile.skinTone && !ageBannerDismissed;
+  const showSkinToneBanner = !profile.skin_tone && !skinToneBannerDismissed;
+  const showAgeBanner = scanCount >= 2 && !profile.age_range && profile.skin_tone && !ageBannerDismissed;
 
   useEffect(() => {
     // Activate trial after successful Stripe checkout
@@ -119,8 +96,17 @@ export default function MatchResults() {
     finally { setLoading(false); }
   }, []);
 
+  useEffect(() => {
+    let active = true
+    getProfile().then(p => { if (active) setProfile(p) })
+    getSavedProducts().then(products => {
+      if (active) setSavedProductIds(new Set(products.map(p => p.name + p.brand)))
+    })
+    return () => { active = false }
+  }, [])
+
   async function handleSkinToneSelect(tone) {
-    saveProfile({ skinTone: tone });
+    saveProfile({ skin_tone: tone });
     setShowSkinToneSheet(false);
     setSkinToneBannerDismissed(true);
     if (record) {
@@ -137,7 +123,7 @@ export default function MatchResults() {
   }
 
   function handleAgeSelect(age) {
-    saveProfile({ ageRange: age });
+    saveProfile({ age_range: age });
     setShowAgeSheet(false);
     setAgeBannerDismissed(true);
   }
@@ -156,27 +142,42 @@ export default function MatchResults() {
     } catch (err) { console.error('[MatchResults] checkout error:', err); alert('Something went wrong. Please try again.'); }
   }
 
-  function handleSaveShade() {
+  async function handleSaveShade() {
     if (!shadeName || !record) return;
     try {
-      const shades = JSON.parse(localStorage.getItem('mmm_my_shades') || '[]');
-      shades.push({ id: Date.now(), name: shadeName, hex: record.scannedHex });
-      localStorage.setItem('mmm_my_shades', JSON.stringify(shades));
-    } catch {}
+      await saveShade({ name: shadeName, hex: record.scannedHex });
+    } catch (err) {
+      console.error('[MatchResults] saveShade failed:', err);
+    }
     setShadeName(''); setShowSaveShade(false);
   }
 
-  function saveProductToLibrary(p) {
+  async function saveProductToLibrary(p) {
     const key = p.name + p.brand;
     if (savedProductIds.has(key)) return;
+    setSavedProductIds(prev => new Set([...prev, key]));
+    setJustSaved(key);
+    setTimeout(() => setJustSaved(null), 2000);
     try {
-      const existing = JSON.parse(localStorage.getItem('mmm_my_products') || '[]');
-      existing.push({ id: Date.now(), productName: p.name, brand: p.brand, category: p.category, hex: p.hexCode, colorName: p.colorName, price: p.price, currency: p.currency, rating: 5, notes: '', dateSaved: new Date().toISOString() });
-      localStorage.setItem('mmm_my_products', JSON.stringify(existing));
-      setSavedProductIds(prev => new Set([...prev, key]));
-      setJustSaved(key);
-      setTimeout(() => setJustSaved(null), 2000);
-    } catch {}
+      await saveProduct({
+        name: p.name,
+        brand: p.brand,
+        category: p.category,
+        hex: p.hexCode,
+        shade: p.colorName,
+        price: p.price,
+        currency: p.currency,
+        rating: 5,
+        notes: '',
+      });
+    } catch (err) {
+      console.error('[MatchResults] saveProduct failed:', err);
+      setSavedProductIds(prev => {
+        const next = new Set(prev)
+        next.delete(key)
+        return next
+      });
+    }
   }
 
   const SHARE_PLATFORMS = {
@@ -214,17 +215,13 @@ export default function MatchResults() {
   };
 
   function getSharePlatforms() {
-    let userCountry = record?.country || '';
-    try { const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); if (p.country) userCountry = p.country; } catch {}
+    const userCountry = profile.country || record?.country || '';
     const platforms = [...(COUNTRY_SHARE_MAP[userCountry] || ['whatsapp','instagram','telegram','facebook','tiktok','copy'])];
     if (!platforms.includes('copy')) platforms.push('copy');
-    try {
-      const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}');
-      if (p.sharePreference && platforms.includes(p.sharePreference)) {
-        const idx = platforms.indexOf(p.sharePreference);
-        if (idx > 0) { platforms.splice(idx, 1); platforms.unshift(p.sharePreference); }
-      }
-    } catch {}
+    if (profile.share_preference && platforms.includes(profile.share_preference)) {
+      const idx = platforms.indexOf(profile.share_preference);
+      if (idx > 0) { platforms.splice(idx, 1); platforms.unshift(profile.share_preference); }
+    }
     return platforms;
   }
 
