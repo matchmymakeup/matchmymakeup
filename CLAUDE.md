@@ -47,6 +47,19 @@ src/
 - No backend DB — all persistence is client-side, factor this into any
   feature additions
 
+## Maintenance backlog
+
+### api/advice.js — opportunistic upgrades
+Bundle the following changes the next time `api/advice.js` is edited for any reason. None are urgent in isolation; deferring avoids a standalone deploy.
+
+- **Model string:** `claude-sonnet-4-20250514` → `claude-sonnet-4-6-[latest]`
+  - Same price, 1M context now GA on Sonnet 4.6
+  - Sonnet 4 remains supported at 200K context; no forced deadline
+- **API version header:** Review `anthropic-version: 2023-06-01` — currently fine but flagged for revisit on next SDK update
+- **Verify after change:** Run a smoke test on at least one persona to confirm response quality is unchanged
+
+Reviewed 26 Apr 2026 — confirmed not affected by 1M context beta retirement (April 30, 2026), as no `anthropic-beta` header is set and request size stays ~1,300 tokens.
+
 ## Deployment
 - Platform: Vercel
 - API routes: /api/* (serverless functions)
