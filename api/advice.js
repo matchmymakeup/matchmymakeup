@@ -117,6 +117,9 @@ export default async function handler(req, res) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
+        // [TODO 1] Bundle on next edit — bump model to claude-sonnet-4-6-[latest version]
+        // (1M context now GA, same price) and review anthropic-version header.
+        // Sonnet 4 remains supported at 200K; not urgent. See CLAUDE.md "Maintenance backlog".
         model: 'claude-sonnet-4-20250514',
         max_tokens: 300,
         system: systemPrompt,
