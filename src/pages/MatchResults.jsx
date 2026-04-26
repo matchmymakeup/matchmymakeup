@@ -100,7 +100,7 @@ export default function MatchResults() {
     let active = true
     getProfile().then(p => { if (active) setProfile(p) })
     getSavedProducts().then(products => {
-      if (active) setSavedProductIds(new Set(products.map(p => p.name + p.brand)))
+      if (active) setSavedProductIds(new Set(products.map(p => `${p.name}|${p.brand}`)))
     })
     return () => { active = false }
   }, [])
@@ -153,7 +153,7 @@ export default function MatchResults() {
   }
 
   async function saveProductToLibrary(p) {
-    const key = p.name + p.brand;
+    const key = `${p.name}|${p.brand}`;
     if (savedProductIds.has(key)) return;
     setSavedProductIds(prev => new Set([...prev, key]));
     setJustSaved(key);
@@ -167,8 +167,6 @@ export default function MatchResults() {
         shade: p.colorName,
         price: p.price,
         currency: p.currency,
-        rating: 5,
-        notes: '',
       });
     } catch (err) {
       console.error('[MatchResults] saveProduct failed:', err);
@@ -490,8 +488,8 @@ export default function MatchResults() {
                       <a href={getShopUrl(p)} target="_blank" rel="noopener noreferrer" style={{flex:1,textAlign:"center",background:"#C9A96E",color:"#1C1C1E",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none",minHeight:32,display:"flex",alignItems:"center",justifyContent:"center"}}>
                         {p.retailerUrl && p.retailerUrl.startsWith('http') ? t.shopNow : 'Search Online →'}
                       </a>
-                      <button onClick={()=>saveProductToLibrary(p)} style={{background:savedProductIds.has(p.name+p.brand)?"#ecfdf5":"#f9fafb",border:savedProductIds.has(p.name+p.brand)?"1px solid #86efac":"1px solid #e5e7eb",borderRadius:10,padding:"4px 8px",cursor:"pointer",fontSize:10,fontWeight:700,color:savedProductIds.has(p.name+p.brand)?"#16a34a":"#888",minHeight:32,whiteSpace:"nowrap"}}>
-                        {justSaved===(p.name+p.brand) ? 'Saved! ✓' : savedProductIds.has(p.name+p.brand) ? 'Saved ✓' : '🔖 Save'}
+                      <button onClick={()=>saveProductToLibrary(p)} style={{background:savedProductIds.has(`${p.name}|${p.brand}`)?"#ecfdf5":"#f9fafb",border:savedProductIds.has(`${p.name}|${p.brand}`)?"1px solid #86efac":"1px solid #e5e7eb",borderRadius:10,padding:"4px 8px",cursor:"pointer",fontSize:10,fontWeight:700,color:savedProductIds.has(`${p.name}|${p.brand}`)?"#16a34a":"#888",minHeight:32,whiteSpace:"nowrap"}}>
+                        {justSaved===(`${p.name}|${p.brand}`) ? 'Saved! ✓' : savedProductIds.has(`${p.name}|${p.brand}`) ? 'Saved ✓' : '🔖 Save'}
                       </button>
                     </div>
                   </div>
