@@ -2,15 +2,8 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUser, sanitizeError } from '../lib/auth'
+import { safeRedirect } from '../lib/safeRedirect'
 import AuthCard from '../components/AuthCard'
-
-// Open-redirect guard for the ?redirect= param. Only allow same-origin
-// in-app paths; reject null/undefined/external URLs and protocol-relative
-// (//evil.com) attempts.
-function safeRedirect(target) {
-  if (!target || !target.startsWith('/') || target.startsWith('//')) return '/Home'
-  return target
-}
 
 const labelStyle = { display: 'block', fontSize: 12, color: '#888', marginBottom: 4, fontWeight: 600 }
 const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #555', background: '#3C3C3E', color: '#F5F0E8', fontSize: 14, marginBottom: 12, boxSizing: 'border-box', minHeight: 44 }
@@ -54,9 +47,13 @@ export default function LogIn() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    // Magic-link defaults to /Library (Step 6 Commit 2). Forward incoming
+    // ?redirect= (e.g. from RequireAuth bounces) so the original intent wins.
+    const target = safeRedirect(searchParams.get('redirect'), '/Library')
+    const callbackUrl = `${window.location.origin}/AuthCallback?redirect=${encodeURIComponent(target)}`
     const { error: sbError } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/AuthCallback` },
+      options: { emailRedirectTo: callbackUrl },
     })
     setLoading(false)
     if (sbError) {

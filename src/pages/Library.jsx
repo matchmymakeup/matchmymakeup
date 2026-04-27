@@ -39,6 +39,9 @@ export default function Library() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Migration error surfaced from AuthCallback (Step 6 Commit 2) via sessionStorage
+  const [migrationError, setMigrationError] = useState(null);
+
   // My Looks (out of scope for Step 5 — still localStorage)
   const [myLooks, setMyLooks] = useState(() => loadStore('mmm_my_looks', []));
   const [showAddLook, setShowAddLook] = useState(false);
@@ -77,6 +80,13 @@ export default function Library() {
 
   useEffect(() => {
     let cancelled = false;
+
+    // Surface migration failure from AuthCallback if present, then clear flag
+    const migErr = sessionStorage.getItem('mmm_migration_error');
+    if (migErr) {
+      setMigrationError(migErr);
+      sessionStorage.removeItem('mmm_migration_error');
+    }
 
     // Wait for session hydration before first read to avoid race with storage.js cache
     supabase.auth.getSession().then(() => {
@@ -179,6 +189,12 @@ export default function Library() {
       </div>
 
       <div style={{maxWidth:480,margin:"0 auto",padding:"16px"}}>
+        {migrationError && (
+          <div style={{background:'#3C1F1F',color:'#F5D8D8',padding:'12px 14px',borderRadius:12,marginBottom:12,fontSize:13,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
+            <span>Some saved items couldn't be restored from this device.</span>
+            <button onClick={() => setMigrationError(null)} style={{background:'none',border:'none',color:'#F5D8D8',cursor:'pointer',fontSize:18,minWidth:32,minHeight:32,padding:0}}>✕</button>
+          </div>
+        )}
         {/* Tabs */}
         <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
           <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
