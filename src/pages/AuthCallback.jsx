@@ -56,8 +56,15 @@ export default function AuthCallback() {
             console.warn('[auth] Migration during callback failed:', err)
             sessionStorage.setItem('mmm_migration_error', err?.message || 'Unknown error')
           }
-          // /Home is the generic fallback. Magic-link explicitly sets ?redirect=/Library; SignUp/recovery paths fall through to /Home.
-          const target = safeRedirect(params.get('redirect'), '/Home')
+          // Read post-auth redirect from sessionStorage (set by LogIn before
+          // signInWithOtp). Used instead of a URL query param because Supabase
+          // malforms emailRedirectTo URLs that already carry query strings.
+          // Cross-tab / cross-device magic-links won't have the key — fall
+          // through to /Home. SignUp + ResetPassword paths also have no key
+          // and use the /Home fallback (recovery is handled in branch above).
+          const stashed = sessionStorage.getItem('mmm_post_auth_redirect')
+          sessionStorage.removeItem('mmm_post_auth_redirect')
+          const target = safeRedirect(stashed, '/Home')
           navigate(target, { replace: true })
         }
       })

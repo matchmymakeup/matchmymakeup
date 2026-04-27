@@ -47,13 +47,19 @@ export default function LogIn() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    // Magic-link defaults to /Library (Step 6 Commit 2). Forward incoming
-    // ?redirect= (e.g. from RequireAuth bounces) so the original intent wins.
+    // Magic-link defaults to /Library. Forward incoming ?redirect= (e.g.
+    // from RequireAuth bounces). Stashed in sessionStorage rather than as
+    // a query string on emailRedirectTo because Supabase malforms URLs that
+    // already carry query params (appends ?token_hash= with ? not &),
+    // producing /AuthCallback?redirect=%2FLibrary?token_hash=… — broken.
+    // Trade-off: cross-tab or cross-device magic-links (request in one
+    // tab/device, click in another) lose the redirect and fall back to
+    // /Home in AuthCallback.
     const target = safeRedirect(searchParams.get('redirect'), '/Library')
-    const callbackUrl = `${window.location.origin}/AuthCallback?redirect=${encodeURIComponent(target)}`
+    sessionStorage.setItem('mmm_post_auth_redirect', target)
     const { error: sbError } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: callbackUrl },
+      options: { emailRedirectTo: `${window.location.origin}/AuthCallback` },
     })
     setLoading(false)
     if (sbError) {
