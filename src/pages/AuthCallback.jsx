@@ -56,7 +56,8 @@ export default function AuthCallback() {
             console.warn('[auth] Migration during callback failed:', err)
             sessionStorage.setItem('mmm_migration_error', err?.message || 'Unknown error')
           }
-          const target = safeRedirect(params.get('redirect'), '/Library')
+          // /Home is the generic fallback. Magic-link explicitly sets ?redirect=/Library; SignUp/recovery paths fall through to /Home.
+          const target = safeRedirect(params.get('redirect'), '/Home')
           navigate(target, { replace: true })
         }
       })
