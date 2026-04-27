@@ -395,3 +395,107 @@ export async function saveStreak(streak) {
   }
   localStorage.setItem('mmm_streak', JSON.stringify(streak))
 }
+
+// ─────────────────────────────────────────────────────────
+// Migration: anon localStorage → authed Supabase
+// Called from AuthProvider on SIGNED_IN. Fire-and-forget.
+// Safe to call repeatedly: no-ops when localStorage is empty.
+// On partial failure, preserves localStorage for retry next SIGNED_IN.
+// ─────────────────────────────────────────────────────────
+export async function migrateAnonymousData() {
+  const rawProducts = JSON.parse(localStorage.getItem('mmm_my_products') || '[]')
+  const rawShades = JSON.parse(localStorage.getItem('mmm_my_shades') || '[]')
+
+  if (rawProducts.length === 0 && rawShades.length === 0) {
+    return { migrated: 0, skipped: 0, errors: 0 }
+  }
+
+  // Defensive session hydration (mirrors Step 5 hotfix pattern)
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) {
+    console.warn('[migration] No session on SIGNED_IN — aborting')
+    return { migrated: 0, skipped: 0, errors: 1 }
+  }
+
+  const userId = session.user.id
+  const localProducts = rawProducts.map(productFromLegacy)
+  const localShades = rawShades
+
+  // Fetch existing rows for dup detection
+  const [productsRes, shadesRes] = await Promise.all([
+    supabase.from('saved_products').select('name, brand, shade').eq('user_id', userId),
+    supabase.from('saved_shades').select('name, hex').eq('user_id', userId),
+  ])
+
+  if (productsRes.error || shadesRes.error) {
+    console.warn('[migration] Fetch existing failed — aborting, localStorage preserved',
+      productsRes.error || shadesRes.error)
+    return { migrated: 0, skipped: 0, errors: 1 }
+  }
+
+  const existingProductKeys = new Set(
+    (productsRes.data || []).map(p => `${p.name}|${p.brand || ''}|${p.shade || ''}`)
+  )
+  const existingShadeKeys = new Set(
+    (shadesRes.data || []).map(s => `${s.name}|${s.hex}`)
+  )
+
+  const productsToInsert = localProducts.filter(
+    p => !existingProductKeys.has(`${p.name}|${p.brand || ''}|${p.shade || ''}`)
+  )
+  const shadesToInsert = localShades.filter(
+    s => !existingShadeKeys.has(`${s.name}|${s.hex}`)
+  )
+
+  const dupsSkipped =
+    (localProducts.length - productsToInsert.length) +
+    (localShades.length - shadesToInsert.length)
+
+  let migratedCount = 0
+  let errorCount = 0
+
+  if (productsToInsert.length > 0) {
+    const rows = productsToInsert.map(p => ({
+      user_id: userId,
+      name: p.name,
+      brand: p.brand || null,
+      category: p.category || null,
+      hex: p.hex || null,
+      shade: p.shade || null,
+      price: p.price ?? null,
+      currency: p.currency || null,
+    }))
+    const { error } = await supabase.from('saved_products').insert(rows)
+    if (error) {
+      console.warn('[migration] Products insert failed:', error)
+      errorCount++
+    } else {
+      migratedCount += rows.length
+    }
+  }
+
+  if (shadesToInsert.length > 0) {
+    const rows = shadesToInsert.map(s => ({
+      user_id: userId,
+      name: s.name,
+      hex: s.hex,
+    }))
+    const { error } = await supabase.from('saved_shades').insert(rows)
+    if (error) {
+      console.warn('[migration] Shades insert failed:', error)
+      errorCount++
+    } else {
+      migratedCount += rows.length
+    }
+  }
+
+  if (errorCount === 0) {
+    localStorage.removeItem('mmm_my_products')
+    localStorage.removeItem('mmm_my_shades')
+    console.log(`[migration] Migrated ${migratedCount} items, skipped ${dupsSkipped} dups`)
+  } else {
+    console.warn(`[migration] Partial failure — localStorage preserved for retry. Migrated ${migratedCount}, errors ${errorCount}`)
+  }
+
+  return { migrated: migratedCount, skipped: dupsSkipped, errors: errorCount }
+}
