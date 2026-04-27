@@ -465,9 +465,14 @@ export async function migrateAnonymousData() {
       price: p.price ?? null,
       currency: p.currency || null,
     }))
-    const { error } = await supabase.from('saved_products').insert(rows)
+    const { error } = await supabase
+      .from('saved_products')
+      .upsert(rows, {
+        onConflict: 'user_id,name,brand,shade',
+        ignoreDuplicates: true,
+      })
     if (error) {
-      console.warn('[migration] Products insert failed:', error)
+      console.warn('[migration] Products upsert failed:', error)
       errorCount++
     } else {
       migratedCount += rows.length
@@ -480,9 +485,14 @@ export async function migrateAnonymousData() {
       name: s.name,
       hex: s.hex,
     }))
-    const { error } = await supabase.from('saved_shades').insert(rows)
+    const { error } = await supabase
+      .from('saved_shades')
+      .upsert(rows, {
+        onConflict: 'user_id,name,hex',
+        ignoreDuplicates: true,
+      })
     if (error) {
-      console.warn('[migration] Shades insert failed:', error)
+      console.warn('[migration] Shades upsert failed:', error)
       errorCount++
     } else {
       migratedCount += rows.length
