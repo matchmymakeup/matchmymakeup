@@ -1,23 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getColourName } from "../utils/colourNames.js";
-
-function getTrialInfo() {
-  try {
-    const start = localStorage.getItem('mmm_trial_start');
-    if (!start) return { active: false, started: false, daysLeft: 0, scansSaved: 0 };
-    const startDate = new Date(start);
-    const now = new Date();
-    const elapsed = Math.floor((now - startDate) / 86400000);
-    const daysLeft = Math.max(0, 7 - elapsed);
-    const lib = JSON.parse(localStorage.getItem('mmm_library') || '{}');
-    const scansSaved = (lib.scans || []).length;
-    return { active: daysLeft > 0, started: true, daysLeft, scansSaved, elapsed };
-  } catch { return { active: false, started: false, daysLeft: 0, scansSaved: 0 }; }
-}
-function startTrial() {
-  localStorage.setItem('mmm_trial_start', new Date().toISOString());
-}
+import { getProfile, saveProfile, getSavedProducts, saveProduct, getSavedShades, saveShade } from "../lib/storage";
+import { getTrialInfo, startTrial } from "../lib/trial";
+import PageBackBar from "../components/PageBackBar";
 
 const T = {
   en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
@@ -44,14 +30,6 @@ function formatAdvice(text) {
   return text.replace(/#{1,3}\s*/g,"").replace(/\*\*(.*?)\*\*/g,"$1").replace(/\*(.*?)\*/g,"$1").replace(/---+/g,"").split(/\n\n+/).map(p=>p.trim()).filter(p=>p.length>0);
 }
 
-function getProfile() {
-  try { return JSON.parse(localStorage.getItem('mmm_profile') || '{}'); } catch { return {}; }
-}
-function saveProfile(data) {
-  const p = { ...getProfile(), ...data };
-  localStorage.setItem('mmm_profile', JSON.stringify(p));
-  return p;
-}
 function getScanCount() {
   try { const lib = JSON.parse(localStorage.getItem('mmm_library') || '{}'); return (lib.scans || []).length; } catch { return 0; }
 }
@@ -79,21 +57,22 @@ export default function MatchResults() {
   const [skinToneBannerDismissed, setSkinToneBannerDismissed] = useState(false);
   const [ageBannerDismissed, setAgeBannerDismissed] = useState(false);
   const [bonusProducts, setBonusProducts] = useState([]);
-  const [trialInfo, setTrialInfo] = useState(getTrialInfo);
+  const [trialInfo, setTrialInfo] = useState(getTrialInfo());
   const shareCanvasRef = useRef(null);
   const [showSaveShade, setShowSaveShade] = useState(false);
-  const [savedProductIds, setSavedProductIds] = useState(() => {
-    try { return new Set(JSON.parse(localStorage.getItem('mmm_my_products') || '[]').map(p => p.productName + p.brand)); } catch { return new Set(); }
-  });
+  const [savedProductIds, setSavedProductIds] = useState(new Set());
   const [justSaved, setJustSaved] = useState(null);
+  const [savedThisSession, setSavedThisSession] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [shareCopied, setShareCopied] = useState(null);
   const [shadeName, setShadeName] = useState('');
 
-  const profile = getProfile();
+  const [profile, setProfile] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mmm_profile') || '{}') } catch { return {} }
+  });
   const scanCount = getScanCount();
-  const showSkinToneBanner = !profile.skinTone && !skinToneBannerDismissed;
-  const showAgeBanner = scanCount >= 2 && !profile.ageRange && profile.skinTone && !ageBannerDismissed;
+  const showSkinToneBanner = !profile.skin_tone && !skinToneBannerDismissed;
+  const showAgeBanner = scanCount >= 2 && !profile.age_range && profile.skin_tone && !ageBannerDismissed;
 
   useEffect(() => {
     // Activate trial after successful Stripe checkout
@@ -119,8 +98,23 @@ export default function MatchResults() {
     finally { setLoading(false); }
   }, []);
 
+  useEffect(() => {
+    let active = true
+    getProfile().then(p => { if (active) setProfile(p) })
+    getSavedProducts().then(products => {
+      if (active) setSavedProductIds(new Set(products.map(p => `${p.name}|${p.brand}`)))
+    })
+    return () => { active = false }
+  }, [])
+
+  // Reset on color change — MatchResults stays mounted across some scan
+  // flows; without this, savedThisSession leaks from a previous match.
+  useEffect(() => {
+    setSavedThisSession(false)
+  }, [record?.scannedHex])
+
   async function handleSkinToneSelect(tone) {
-    saveProfile({ skinTone: tone });
+    saveProfile({ skin_tone: tone });
     setShowSkinToneSheet(false);
     setSkinToneBannerDismissed(true);
     if (record) {
@@ -137,7 +131,7 @@ export default function MatchResults() {
   }
 
   function handleAgeSelect(age) {
-    saveProfile({ ageRange: age });
+    saveProfile({ age_range: age });
     setShowAgeSheet(false);
     setAgeBannerDismissed(true);
   }
@@ -156,27 +150,42 @@ export default function MatchResults() {
     } catch (err) { console.error('[MatchResults] checkout error:', err); alert('Something went wrong. Please try again.'); }
   }
 
-  function handleSaveShade() {
+  async function handleSaveShade() {
     if (!shadeName || !record) return;
     try {
-      const shades = JSON.parse(localStorage.getItem('mmm_my_shades') || '[]');
-      shades.push({ id: Date.now(), name: shadeName, hex: record.scannedHex });
-      localStorage.setItem('mmm_my_shades', JSON.stringify(shades));
-    } catch {}
+      await saveShade({ name: shadeName, hex: record.scannedHex });
+      setSavedThisSession(true);
+    } catch (err) {
+      console.error('[MatchResults] saveShade failed:', err);
+    }
     setShadeName(''); setShowSaveShade(false);
   }
 
-  function saveProductToLibrary(p) {
-    const key = p.name + p.brand;
+  async function saveProductToLibrary(p) {
+    const key = `${p.name}|${p.brand}`;
     if (savedProductIds.has(key)) return;
+    setSavedProductIds(prev => new Set([...prev, key]));
+    setJustSaved(key);
+    setTimeout(() => setJustSaved(null), 2000);
     try {
-      const existing = JSON.parse(localStorage.getItem('mmm_my_products') || '[]');
-      existing.push({ id: Date.now(), productName: p.name, brand: p.brand, category: p.category, hex: p.hexCode, colorName: p.colorName, price: p.price, currency: p.currency, rating: 5, notes: '', dateSaved: new Date().toISOString() });
-      localStorage.setItem('mmm_my_products', JSON.stringify(existing));
-      setSavedProductIds(prev => new Set([...prev, key]));
-      setJustSaved(key);
-      setTimeout(() => setJustSaved(null), 2000);
-    } catch {}
+      await saveProduct({
+        name: p.name,
+        brand: p.brand,
+        category: p.category,
+        hex: p.hexCode,
+        shade: p.colorName,
+        price: p.price,
+        currency: p.currency,
+      });
+      setSavedThisSession(true);
+    } catch (err) {
+      console.error('[MatchResults] saveProduct failed:', err);
+      setSavedProductIds(prev => {
+        const next = new Set(prev)
+        next.delete(key)
+        return next
+      });
+    }
   }
 
   const SHARE_PLATFORMS = {
@@ -214,17 +223,13 @@ export default function MatchResults() {
   };
 
   function getSharePlatforms() {
-    let userCountry = record?.country || '';
-    try { const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); if (p.country) userCountry = p.country; } catch {}
+    const userCountry = profile.country || record?.country || '';
     const platforms = [...(COUNTRY_SHARE_MAP[userCountry] || ['whatsapp','instagram','telegram','facebook','tiktok','copy'])];
     if (!platforms.includes('copy')) platforms.push('copy');
-    try {
-      const p = JSON.parse(localStorage.getItem('mmm_profile') || '{}');
-      if (p.sharePreference && platforms.includes(p.sharePreference)) {
-        const idx = platforms.indexOf(p.sharePreference);
-        if (idx > 0) { platforms.splice(idx, 1); platforms.unshift(p.sharePreference); }
-      }
-    } catch {}
+    if (profile.share_preference && platforms.includes(profile.share_preference)) {
+      const idx = platforms.indexOf(profile.share_preference);
+      if (idx > 0) { platforms.splice(idx, 1); platforms.unshift(profile.share_preference); }
+    }
     return platforms;
   }
 
@@ -342,17 +347,14 @@ export default function MatchResults() {
 
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{background:"#2C2C2E",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
-        <div style={{maxWidth:560,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #555",borderRadius:10,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",fontWeight:600}}>{t.scanAgain}</button>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:20}}>💄</span>
-            <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>{'\u2122'}</span></span>
-          </div>
-        </div>
-      </div>
-
       <div style={{maxWidth:560,margin:"0 auto",padding:"20px 16px 60px"}}>
+        <PageBackBar onBack={() => navigate('/ColorScanner')} label={t.scanAgain} title="Your Match" />
+        {/* Wordmark — preserved verbatim from original chrome bar; MatchResults is the highest-share page so the wordmark drives outbound brand exposure */}
+        {/* fontSize:8 trademark trick — visually intentional, not a typo */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:20}}>
+          <span style={{fontSize:20}}>💄</span>
+          <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>{'™'}</span></span>
+        </div>
         {/* Scanned color */}
         <div style={{background:"#2C2C2E",borderRadius:20,padding:20,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:20}}>
           <div style={{fontSize:11,color:"#aaa",fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:12}}>{t.yourColor}</div>
@@ -434,6 +436,15 @@ export default function MatchResults() {
           </button>
         </div>
 
+        {/* Post-save affordance — session-scoped, NOT derived from storage. Set true on successful save in saveProductToLibrary or handleSaveShade; never resets in this session, never appears on revisit without a fresh save. */}
+        {savedThisSession && (
+          <div style={{textAlign:"center",marginBottom:16}}>
+            <button onClick={()=>navigate('/Library')} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#C9A96E",fontWeight:700,padding:"4px 12px",fontFamily:"'Segoe UI',sans-serif"}}>
+              ✓ Saved · View in Library →
+            </button>
+          </div>
+        )}
+
         {/* Reverse trial / upsell */}
         {!upsellDismissed && (
           <div style={{position:"relative",background:"#2C2C2E",border:"1px solid #C9A96E",borderRadius:20,padding:"18px 44px 18px 18px",marginBottom:20}}>
@@ -493,8 +504,8 @@ export default function MatchResults() {
                       <a href={getShopUrl(p)} target="_blank" rel="noopener noreferrer" style={{flex:1,textAlign:"center",background:"#C9A96E",color:"#1C1C1E",borderRadius:10,padding:"7px 0",fontSize:11,fontWeight:700,textDecoration:"none",minHeight:32,display:"flex",alignItems:"center",justifyContent:"center"}}>
                         {p.retailerUrl && p.retailerUrl.startsWith('http') ? t.shopNow : 'Search Online →'}
                       </a>
-                      <button onClick={()=>saveProductToLibrary(p)} style={{background:savedProductIds.has(p.name+p.brand)?"#ecfdf5":"#f9fafb",border:savedProductIds.has(p.name+p.brand)?"1px solid #86efac":"1px solid #e5e7eb",borderRadius:10,padding:"4px 8px",cursor:"pointer",fontSize:10,fontWeight:700,color:savedProductIds.has(p.name+p.brand)?"#16a34a":"#888",minHeight:32,whiteSpace:"nowrap"}}>
-                        {justSaved===(p.name+p.brand) ? 'Saved! ✓' : savedProductIds.has(p.name+p.brand) ? 'Saved ✓' : '🔖 Save'}
+                      <button onClick={()=>saveProductToLibrary(p)} style={{background:savedProductIds.has(`${p.name}|${p.brand}`)?"#ecfdf5":"#f9fafb",border:savedProductIds.has(`${p.name}|${p.brand}`)?"1px solid #86efac":"1px solid #e5e7eb",borderRadius:10,padding:"4px 8px",cursor:"pointer",fontSize:10,fontWeight:700,color:savedProductIds.has(`${p.name}|${p.brand}`)?"#16a34a":"#888",minHeight:32,whiteSpace:"nowrap"}}>
+                        {justSaved===(`${p.name}|${p.brand}`) ? 'Saved! ✓' : savedProductIds.has(`${p.name}|${p.brand}`) ? 'Saved ✓' : '🔖 Save'}
                       </button>
                     </div>
                   </div>

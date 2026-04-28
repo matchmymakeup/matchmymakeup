@@ -28,6 +28,7 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#1C1C1E', fontFamily: "Georgia, 'Times New Roman', serif", position: 'relative' }}>
+      {/* TODO(phase-5+): unify Home auth widget with shared Header design */}
       <div style={{ position: 'absolute', top: 16, right: 24, zIndex: 10 }}>
         {session ? (
           <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#C9A96E', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}>Log out</button>

@@ -1,13 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-function getTrialInfo() {
-  try {
-    const start = localStorage.getItem('mmm_trial_start');
-    if (!start) return false;
-    return (7 - Math.floor((new Date() - new Date(start)) / 86400000)) > 0;
-  } catch { return false; }
-}
+import { isPremium } from "../lib/trial";
+import { getSavedProducts, getSavedShades, saveProduct, saveShade, removeSavedProduct, removeSavedShade } from "../lib/storage";
+import { supabase } from "../lib/supabase";
+import PageBackBar from "../components/PageBackBar";
 
 function loadStore(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; }
@@ -23,49 +19,133 @@ const tabBtn = (active) => ({
 export default function Library() {
   const navigate = useNavigate();
   const [tab, setTab] = useState("scans");
-  const isPremium = getTrialInfo();
+  const isPremiumUser = isPremium();
 
-  // Scan History
+  // Scan History (out of scope for Step 5 — still localStorage)
   const lib = loadStore('mmm_library', {scans:[],images:{}});
   const scans = lib.scans || [];
-  const visibleScans = isPremium ? [...scans].reverse() : [...scans].reverse().slice(0, 10);
+  const visibleScans = isPremiumUser ? [...scans].reverse() : [...scans].reverse().slice(0, 10);
 
-  // My Products
-  const [myProducts, setMyProducts] = useState(() => loadStore('mmm_my_products', []));
+  // My Products (Step 5 — storage layer)
+  const [products, setProducts] = useState([]);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [newProduct, setNewProduct] = useState({name:'',brand:'',category:'lipstick',hex:'#FF6B9D',rating:5,notes:''});
 
-  // My Shades
-  const [myShades, setMyShades] = useState(() => loadStore('mmm_my_shades', []));
+  // My Shades (Step 5 — storage layer)
+  const [shades, setShades] = useState([]);
   const [showAddShade, setShowAddShade] = useState(false);
   const [newShade, setNewShade] = useState({name:'',hex:'#FF6B9D'});
 
-  // My Looks
+  // Loading + error state for products + shades
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Migration error surfaced from AuthCallback (Step 6 Commit 2) via sessionStorage
+  const [migrationError, setMigrationError] = useState(null);
+
+  // My Looks (out of scope for Step 5 — still localStorage)
   const [myLooks, setMyLooks] = useState(() => loadStore('mmm_my_looks', []));
   const [showAddLook, setShowAddLook] = useState(false);
   const [newLook, setNewLook] = useState({name:'',occasion:'everyday',shades:[]});
   const [lookShadeHex, setLookShadeHex] = useState('#FF6B9D');
 
-  function addProduct() {
-    if (!newProduct.name) return;
-    const updated = [...myProducts, {...newProduct, id: Date.now()}];
-    setMyProducts(updated); saveStore('mmm_my_products', updated);
-    setNewProduct({name:'',brand:'',category:'lipstick',hex:'#FF6B9D',rating:5,notes:''}); setShowAddProduct(false);
-  }
-  function removeProduct(id) {
-    const updated = myProducts.filter(p => p.id !== id);
-    setMyProducts(updated); saveStore('mmm_my_products', updated);
+  async function loadAll() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [productsResult, shadesResult] = await Promise.all([
+        getSavedProducts(),
+        getSavedShades(),
+      ]);
+      const sortedProducts = (productsResult || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      const sortedShades = (shadesResult || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setProducts(sortedProducts);
+      setShades(sortedShades);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        if (sortedProducts.length === 0) {
+          console.warn("[Library] Authed user returned 0 rows from saved_products — possible RLS misconfig or genuinely empty Library");
+        }
+        if (sortedShades.length === 0) {
+          console.warn("[Library] Authed user returned 0 rows from saved_shades — possible RLS misconfig or genuinely empty Library");
+        }
+      }
+    } catch (err) {
+      console.error('[Library] load failed:', err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function addShade() {
-    if (!newShade.name) return;
-    const updated = [...myShades, {...newShade, id: Date.now()}];
-    setMyShades(updated); saveStore('mmm_my_shades', updated);
-    setNewShade({name:'',hex:'#FF6B9D'}); setShowAddShade(false);
+  useEffect(() => {
+    let cancelled = false;
+
+    // Surface migration failure from AuthCallback if present, then clear flag
+    const migErr = sessionStorage.getItem('mmm_migration_error');
+    if (migErr) {
+      setMigrationError(migErr);
+      sessionStorage.removeItem('mmm_migration_error');
+    }
+
+    // Wait for session hydration before first read to avoid race with storage.js cache
+    supabase.auth.getSession().then(() => {
+      if (!cancelled) loadAll();
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        loadAll();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  async function addProduct() {
+    if (!newProduct.name) return;
+    try {
+      await saveProduct(newProduct);
+      await loadAll();
+      setNewProduct({name:'',brand:'',category:'lipstick',hex:'#FF6B9D',rating:5,notes:''});
+      setShowAddProduct(false);
+    } catch (err) {
+      console.error('[Library] saveProduct failed:', err);
+      alert('Could not save product. Try again.');
+    }
   }
-  function removeShade(id) {
-    const updated = myShades.filter(s => s.id !== id);
-    setMyShades(updated); saveStore('mmm_my_shades', updated);
+  async function removeProduct(id) {
+    try {
+      await removeSavedProduct(id);
+      await loadAll();
+    } catch (err) {
+      console.error('[Library] removeSavedProduct failed:', err);
+    }
+  }
+
+  async function addShade() {
+    if (!newShade.name) return;
+    try {
+      await saveShade(newShade);
+      await loadAll();
+      setNewShade({name:'',hex:'#FF6B9D'});
+      setShowAddShade(false);
+    } catch (err) {
+      console.error('[Library] saveShade failed:', err);
+      alert('Could not save shade. Try again.');
+    }
+  }
+  async function removeShade(id) {
+    try {
+      await removeSavedShade(id);
+      await loadAll();
+    } catch (err) {
+      console.error('[Library] removeSavedShade failed:', err);
+    }
   }
 
   function addLookShade() {
@@ -100,22 +180,21 @@ export default function Library() {
 
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{background:"#2C2C2E",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
-        <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #555",borderRadius:20,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",minHeight:44}}>← Scanner</button>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{fontSize:20}}>💄</span>
-          <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>My Library</span>
-        </div>
-        <div style={{width:60}}/>
-      </div>
-
       <div style={{maxWidth:480,margin:"0 auto",padding:"16px"}}>
+        {/* Uses shared <PageBackBar/> — see src/components/PageBackBar.jsx */}
+        {migrationError && (
+          <div style={{background:'#3C1F1F',color:'#F5D8D8',padding:'12px 14px',borderRadius:12,marginBottom:12,fontSize:13,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
+            <span>Some saved items couldn't be restored from this device.</span>
+            <button onClick={() => setMigrationError(null)} style={{background:'none',border:'none',color:'#F5D8D8',cursor:'pointer',fontSize:18,minWidth:32,minHeight:32,padding:0}}>✕</button>
+          </div>
+        )}
+        <PageBackBar onBack={() => navigate('/ColorScanner')} label="← Scanner" title="💄 My Library" />
         {/* Tabs */}
         <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
           <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
-          <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap",minWidth:0}}>{isPremium?'':'🔒 '}Products</button>
-          <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap",minWidth:0}}>{isPremium?'':'🔒 '}Shades</button>
-          <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap",minWidth:0}}>{isPremium?'':'🔒 '}Looks</button>
+          <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Products</button>
+          <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Shades</button>
+          <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Looks</button>
           <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap",minWidth:0}}>👗 Outfit</button>
           <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap",minWidth:0}}>👠 Shoes</button>
           <button onClick={()=>setTab("hair")} style={{...tabBtn(tab==="hair"),whiteSpace:"nowrap",minWidth:0}}>💇 Hair</button>
@@ -132,7 +211,7 @@ export default function Library() {
             </div>
           ) : (
             <div>
-              {!isPremium && scans.length > 10 && (
+              {!isPremiumUser && scans.length > 10 && (
                 <div style={{background:"#fef3c7",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:12,color:"#92400e",fontWeight:600}}>
                   Showing last 10 scans. Premium unlocks your full history ({scans.length} scans).
                 </div>
@@ -157,26 +236,43 @@ export default function Library() {
 
         {/* MY PRODUCTS */}
         {tab==="products"&&(
-          !isPremium ? premiumGate("Save products you own, rate them, and build your personal collection.") : (
+          !isPremiumUser ? premiumGate("Save products you own, rate them, and build your personal collection.") : (
             <div>
               <button onClick={()=>setShowAddProduct(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Add Product</button>
-              {myProducts.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Add your first product to start building your collection</div>}
+              {loading && <p style={{textAlign:"center",padding:20,color:"#888",fontSize:13}}>Loading…</p>}
+              {error && (
+                <div style={{textAlign:"center",padding:20}}>
+                  <p style={{color:"#dc2626",marginBottom:8,fontSize:13}}>Couldn't load — tap to retry</p>
+                  <button onClick={loadAll} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Retry</button>
+                </div>
+              )}
+              {!loading && !error && products.length === 0 && (
+                <div style={{textAlign:"center",padding:"40px 20px"}}>
+                  <p style={{color:"#aaa",fontSize:13,marginBottom:12}}>No saved products yet</p>
+                  <button onClick={()=>navigate('/MatchResults')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Browse products</button>
+                  {/* TODO Step 6: show migration hint for authed users with localStorage entries */}
+                </div>
+              )}
+              {!loading && !error && products.length > 0 && (
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                {myProducts.map(p => (
+                {products.map(p => (
                   <div key={p.id} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:p.hex,flexShrink:0}} />
                       <div style={{flex:1}}>
                         <div style={{fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{p.name}</div>
                         <div style={{fontSize:12,color:"rgba(201,169,110,0.7)"}}>{p.brand} · {p.category}</div>
-                        <div style={{fontSize:14,color:"#fbbf24",marginTop:2}}>{stars(p.rating)}</div>
+                        {p.rating != null && p.rating > 0 && (
+                          <div style={{fontSize:14,color:"#fbbf24",marginTop:2}}>{stars(p.rating)}</div>
+                        )}
                       </div>
                       <button onClick={()=>removeProduct(p.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#ccc",padding:4}}>✕</button>
                     </div>
-                    {p.notes && <div style={{fontSize:12,color:"#F5F0E8",marginTop:8,background:"#3C3C3E",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
+                    {p.notes && p.notes.trim().length > 0 && <div style={{fontSize:12,color:"#F5F0E8",marginTop:8,background:"#3C3C3E",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
                   </div>
                 ))}
               </div>
+              )}
               {showAddProduct && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddProduct(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
@@ -209,12 +305,26 @@ export default function Library() {
 
         {/* MY SHADES */}
         {tab==="shades"&&(
-          !isPremium ? premiumGate("Save your favourite hex codes with custom names and build a personal swatch library.") : (
+          !isPremiumUser ? premiumGate("Save your favourite hex codes with custom names and build a personal swatch library.") : (
             <div>
               <button onClick={()=>setShowAddShade(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Save a Shade</button>
-              {myShades.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Save your first shade to start your swatch library</div>}
+              {loading && <p style={{textAlign:"center",padding:20,color:"#888",fontSize:13}}>Loading…</p>}
+              {error && (
+                <div style={{textAlign:"center",padding:20}}>
+                  <p style={{color:"#dc2626",marginBottom:8,fontSize:13}}>Couldn't load — tap to retry</p>
+                  <button onClick={loadAll} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Retry</button>
+                </div>
+              )}
+              {!loading && !error && shades.length === 0 && (
+                <div style={{textAlign:"center",padding:"40px 20px"}}>
+                  <p style={{color:"#aaa",fontSize:13,marginBottom:12}}>No saved shades yet</p>
+                  <button onClick={()=>navigate('/')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Start scanning</button>
+                  {/* TODO Step 6: show migration hint for authed users with localStorage entries */}
+                </div>
+              )}
+              {!loading && !error && shades.length > 0 && (
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
-                {myShades.map(s => (
+                {shades.map(s => (
                   <div key={s.id} style={{background:"#2C2C2E",borderRadius:16,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",position:"relative"}}>
                     <button onClick={()=>removeShade(s.id)} style={{position:"absolute",top:4,right:4,background:"rgba(255,255,255,0.8)",border:"none",borderRadius:"50%",width:22,height:22,cursor:"pointer",fontSize:12,color:"#999",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                     <div style={{height:64,background:s.hex}} />
@@ -225,6 +335,7 @@ export default function Library() {
                   </div>
                 ))}
               </div>
+              )}
               {showAddShade && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
@@ -247,7 +358,7 @@ export default function Library() {
 
         {/* MY LOOKS */}
         {tab==="looks"&&(
-          !isPremium ? premiumGate("Create and save makeup looks by combining your saved shades with occasion tags.") : (
+          !isPremiumUser ? premiumGate("Create and save makeup looks by combining your saved shades with occasion tags.") : (
             <div>
               <button onClick={()=>setShowAddLook(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Create a Look</button>
               {myLooks.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Create your first look to save shade combinations</div>}

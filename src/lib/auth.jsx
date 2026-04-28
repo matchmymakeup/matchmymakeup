@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabase'
+import { migrateAnonymousData } from './storage'
 
 const AuthContext = createContext({ user: null, session: null, loading: true })
 
@@ -24,10 +25,17 @@ export function AuthProvider({ children }) {
       })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      (event, newSession) => {
         if (!active) return
         setSession(newSession)
         setLoading(false)
+
+        // Migrate anon localStorage data on sign-in (fire-and-forget)
+        if (event === 'SIGNED_IN' && newSession) {
+          migrateAnonymousData().catch(err => {
+            console.warn('[auth] Migration failed:', err)
+          })
+        }
       }
     )
 

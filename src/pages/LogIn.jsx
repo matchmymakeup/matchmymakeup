@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUser, sanitizeError } from '../lib/auth'
+import { safeRedirect } from '../lib/safeRedirect'
 import AuthCard from '../components/AuthCard'
 
 const labelStyle = { display: 'block', fontSize: 12, color: '#888', marginBottom: 4, fontWeight: 600 }
@@ -16,6 +17,8 @@ const forgotLinkStyle = { color: '#C9A96E', fontSize: 12, textDecoration: 'none'
 export default function LogIn() {
   const { session, loading: sessionLoading } = useUser()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirectTarget = safeRedirect(searchParams.get('redirect'))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -37,13 +40,23 @@ export default function LogIn() {
       setError(sanitizeError(sbError))
       return
     }
-    navigate('/Home')
+    navigate(redirectTarget)
   }
 
   async function handleMagicSubmit(e) {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    // Magic-link defaults to /Library. Forward incoming ?redirect= (e.g.
+    // from RequireAuth bounces). Stashed in sessionStorage rather than as
+    // a query string on emailRedirectTo because Supabase malforms URLs that
+    // already carry query params (appends ?token_hash= with ? not &),
+    // producing /AuthCallback?redirect=%2FLibrary?token_hash=… — broken.
+    // Trade-off: cross-tab or cross-device magic-links (request in one
+    // tab/device, click in another) lose the redirect and fall back to
+    // /Home in AuthCallback.
+    const target = safeRedirect(searchParams.get('redirect'), '/Library')
+    sessionStorage.setItem('mmm_post_auth_redirect', target)
     const { error: sbError } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/AuthCallback` },

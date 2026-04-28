@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { migrateAnonymousData } from '../lib/storage'
+import { safeRedirect } from '../lib/safeRedirect'
 
 const pageStyle = { minHeight: '100vh', background: '#1C1C1E', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, fontFamily: "'Segoe UI', sans-serif" }
 const cardStyle = { background: '#2C2C2E', borderRadius: 20, padding: 24, width: '100%', maxWidth: 400, boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }
@@ -32,21 +34,38 @@ export default function AuthCallback() {
     if (!tokenHash || !type) {
       navigate('/LogIn', { replace: true })
     } else {
-      supabase.auth.verifyOtp({ token_hash: tokenHash, type }).then(({ error }) => {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type }).then(async ({ error }) => {
         if (error) {
           console.error('[auth] verifyOtp failed:', error)
           setMessage('Login link invalid or expired. Redirecting…')
           timeoutId = setTimeout(() => {
             navigate('/LogIn', { replace: true })
           }, 1500)
+        } else if (type === 'recovery') {
+          // Password reset flow — skip migration, go straight to reset form.
+          navigate('/ResetPassword/Confirm', { replace: true })
         } else {
-          // type is Supabase-defined for email links — recovery → reset
-          // password form; everything else (signup, magiclink) → Home.
-          if (type === 'recovery') {
-            navigate('/ResetPassword/Confirm', { replace: true })
-          } else {
-            navigate('/Home', { replace: true })
+          // Signin / magiclink / signup: await migration before navigating so
+          // the destination (Library by default) mounts with merged data, not
+          // mid-flight. migrateAnonymousData is idempotent — duplicate fire
+          // from auth.jsx's SIGNED_IN hook is a no-op once localStorage is
+          // cleared. Failure stashes to sessionStorage for Library to render.
+          try {
+            await migrateAnonymousData()
+          } catch (err) {
+            console.warn('[auth] Migration during callback failed:', err)
+            sessionStorage.setItem('mmm_migration_error', err?.message || 'Unknown error')
           }
+          // Read post-auth redirect from sessionStorage (set by LogIn before
+          // signInWithOtp). Used instead of a URL query param because Supabase
+          // malforms emailRedirectTo URLs that already carry query strings.
+          // Cross-tab / cross-device magic-links won't have the key — fall
+          // through to /Home. SignUp + ResetPassword paths also have no key
+          // and use the /Home fallback (recovery is handled in branch above).
+          const stashed = sessionStorage.getItem('mmm_post_auth_redirect')
+          sessionStorage.removeItem('mmm_post_auth_redirect')
+          const target = safeRedirect(stashed, '/Home')
+          navigate(target, { replace: true })
         }
       })
     }
