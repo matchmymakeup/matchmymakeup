@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { isPremium } from "../lib/trial";
 import { getSavedProducts, getSavedShades, saveProduct, saveShade, removeSavedProduct, removeSavedShade } from "../lib/storage";
 import { supabase } from "../lib/supabase";
+import PageBackBar from "../components/PageBackBar";
 
 function loadStore(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; }
@@ -180,17 +181,14 @@ export default function Library() {
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{maxWidth:480,margin:"0 auto",padding:"16px"}}>
-        {/* If this pattern repeats on another page, promote to <PageBackBar/> component (Phase 5+) */}
-        <div style={{padding:'8px 0 4px 0'}}>
-          <button onClick={()=>navigate('/ColorScanner')} style={{background:'none',border:'none',padding:0,fontSize:12,color:'#C9A96E',cursor:'pointer',fontWeight:600,fontFamily:"'Segoe UI',sans-serif"}}>← Scanner</button>
-        </div>
+        {/* Uses shared <PageBackBar/> — see src/components/PageBackBar.jsx */}
         {migrationError && (
           <div style={{background:'#3C1F1F',color:'#F5D8D8',padding:'12px 14px',borderRadius:12,marginBottom:12,fontSize:13,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
             <span>Some saved items couldn't be restored from this device.</span>
             <button onClick={() => setMigrationError(null)} style={{background:'none',border:'none',color:'#F5D8D8',cursor:'pointer',fontSize:18,minWidth:32,minHeight:32,padding:0}}>✕</button>
           </div>
         )}
-        <h1 style={{margin:'0 0 16px',fontSize:22,fontWeight:800,color:'#F5F0E8'}}>💄 My Library</h1>
+        <PageBackBar onBack={() => navigate('/ColorScanner')} label="← Scanner" title="💄 My Library" />
         {/* Tabs */}
         <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
           <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>

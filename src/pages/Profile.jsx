@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PageBackBar from "../components/PageBackBar";
 
 const ETHNICITIES = ['East Asian','South Asian','Southeast Asian','Middle Eastern','Black/African','Latino/Hispanic','White/European','Mixed','Prefer not to say'];
 const SKIN_CONCERNS = ['Acne','Hyperpigmentation','Dryness','Oiliness','Ageing','Sensitivity','Uneven tone'];
@@ -86,18 +87,12 @@ export default function Profile() {
 
   return (
     <div style={{minHeight:'100vh',background:'#1C1C1E',fontFamily:"'Segoe UI',sans-serif"}}>
-      {/* Header */}
-      <div style={{background:'#2C2C2E',padding:'16px',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
-        <div style={{maxWidth:560,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-          <button onClick={()=>navigate(-1)} style={{background:'none',border:'1px solid #555',borderRadius:10,padding:'8px 14px',cursor:'pointer',fontSize:13,color:'#F5F0E8',fontWeight:600}}>← Back</button>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <span style={{fontSize:20}}>{pct===100?'✨':'🧬'}</span>
-            <span style={{fontWeight:800,fontSize:16,background:'#C9A96E',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>{pct===100?'Beauty DNA Complete!':'Your Beauty DNA'}</span>
-          </div>
-        </div>
-      </div>
-
       <div style={{maxWidth:560,margin:'0 auto',padding:'20px 16px 60px'}}>
+        <PageBackBar
+          onBack={() => navigate(-1)}
+          label="← Back"
+          title={pct === 100 ? '✨ Beauty DNA Complete!' : '🧬 Your Beauty DNA'}
+        />
         {/* Progress bar */}
         <div style={{background:'#2C2C2E',borderRadius:20,padding:20,boxShadow:'0 4px 20px rgba(0,0,0,0.08)',marginBottom:20}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getColourName } from "../utils/colourNames.js";
 import { getProfile, saveProfile, getSavedProducts, saveProduct, getSavedShades, saveShade } from "../lib/storage";
 import { getTrialInfo, startTrial } from "../lib/trial";
+import PageBackBar from "../components/PageBackBar";
 
 const T = {
   en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
@@ -61,6 +62,7 @@ export default function MatchResults() {
   const [showSaveShade, setShowSaveShade] = useState(false);
   const [savedProductIds, setSavedProductIds] = useState(new Set());
   const [justSaved, setJustSaved] = useState(null);
+  const [savedThisSession, setSavedThisSession] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [shareCopied, setShareCopied] = useState(null);
   const [shadeName, setShadeName] = useState('');
@@ -146,6 +148,7 @@ export default function MatchResults() {
     if (!shadeName || !record) return;
     try {
       await saveShade({ name: shadeName, hex: record.scannedHex });
+      setSavedThisSession(true);
     } catch (err) {
       console.error('[MatchResults] saveShade failed:', err);
     }
@@ -168,6 +171,7 @@ export default function MatchResults() {
         price: p.price,
         currency: p.currency,
       });
+      setSavedThisSession(true);
     } catch (err) {
       console.error('[MatchResults] saveProduct failed:', err);
       setSavedProductIds(prev => {
@@ -337,17 +341,14 @@ export default function MatchResults() {
 
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{background:"#2C2C2E",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
-        <div style={{maxWidth:560,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate('/ColorScanner')} style={{background:"none",border:"1px solid #555",borderRadius:10,padding:"8px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8",fontWeight:600}}>{t.scanAgain}</button>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:20}}>💄</span>
-            <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>{'\u2122'}</span></span>
-          </div>
-        </div>
-      </div>
-
       <div style={{maxWidth:560,margin:"0 auto",padding:"20px 16px 60px"}}>
+        <PageBackBar onBack={() => navigate('/ColorScanner')} label={t.scanAgain} title="Your Match" />
+        {/* Wordmark — preserved verbatim from original chrome bar; MatchResults is the highest-share page so the wordmark drives outbound brand exposure */}
+        {/* fontSize:8 trademark trick — visually intentional, not a typo */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:20}}>
+          <span style={{fontSize:20}}>💄</span>
+          <span style={{fontWeight:800,fontSize:16,background:"#C9A96E",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>MatchMyMakeup<span style={{fontSize:8}}>{'™'}</span></span>
+        </div>
         {/* Scanned color */}
         <div style={{background:"#2C2C2E",borderRadius:20,padding:20,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:20}}>
           <div style={{fontSize:11,color:"#aaa",fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:12}}>{t.yourColor}</div>
@@ -428,6 +429,15 @@ export default function MatchResults() {
             💾 Save This Color
           </button>
         </div>
+
+        {/* Post-save affordance — session-scoped, NOT derived from storage. Set true on successful save in saveProductToLibrary or handleSaveShade; never resets in this session, never appears on revisit without a fresh save. */}
+        {savedThisSession && (
+          <div style={{textAlign:"center",marginBottom:16}}>
+            <button onClick={()=>navigate('/Library')} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#C9A96E",fontWeight:700,padding:"4px 12px",fontFamily:"'Segoe UI',sans-serif"}}>
+              ✓ Saved · View in Library →
+            </button>
+          </div>
+        )}
 
         {/* Reverse trial / upsell */}
         {!upsellDismissed && (

@@ -1,15 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import PageBackBar from "../components/PageBackBar";
 
 export default function Privacy() {
   const navigate = useNavigate();
   const h3Style = {fontSize:14,color:'#C9A96E',fontWeight:700,margin:'20px 0 8px'};
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
-      <div style={{background:"#2C2C2E",padding:"16px",display:"flex",alignItems:"center",gap:12,boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
-        <button onClick={()=>navigate(-1)} style={{background:"none",border:"1px solid #555",borderRadius:20,padding:"6px 14px",cursor:"pointer",fontSize:13,color:"#F5F0E8"}}>← Back</button>
-        <span style={{fontWeight:800,fontSize:16,color:"#C9A96E"}}>Privacy Policy</span>
-      </div>
       <div style={{maxWidth:480,margin:"0 auto",padding:"24px 16px 60px",fontSize:13,color:"#F5F0E8",lineHeight:1.8}}>
+        <PageBackBar onBack={() => navigate(-1)} label="← Back" title="Privacy Policy" />
         <h2 style={{color:"#C9A96E",fontSize:18,fontWeight:700,marginBottom:4}}>MatchMyMakeup Privacy Policy</h2>
         <p style={{color:"#888",fontSize:12,marginBottom:20}}>Last updated: April 2026</p>
 
