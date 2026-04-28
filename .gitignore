@@ -8,3 +8,4 @@ dist
 .env.vercel-dev
 .env*.backup
 .DS_Store
+supabase/.temp/
