@@ -107,6 +107,12 @@ export default function MatchResults() {
     return () => { active = false }
   }, [])
 
+  // Reset on color change — MatchResults stays mounted across some scan
+  // flows; without this, savedThisSession leaks from a previous match.
+  useEffect(() => {
+    setSavedThisSession(false)
+  }, [record?.scannedHex])
+
   async function handleSkinToneSelect(tone) {
     saveProfile({ skin_tone: tone });
     setShowSkinToneSheet(false);
