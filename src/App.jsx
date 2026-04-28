@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './lib/auth'
+import AppLayout from './components/AppLayout';
 import Home from './pages/Home';
 import MatchResults from './pages/MatchResults';
 import ColorScanner from './pages/ColorScanner';
@@ -19,18 +20,25 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/Home" replace />} />
+
+          {/* No shared Header — funnel surfaces + auth flow */}
           <Route path="/Home" element={<Home />} />
           <Route path="/ColorScanner" element={<ColorScanner />} />
-          <Route path="/MatchResults" element={<MatchResults />} />
-          <Route path="/Library" element={<Library />} />
-          <Route path="/Terms" element={<Terms />} />
-          <Route path="/Privacy" element={<Privacy />} />
-          <Route path="/Profile" element={<Profile />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/LogIn" element={<LogIn />} />
           <Route path="/AuthCallback" element={<AuthCallback />} />
           <Route path="/ResetPassword" element={<ResetPassword />} />
           <Route path="/ResetPassword/Confirm" element={<ResetPasswordConfirm />} />
+
+          {/* Shared Header — children of AppLayout */}
+          <Route element={<AppLayout />}>
+            <Route path="/MatchResults" element={<MatchResults />} />
+            <Route path="/Library" element={<Library />} />
+            <Route path="/Profile" element={<Profile />} />
+            <Route path="/Terms" element={<Terms />} />
+            <Route path="/Privacy" element={<Privacy />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/Home" replace />} />
         </Routes>
       </BrowserRouter>
