@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider } from './lib/auth'
 import AppLayout from './components/AppLayout';
 import Home from './pages/Home';
@@ -41,6 +43,8 @@ function App() {
 
           <Route path="*" element={<Navigate to="/Home" replace />} />
         </Routes>
+        <Analytics />
+        <SpeedInsights />
       </BrowserRouter>
     </AuthProvider>
   )
