@@ -17,6 +17,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Stripe not configured' });
   }
 
+  const priceId = process.env.STRIPE_PRICE_ID_PREMIUM;
+  if (!priceId) {
+    return res.status(500).json({ error: 'Stripe Price ID not configured' });
+  }
+
   const stripe = new Stripe(stripeKey);
 
   try {
@@ -27,15 +32,7 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'aud',
-            unit_amount: 499,
-            recurring: { interval: 'month' },
-            product_data: {
-              name: 'MatchMyMakeup Premium',
-              description: 'Match against 500+ products from 100+ brands. Personalised advice from your beauty consultant.',
-            },
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
