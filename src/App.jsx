@@ -10,6 +10,7 @@ import Library from './pages/Library';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
+import MyDNA from './pages/MyDNA';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
 import AuthCallback from './pages/AuthCallback';
@@ -36,6 +37,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/MatchResults" element={<MatchResults />} />
             <Route path="/Library" element={<Library />} />
+            <Route path="/MyDNA" element={<MyDNA />} />
             <Route path="/Profile" element={<Profile />} />
             <Route path="/Terms" element={<Terms />} />
             <Route path="/Privacy" element={<Privacy />} />

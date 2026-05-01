@@ -3,11 +3,50 @@ import { Link, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUser } from '../lib/auth'
 
+// Library / Log in / Log out remain hardcoded English — pre-existing tech
+// debt to be retrofitted in Phase 4+ alongside the broader Header / Profile
+// / Library / Home i18n sweep. Only the new v2.1 vocabulary string ("My
+// DNA") is translated here per Path A.
 const LABELS = {
   library: 'Library',
-  profile: 'Profile',
   logIn: 'Log in',
   logOut: 'Log out',
+}
+
+// AI-generated; native QA pass scheduled for Phase 4+ pre-launch on
+// US/IN/BR/CN/ID/NG per the i18n strategy memory.
+// FLAGS: 'ar' uses DNA-loanword form 'DNA الخاص بي' (consistent with
+// brand vocabulary across locales, avoids the clinical scientific
+// register of 'حمضي النووي'); native QA pass should verify register
+// matches beauty-app tone. 'af' uses English-borrowed "DNA";
+// technical Afrikaans uses "DNS" — verify on QA pass which reads
+// more natural for the beauty-app context. 'ng' Pidgin literal
+// 'My DNA' is correct but underwhelming — Phase 4+ refinement
+// candidate (e.g. "My DNA self").
+const T_MYDNA = {
+  en:      'My DNA',
+  'en-za': 'My DNA',
+  es:      'Mi ADN',
+  pt:      'Meu DNA',
+  fr:      'Mon ADN',
+  zh:      '我的DNA',
+  ar:      'DNA الخاص بي',
+  hi:      'मेरा डीएनए',
+  bn:      'আমার ডিএনএ',
+  id:      'DNA Saya',
+  sw:      'DNA Yangu',
+  tl:      'DNA Ko',
+  af:      'My DNA',
+  zu:      'I-DNA Yami',
+  ng:      'My DNA',
+}
+
+function resolveLang() {
+  try {
+    return sessionStorage.getItem('mmm_language') || sessionStorage.getItem('mmm_lang') || 'en';
+  } catch {
+    return 'en';
+  }
 }
 
 function HeaderLogo({ hovered }) {
@@ -65,7 +104,7 @@ export default function Header() {
 
       <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <Link to="/Library" style={navLinkStyle('/Library')} aria-current={location.pathname === '/Library' ? 'page' : undefined}>{LABELS.library}</Link>
-        <Link to="/Profile" style={navLinkStyle('/Profile')} aria-current={location.pathname === '/Profile' ? 'page' : undefined}>{LABELS.profile}</Link>
+        <Link to="/MyDNA" style={navLinkStyle('/MyDNA')} aria-current={location.pathname === '/MyDNA' ? 'page' : undefined}>{T_MYDNA[resolveLang()] || T_MYDNA.en}</Link>
       </nav>
 
       <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
