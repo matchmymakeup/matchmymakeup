@@ -147,11 +147,13 @@ export default function MyDNA() {
           gap: 8,
           marginBottom: 36,
         }}>
-          <button onClick={() => {/* Step 4 wires */}} style={tilePrimary}>
+          <button onClick={() => {/* Step 4 wires; tile demoted to secondary
+                                     until /Quiz lands so the highlighted CTA
+                                     isn't a no-op */}} style={tileBase}>
             <div style={{ fontSize: 24, lineHeight: 1 }}>✨</div>
             <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginTop: 4 }}>Take Quiz</div>
           </button>
-          <button onClick={() => navigate('/ColorScanner')} style={tileBase}>
+          <button onClick={() => navigate('/ColorScanner')} style={tilePrimary}>
             <div style={{ fontSize: 24, lineHeight: 1 }}>📷</div>
             <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginTop: 4 }}>Just Scan</div>
           </button>

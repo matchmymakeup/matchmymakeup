@@ -4,9 +4,12 @@
 // ColorScanner.jsx:352 reads from). English-only chrome per speed-mode.
 //
 // Wiring:
-//   Take Quiz  → no-op (Step 4 builds /Quiz). active=true marks the
-//                recommended path (clay-fill + cream icon).
-//   Just Scan  → /ColorScanner (no auth gate, anon flow).
+//   Take Quiz  → no-op (PR6 builds /Quiz). Demoted to secondary tile
+//                (active=false default) until then — a no-op highlighted
+//                CTA reads as broken in stakeholder review. Reverts to
+//                active=true at PR6.
+//   Just Scan  → /ColorScanner (no auth gate, anon flow). active=true
+//                marks the highlighted recommended path until quiz lands.
 //   Sign in    → /LogIn (anon-only; authed users see "Continue to My
 //                DNA →" link instead).
 
@@ -131,12 +134,13 @@ export default function Landing() {
           <CircleIconButton
             icon="✨"
             label="Take Quiz"
-            active={true}
-            onClick={() => {/* Step 4 wires /Quiz */}}
+            onClick={() => {/* Step 4 wires /Quiz; tile demoted to secondary
+                              until then so the highlighted CTA isn't a no-op */}}
           />
           <CircleIconButton
             icon="📷"
             label="Just Scan"
+            active={true}
             onClick={() => navigate('/ColorScanner')}
           />
           {!loading && !session && (
