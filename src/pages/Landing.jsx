@@ -1,44 +1,69 @@
-// v2.1 Page-1 entry — speed-mode build for Desiree-review demo.
-// Cream/clay/serif aesthetic. New app root (replaces / → /Home redirect).
-//
-// Three entry tiles styled to match rebuilt MyDNA tiles for visual
-// consistency. English-only per speed-mode brief.
+// v2.1 Page-1 entry — PR4 rebuild using shared button vocabulary.
+// Cream/clay/serif aesthetic; CircleIconButton entry tiles; Dropdown
+// consultant selector wired to sessionStorage 'mmm_language' (same key
+// ColorScanner.jsx:352 reads from). English-only chrome per speed-mode.
 //
 // Wiring:
-//   Take Quiz  → no-op (Step 4 builds /Quiz)
-//   Just Scan  → /ColorScanner (no auth gate, anon flow)
-//   Sign in    → /LogIn (anon-only; authed users see "Continue to My DNA")
+//   Take Quiz  → no-op (Step 4 builds /Quiz). active=true marks the
+//                recommended path (clay-fill + cream icon).
+//   Just Scan  → /ColorScanner (no auth gate, anon flow).
+//   Sign in    → /LogIn (anon-only; authed users see "Continue to My
+//                DNA →" link instead).
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
+import CircleIconButton from "../components/CircleIconButton";
+import Dropdown from "../components/Dropdown";
 
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS  = "'Segoe UI', system-ui, -apple-system, sans-serif";
 const CREAM = '#F5F1EA';
-const WHITE = '#FFFFFF';
 const INK   = '#1A1A1A';
 const CLAY  = '#9C5B4A';
-const HAIRLINE = 'rgba(26,26,26,0.08)';
 const DIM   = 'rgba(26,26,26,0.55)';
 
-const tileBase = {
-  background: WHITE,
-  border: `1px solid ${HAIRLINE}`,
-  borderRadius: 14,
-  padding: '22px 12px',
-  cursor: 'pointer',
-  fontFamily: SANS,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: 8,
-  minHeight: 120,
-};
-const tilePrimary = { ...tileBase, border: `2px solid ${CLAY}` };
+// 15 personas, slash-separated <Language> / <Persona> / <Region> labels
+// (locked 2026-05-02). Inlined here vs centralising to src/lib/personas.js
+// — deliberate duplication for speed-mode scope. Two pre-existing persona
+// definitions live elsewhere (ColorScanner.jsx:420 UI, api/advice.js:71
+// server-side culture/lang). DRY violation banked, polish-pass refactor.
+const PERSONA_OPTIONS = [
+  { value: 'en',    icon: '💄', label: 'English / Maya / Global' },
+  { value: 'hi',    icon: '🪷', label: 'Hindi / Priya / India' },
+  { value: 'pt',    icon: '💃', label: 'Portuguese / Valentina / Brazil' },
+  { value: 'zh',    icon: '🌸', label: 'Mandarin / Mei / China' },
+  { value: 'id',    icon: '🌺', label: 'Bahasa / Sari / Indonesia' },
+  { value: 'ng',    icon: '👑', label: 'Pidgin / Adaeze / Nigeria' },
+  { value: 'es',    icon: '💃', label: 'Spanish / Isabella / Latin America' },
+  { value: 'ar',    icon: '✨', label: 'Arabic / Layla / MENA' },
+  { value: 'fr',    icon: '🗼', label: 'French / Céline / France' },
+  { value: 'bn',    icon: '🌹', label: 'Bengali / Ananya / Bangladesh' },
+  { value: 'sw',    icon: '🌍', label: 'Swahili / Amara / East Africa' },
+  { value: 'tl',    icon: '🌺', label: 'Tagalog / Gabriela / Philippines' },
+  { value: 'af',    icon: '🌸', label: 'Afrikaans / Liezel / South Africa' },
+  { value: 'zu',    icon: '👑', label: 'Zulu / Nomvula / South Africa' },
+];
+
+function getInitialLang() {
+  try {
+    return sessionStorage.getItem('mmm_language')
+        || sessionStorage.getItem('mmm_lang')
+        || 'en';
+  } catch {
+    return 'en';
+  }
+}
 
 export default function Landing() {
   const { session, loading } = useUser();
   const navigate = useNavigate();
+  const [lang, setLang] = useState(getInitialLang);
+
+  function handleLangChange(value) {
+    setLang(value);
+    try { sessionStorage.setItem('mmm_language', value); } catch {}
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: CREAM }}>
@@ -58,7 +83,7 @@ export default function Landing() {
         </div>
 
         {/* Hero */}
-        <div style={{ textAlign: 'center', marginBottom: 44 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <h1 style={{
             margin: 0,
             fontSize: 44,
@@ -85,30 +110,45 @@ export default function Landing() {
           </p>
         </div>
 
+        {/* Consultant dropdown — sets sessionStorage.mmm_language for the journey */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
+          <Dropdown
+            value={lang}
+            options={PERSONA_OPTIONS}
+            onChange={handleLangChange}
+            placeholder="Choose your consultant"
+          />
+        </div>
+
         {/* Entry tiles */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-          gap: 8,
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 28,
           marginBottom: 36,
+          flexWrap: 'wrap',
         }}>
-          <button onClick={() => {/* Step 4 wires /Quiz */}} style={tilePrimary}>
-            <div style={{ fontSize: 28, lineHeight: 1 }}>✨</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: INK, marginTop: 6 }}>Take Quiz</div>
-          </button>
-          <button onClick={() => navigate('/ColorScanner')} style={tileBase}>
-            <div style={{ fontSize: 28, lineHeight: 1 }}>📷</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: INK, marginTop: 6 }}>Just Scan</div>
-          </button>
+          <CircleIconButton
+            icon="✨"
+            label="Take Quiz"
+            active={true}
+            onClick={() => {/* Step 4 wires /Quiz */}}
+          />
+          <CircleIconButton
+            icon="📷"
+            label="Just Scan"
+            onClick={() => navigate('/ColorScanner')}
+          />
           {!loading && !session && (
-            <button onClick={() => navigate('/LogIn')} style={tileBase}>
-              <div style={{ fontSize: 28, lineHeight: 1 }}>🔑</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: INK, marginTop: 6 }}>Sign in</div>
-            </button>
+            <CircleIconButton
+              icon="🔑"
+              label="Sign in"
+              onClick={() => navigate('/LogIn')}
+            />
           )}
         </div>
 
-        {/* Continue link for authed users (replaces Sign-in tile) */}
+        {/* Continue link for authed users (replaces Sign in) */}
         {!loading && session && (
           <div style={{ textAlign: 'center', marginTop: 8 }}>
             <button
