@@ -3,7 +3,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider } from './lib/auth'
 import AppLayout from './components/AppLayout';
-import Home from './pages/Home';
+import Landing from './pages/Landing';
 import MatchResults from './pages/MatchResults';
 import ColorScanner from './pages/ColorScanner';
 import Library from './pages/Library';
@@ -22,10 +22,13 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/Home" replace />} />
+          <Route path="/" element={<Landing />} />
 
           {/* No shared Header — funnel surfaces + auth flow */}
-          <Route path="/Home" element={<Home />} />
+          {/* /Home is sunset in v2.1 — redirected to / (Landing) for the
+              4 internal references (safeRedirect.js, ResetPasswordConfirm,
+              SignUp, AuthCallback) without touching those callers. */}
+          <Route path="/Home" element={<Navigate to="/" replace />} />
           <Route path="/ColorScanner" element={<ColorScanner />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/LogIn" element={<LogIn />} />
@@ -43,7 +46,7 @@ function App() {
             <Route path="/Privacy" element={<Privacy />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/Home" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Analytics />
         <SpeedInsights />
