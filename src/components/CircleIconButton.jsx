@@ -23,8 +23,8 @@ import { useState } from 'react';
 const PALETTE = {
   white: '#FFFFFF',
   ink: '#1A1A1A',
-  clay: '#9C5B4A',
-  clayHover: '#8A4F40',
+  clay: '#B8826F',
+  clayHover: '#9E6A56',
   hairline: 'rgba(26,26,26,0.15)',
   hairlineHover: 'rgba(26,26,26,0.4)',
 };
@@ -35,7 +35,7 @@ const SIZES = {
   lg: { circle: 80, icon: 28, label: 13 },
 };
 
-const SANS = "'Segoe UI', system-ui, -apple-system, sans-serif";
+const SANS = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 
 export default function CircleIconButton({
   icon,

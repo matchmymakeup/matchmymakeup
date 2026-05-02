@@ -43,12 +43,12 @@ function categoryCount(arr, key) {
   ).length;
 }
 
-const SERIF = "Georgia, 'Times New Roman', serif";
-const SANS  = "'Segoe UI', system-ui, -apple-system, sans-serif";
+const SERIF = "'DM Serif Display', Georgia, serif";
+const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 const CREAM = '#F5F1EA';
 const WHITE = '#FFFFFF';
 const INK   = '#1A1A1A';
-const CLAY  = '#9C5B4A';
+const CLAY  = '#B8826F';
 const HAIRLINE = 'rgba(26,26,26,0.08)';
 const DIM   = 'rgba(26,26,26,0.55)';
 const FAINT = 'rgba(26,26,26,0.35)';
@@ -122,8 +122,8 @@ export default function MyDNA() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1 style={{
               margin: 0,
-              fontSize: 30, fontWeight: 600, color: INK,
-              fontFamily: SERIF, letterSpacing: '-0.02em', lineHeight: 1.1,
+              fontSize: 24, fontWeight: 400, color: INK,
+              fontFamily: SERIF, letterSpacing: '-0.02em', lineHeight: 1.15,
               overflow: 'hidden', textOverflow: 'ellipsis',
             }}>
               {userName ? `Hi ${userName}` : 'Hi there'}
@@ -147,12 +147,9 @@ export default function MyDNA() {
           gap: 8,
           marginBottom: 36,
         }}>
-          <button onClick={() => {/* Step 4 wires; tile demoted to secondary
-                                     until /Quiz lands so the highlighted CTA
-                                     isn't a no-op */}} style={tileBase}>
-            <div style={{ fontSize: 24, lineHeight: 1 }}>✨</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginTop: 4 }}>Take Quiz</div>
-          </button>
+          {/* Take Quiz tile hidden until PR7 wires /Quiz. Re-add with
+              tilePrimary (and demote Just Scan back to tileBase) when
+              the route exists. */}
           <button onClick={() => navigate('/ColorScanner')} style={tilePrimary}>
             <div style={{ fontSize: 24, lineHeight: 1 }}>📷</div>
             <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginTop: 4 }}>Just Scan</div>
@@ -331,7 +328,7 @@ function BeautyDNABuilder() {
   }
 
   return (
-    <div style={{background:'#1C1C1E',borderRadius:12,padding:'16px 12px',marginTop:6,fontFamily:"'Segoe UI',sans-serif"}}>
+    <div style={{background:'#1C1C1E',borderRadius:12,padding:'16px 12px',marginTop:6,fontFamily:SANS}}>
       {/* Progress bar */}
       <div style={{background:'#2C2C2E',borderRadius:14,padding:14,marginBottom:12}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>

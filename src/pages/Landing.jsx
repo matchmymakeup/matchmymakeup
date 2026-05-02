@@ -4,10 +4,10 @@
 // ColorScanner.jsx:352 reads from). English-only chrome per speed-mode.
 //
 // Wiring:
-//   Take Quiz  → no-op (PR6 builds /Quiz). Demoted to secondary tile
-//                (active=false default) until then — a no-op highlighted
-//                CTA reads as broken in stakeholder review. Reverts to
-//                active=true at PR6.
+//   Take Quiz  → tile HIDDEN until PR7 wires /Quiz. Was demoted to
+//                secondary in PR4.5; in PR6 removed entirely from the
+//                entry tile row to avoid a dead-end visible CTA. Re-add
+//                with active=true when /Quiz lands.
 //   Just Scan  → /ColorScanner (no auth gate, anon flow). active=true
 //                marks the highlighted recommended path until quiz lands.
 //   Sign in    → /LogIn (anon-only; authed users see "Continue to My
@@ -19,11 +19,11 @@ import { useUser } from "../lib/auth";
 import CircleIconButton from "../components/CircleIconButton";
 import Dropdown from "../components/Dropdown";
 
-const SERIF = "Georgia, 'Times New Roman', serif";
-const SANS  = "'Segoe UI', system-ui, -apple-system, sans-serif";
+const SERIF = "'DM Serif Display', Georgia, serif";
+const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 const CREAM = '#F5F1EA';
 const INK   = '#1A1A1A';
-const CLAY  = '#9C5B4A';
+const CLAY  = '#B8826F';
 const DIM   = 'rgba(26,26,26,0.55)';
 
 // 15 personas, slash-separated <Language> / <Persona> / <Region> labels
@@ -32,20 +32,20 @@ const DIM   = 'rgba(26,26,26,0.55)';
 // definitions live elsewhere (ColorScanner.jsx:420 UI, api/advice.js:71
 // server-side culture/lang). DRY violation banked, polish-pass refactor.
 const PERSONA_OPTIONS = [
-  { value: 'en',    icon: '💄', label: 'English / Maya / Global' },
-  { value: 'hi',    icon: '🪷', label: 'Hindi / Priya / India' },
-  { value: 'pt',    icon: '💃', label: 'Portuguese / Valentina / Brazil' },
-  { value: 'zh',    icon: '🌸', label: 'Mandarin / Mei / China' },
-  { value: 'id',    icon: '🌺', label: 'Bahasa / Sari / Indonesia' },
-  { value: 'ng',    icon: '👑', label: 'Pidgin / Adaeze / Nigeria' },
-  { value: 'es',    icon: '💃', label: 'Spanish / Isabella / Latin America' },
-  { value: 'ar',    icon: '✨', label: 'Arabic / Layla / MENA' },
-  { value: 'fr',    icon: '🗼', label: 'French / Céline / France' },
-  { value: 'bn',    icon: '🌹', label: 'Bengali / Ananya / Bangladesh' },
-  { value: 'sw',    icon: '🌍', label: 'Swahili / Amara / East Africa' },
-  { value: 'tl',    icon: '🌺', label: 'Tagalog / Gabriela / Philippines' },
-  { value: 'af',    icon: '🌸', label: 'Afrikaans / Liezel / South Africa' },
-  { value: 'zu',    icon: '👑', label: 'Zulu / Nomvula / South Africa' },
+  { value: 'en', icon: '🌍', label: 'English / Maya / Global' },
+  { value: 'hi', icon: '🇮🇳', label: 'Hindi / Priya / India' },
+  { value: 'pt', icon: '🇧🇷', label: 'Portuguese / Valentina / Brazil' },
+  { value: 'zh', icon: '🇨🇳', label: 'Mandarin / Mei / China' },
+  { value: 'id', icon: '🇮🇩', label: 'Bahasa / Sari / Indonesia' },
+  { value: 'ng', icon: '🇳🇬', label: 'Pidgin / Adaeze / Nigeria' },
+  { value: 'es', icon: '🇲🇽', label: 'Spanish / Isabella / Latin America' },
+  { value: 'ar', icon: '🇪🇬', label: 'Arabic / Layla / MENA' },
+  { value: 'fr', icon: '🇫🇷', label: 'French / Céline / France' },
+  { value: 'bn', icon: '🇧🇩', label: 'Bengali / Ananya / Bangladesh' },
+  { value: 'sw', icon: '🇹🇿', label: 'Swahili / Amara / East Africa' },
+  { value: 'tl', icon: '🇵🇭', label: 'Tagalog / Gabriela / Philippines' },
+  { value: 'af', icon: '🇿🇦', label: 'Afrikaans / Liezel / South Africa' },
+  { value: 'zu', icon: '🇿🇦', label: 'Zulu / Nomvula / South Africa' },
 ];
 
 function getInitialLang() {
@@ -89,8 +89,8 @@ export default function Landing() {
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <h1 style={{
             margin: 0,
-            fontSize: 44,
-            fontWeight: 600,
+            fontSize: 36,
+            fontWeight: 400,
             color: INK,
             fontFamily: SERIF,
             letterSpacing: '-0.02em',
@@ -131,12 +131,8 @@ export default function Landing() {
           marginBottom: 36,
           flexWrap: 'wrap',
         }}>
-          <CircleIconButton
-            icon="✨"
-            label="Take Quiz"
-            onClick={() => {/* Step 4 wires /Quiz; tile demoted to secondary
-                              until then so the highlighted CTA isn't a no-op */}}
-          />
+          {/* Take Quiz tile hidden until PR7 wires /Quiz. Re-add as
+              active={true} (recommended path) when the route exists. */}
           <CircleIconButton
             icon="📷"
             label="Just Scan"

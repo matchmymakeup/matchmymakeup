@@ -12,7 +12,7 @@
 // Tab inner functions (UploadTab/CameraTab/PickerTab) keep canvas refs
 // always-mounted via display:none/block toggle — never conditional render.
 // Restyled to cream/white/ink/clay; old #C9A96E gold and #B76E79 rose
-// accents swapped to clay #9C5B4A.
+// accents use the v2.1 clay constant (CLAY = #B8826F).
 //
 // English-only chrome per speed-mode brief. Existing 15-locale T table
 // preserved for tab-internal strings (uploadTapPrompt, cameraError, etc.)
@@ -31,12 +31,12 @@ import PillButton from "../components/PillButton";
 import Dropdown from "../components/Dropdown";
 
 // ─── v2.1 palette + typography ──────────────────────────────────────────
-const SERIF = "Georgia, 'Times New Roman', serif";
-const SANS  = "'Segoe UI', system-ui, -apple-system, sans-serif";
+const SERIF = "'DM Serif Display', Georgia, serif";
+const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 const CREAM = '#F5F1EA';
 const WHITE = '#FFFFFF';
 const INK   = '#1A1A1A';
-const CLAY  = '#9C5B4A';
+const CLAY  = '#B8826F';
 const HAIRLINE = 'rgba(26,26,26,0.08)';
 const HAIRLINE_STRONG = 'rgba(26,26,26,0.15)';
 const DIM   = 'rgba(26,26,26,0.55)';
@@ -111,20 +111,20 @@ const SHOP_IN_OPTIONS = [
 // for centralisation in polish pass (third copy now: this file +
 // Landing.jsx + ColorScanner inline at line 420 ± in pre-PR5 version).
 const PERSONA_OPTIONS = [
-  { value: 'en', icon: '💄', label: 'English / Maya / Global' },
-  { value: 'hi', icon: '🪷', label: 'Hindi / Priya / India' },
-  { value: 'pt', icon: '💃', label: 'Portuguese / Valentina / Brazil' },
-  { value: 'zh', icon: '🌸', label: 'Mandarin / Mei / China' },
-  { value: 'id', icon: '🌺', label: 'Bahasa / Sari / Indonesia' },
-  { value: 'ng', icon: '👑', label: 'Pidgin / Adaeze / Nigeria' },
-  { value: 'es', icon: '💃', label: 'Spanish / Isabella / Latin America' },
-  { value: 'ar', icon: '✨', label: 'Arabic / Layla / MENA' },
-  { value: 'fr', icon: '🗼', label: 'French / Céline / France' },
-  { value: 'bn', icon: '🌹', label: 'Bengali / Ananya / Bangladesh' },
-  { value: 'sw', icon: '🌍', label: 'Swahili / Amara / East Africa' },
-  { value: 'tl', icon: '🌺', label: 'Tagalog / Gabriela / Philippines' },
-  { value: 'af', icon: '🌸', label: 'Afrikaans / Liezel / South Africa' },
-  { value: 'zu', icon: '👑', label: 'Zulu / Nomvula / South Africa' },
+  { value: 'en', icon: '🌍', label: 'English / Maya / Global' },
+  { value: 'hi', icon: '🇮🇳', label: 'Hindi / Priya / India' },
+  { value: 'pt', icon: '🇧🇷', label: 'Portuguese / Valentina / Brazil' },
+  { value: 'zh', icon: '🇨🇳', label: 'Mandarin / Mei / China' },
+  { value: 'id', icon: '🇮🇩', label: 'Bahasa / Sari / Indonesia' },
+  { value: 'ng', icon: '🇳🇬', label: 'Pidgin / Adaeze / Nigeria' },
+  { value: 'es', icon: '🇲🇽', label: 'Spanish / Isabella / Latin America' },
+  { value: 'ar', icon: '🇪🇬', label: 'Arabic / Layla / MENA' },
+  { value: 'fr', icon: '🇫🇷', label: 'French / Céline / France' },
+  { value: 'bn', icon: '🇧🇩', label: 'Bengali / Ananya / Bangladesh' },
+  { value: 'sw', icon: '🇹🇿', label: 'Swahili / Amara / East Africa' },
+  { value: 'tl', icon: '🇵🇭', label: 'Tagalog / Gabriela / Philippines' },
+  { value: 'af', icon: '🇿🇦', label: 'Afrikaans / Liezel / South Africa' },
+  { value: 'zu', icon: '🇿🇦', label: 'Zulu / Nomvula / South Africa' },
 ];
 
 // ─── UploadTab — restyled to v2.1 light theme ──────────────────────────
@@ -590,7 +590,7 @@ export default function ColorScanner() {
 
         {/* Hero */}
         <div style={{textAlign:'center',marginBottom:24}}>
-          <h1 style={{margin:0,fontSize:32,fontWeight:600,color:INK,fontFamily:SERIF,letterSpacing:'-0.02em',lineHeight:1.1,marginBottom:8}}>
+          <h1 style={{margin:0,fontSize:28,fontWeight:400,color:INK,fontFamily:SERIF,letterSpacing:'-0.02em',lineHeight:1.15,marginBottom:8}}>
             Find your shade
           </h1>
           <p style={{margin:0,fontSize:13,color:DIM,fontFamily:SANS,lineHeight:1.5}}>
