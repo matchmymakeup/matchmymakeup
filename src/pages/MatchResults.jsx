@@ -4,6 +4,23 @@ import { getColourName } from "../utils/colourNames.js";
 import { getProfile, saveProfile, getSavedProducts, saveProduct, getSavedShades, saveShade } from "../lib/storage";
 import { getTrialInfo, startTrial } from "../lib/trial";
 import PageBackBar from "../components/PageBackBar";
+import Dropdown from "../components/Dropdown";
+
+// PR5 — Shop In dropdown options match ColorScanner. Inlined here vs
+// importing because ColorScanner exports nothing and centralisation is
+// banked polish-pass work.
+const SHOP_IN_OPTIONS = [
+  { value: '',              label: 'Global',       icon: '🌍' },
+  { value: 'USA',           label: 'USA',          icon: '🇺🇸' },
+  { value: 'India',         label: 'India',        icon: '🇮🇳' },
+  { value: 'Brazil',        label: 'Brazil',       icon: '🇧🇷' },
+  { value: 'China',         label: 'China',        icon: '🇨🇳' },
+  { value: 'Indonesia',     label: 'Indonesia',    icon: '🇮🇩' },
+  { value: 'Nigeria',       label: 'Nigeria',      icon: '🇳🇬' },
+  { value: 'Australia',     label: 'Australia',    icon: '🇦🇺' },
+  { value: 'Philippines',   label: 'Philippines',  icon: '🇵🇭' },
+  { value: 'South Africa',  label: 'South Africa', icon: '🇿🇦' },
+];
 
 const T = {
   en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
@@ -67,6 +84,16 @@ export default function MatchResults() {
   const [shareCopied, setShareCopied] = useState(null);
   const [shadeName, setShadeName] = useState('');
 
+  // PR5 — country re-query state. originalCountry is locked at mount
+  // from record.country and used for the stale-advice note copy.
+  // staleAdvice flips true when user changes the Shop In dropdown
+  // (products refresh in place but advice text is from original country
+  // until Match Again re-fetches /api/advice).
+  const [originalCountry, setOriginalCountry] = useState('');
+  const [staleAdvice, setStaleAdvice] = useState(false);
+  const [rematchLoading, setRematchLoading] = useState(false);
+  const [adviceLoading, setAdviceLoading] = useState(false);
+
   const [profile, setProfile] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mmm_profile') || '{}') } catch { return {} }
   });
@@ -90,6 +117,7 @@ export default function MatchResults() {
       const data = JSON.parse(raw);
       setRecord(data);
       setLang(data.lang || "en");
+      setOriginalCountry(data.country || '');
       let prods = [];
       if (Array.isArray(data.matchedProducts)) prods = data.matchedProducts;
       else if (typeof data.matchedProducts === "string") { try { prods = JSON.parse(data.matchedProducts); } catch { prods = []; } }
@@ -345,10 +373,87 @@ export default function MatchResults() {
   const personaEmoji = record.personaEmoji || "💄";
   const allProducts = [...products, ...bonusProducts];
 
+  // PR5 — country dropdown change triggers in-place /api/match re-run.
+  // Advice text stays from original scan; user clicks Match Again to
+  // refresh advice for the new country.
+  async function handleCountryChange(newCountry) {
+    if (!record) return;
+    try { sessionStorage.setItem('mmm_country', newCountry); } catch {}
+    setRecord({ ...record, country: newCountry });
+    setStaleAdvice(newCountry !== originalCountry);
+    if (newCountry === originalCountry) return; // back to original — no re-fetch needed
+    setRematchLoading(true);
+    try {
+      const res = await fetch('/api/match', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          r: record.scannedRed, g: record.scannedGreen, b: record.scannedBlue,
+          country: newCountry, category: record.category
+        })
+      });
+      const data = await res.json();
+      if (data.matches) {
+        setProducts(data.matches);
+        setBonusProducts([]); // bonus products were tied to original country
+      }
+    } catch (err) { console.error('[MatchResults] country re-match failed:', err); }
+    finally { setRematchLoading(false); }
+  }
+
+  async function handleMatchAgain() {
+    if (!record || adviceLoading) return;
+    setAdviceLoading(true);
+    try {
+      let userProfile = {};
+      try { userProfile = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); } catch {}
+      const res = await fetch('/api/advice', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          hex: record.scannedHex,
+          r: record.scannedRed, g: record.scannedGreen, b: record.scannedBlue,
+          skinTone: record.skinTone, occasion: record.occasion,
+          country: record.country, category: record.category,
+          profile: userProfile, lang: record.lang
+        })
+      });
+      const data = await res.json();
+      if (data.advice) {
+        setRecord({ ...record, claudeAdvice: data.advice });
+        setStaleAdvice(false);
+      }
+    } catch (err) { console.error('[MatchResults] match-again advice fetch failed:', err); }
+    finally { setAdviceLoading(false); }
+  }
+
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{maxWidth:560,margin:"0 auto",padding:"20px 16px 60px"}}>
         <PageBackBar onBack={() => navigate('/ColorScanner')} label={t.scanAgain} title="Your Match" />
+
+        {/* PR5 — Shop In country dropdown. Change triggers in-place
+            /api/match re-run; advice stays from original until user taps
+            Match Again. MatchResults retains its pre-v2.1 dark chrome —
+            full v2.1 retrofit deferred to post-Desiree polish pass alongside
+            MyDNA and Library. Local-context styling (gold + ink) preferred
+            over a v2.1 island inside the dark surroundings. */}
+        <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center',gap:8,marginBottom:14}}>
+          <span style={{fontSize:11,color:'#aaa',fontWeight:600,letterSpacing:1,textTransform:'uppercase'}}>Shop In</span>
+          <Dropdown
+            value={record.country || ''}
+            options={SHOP_IN_OPTIONS}
+            onChange={handleCountryChange}
+            placeholder="Global"
+            disabled={rematchLoading}
+          />
+        </div>
+        {rematchLoading && (
+          <div style={{textAlign:'center',color:'#C9A96E',fontSize:12,fontWeight:600,marginBottom:10}}>
+            🔍 Re-scanning products in {record.country || 'Global'}…
+          </div>
+        )}
+
         {/* Wordmark — preserved verbatim from original chrome bar; MatchResults is the highest-share page so the wordmark drives outbound brand exposure */}
         {/* fontSize:8 trademark trick — visually intentional, not a typo */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:20}}>
@@ -391,6 +496,35 @@ export default function MatchResults() {
               {adviceParagraphs.map((para,i) => <p key={i} style={{margin:"0 0 10px 0"}}>{para}</p>)}
             </div>
           ) : <p style={{color:"#aaa",fontSize:14,margin:0}}>{t.noAdvice}</p>}
+
+          {/* PR5 — stale-advice note + Match Again button (only when user
+              changed the Shop In dropdown to a country other than the
+              original scan's country). */}
+          {staleAdvice && record.country !== originalCountry && (
+            <div style={{marginTop:12,paddingTop:12,borderTop:'1px solid rgba(245,240,232,0.15)'}}>
+              <div style={{fontStyle:'italic',fontSize:12,color:'#aaa',lineHeight:1.5,marginBottom:8}}>
+                Advice based on your original {originalCountry || 'Global'} scan.
+                Tap Match Again for fresh advice in {record.country || 'Global'}.
+              </div>
+              <button
+                onClick={handleMatchAgain}
+                disabled={adviceLoading}
+                style={{
+                  background: adviceLoading ? '#3C3C3E' : '#C9A96E',
+                  color: adviceLoading ? '#aaa' : '#1C1C1E',
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: '8px 18px',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: adviceLoading ? 'default' : 'pointer',
+                  fontFamily: "'Segoe UI',sans-serif",
+                }}
+              >
+                {adviceLoading ? '✨ Refreshing advice…' : '✨ Match Again'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Progressive: Skin tone banner (after 1st scan) */}
