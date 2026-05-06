@@ -4,10 +4,10 @@
 // Used for entry tiles (Landing/MyDNA) and ColorScanner action buttons
 // (Upload / Camera / Pick Color).
 //
-// v2.1 button vocabulary rules:
-//   - Default state: white circle, hairline border, ink icon
-//   - Active state: clay-filled circle, cream icon (strong, unambiguous)
-//   - Hover: border darkens; on active, slightly darker clay
+// Monochrome chrome per Artefact 2 §7.2 (clay retired 2026-05-02):
+//   - Default state: BG_WHITE fill, HAIRLINE border, INK_PRIMARY icon
+//   - Active state:  ACCENT_BLACK fill, BG_WHITE icon
+//   - Hover (default state only): border tightens HAIRLINE → BORDER_ACTIVE
 //   - Disabled: 40% opacity, no hover, no cursor pointer
 //
 // Props:
@@ -19,15 +19,7 @@
 //   size      — 'sm' | 'md' | 'lg', default 'md'
 
 import { useState } from 'react';
-
-const PALETTE = {
-  white: '#FFFFFF',
-  ink: '#1A1A1A',
-  clay: '#B8826F',
-  clayHover: '#9E6A56',
-  hairline: 'rgba(26,26,26,0.15)',
-  hairlineHover: 'rgba(26,26,26,0.4)',
-};
+import { BG_WHITE, INK_PRIMARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE } from '../lib/design-tokens';
 
 const SIZES = {
   sm: { circle: 48, icon: 18, label: 11 },
@@ -48,13 +40,11 @@ export default function CircleIconButton({
   const [hover, setHover] = useState(false);
   const s = SIZES[size] || SIZES.md;
 
-  const circleBg = active
-    ? (hover ? PALETTE.clayHover : PALETTE.clay)
-    : PALETTE.white;
+  const circleBg = active ? ACCENT_BLACK : BG_WHITE;
   const circleBorder = active
-    ? (hover ? PALETTE.clayHover : PALETTE.clay)
-    : (hover ? PALETTE.hairlineHover : PALETTE.hairline);
-  const iconColor = active ? PALETTE.white : PALETTE.ink;
+    ? ACCENT_BLACK
+    : (hover ? BORDER_ACTIVE : HAIRLINE);
+  const iconColor = active ? BG_WHITE : INK_PRIMARY;
 
   return (
     <button
@@ -95,7 +85,7 @@ export default function CircleIconButton({
         <div style={{
           fontSize: s.label,
           fontWeight: 600,
-          color: PALETTE.ink,
+          color: INK_PRIMARY,
         }}>
           {label}
         </div>

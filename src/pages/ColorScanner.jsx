@@ -1,4 +1,4 @@
-// PR5 — v2.1 visual rebuild. Cream/clay/serif palette, new button
+// ColorScanner — capture surface; monochrome chrome (Artefact 2 §7.2); button
 // vocabulary (CircleIconButton, PillButton, Dropdown). Scan mechanism
 // (canvas, eyedropper, /api/match, /api/advice) preserved unchanged.
 //
@@ -11,8 +11,8 @@
 //
 // Tab inner functions (UploadTab/CameraTab/PickerTab) keep canvas refs
 // always-mounted via display:none/block toggle — never conditional render.
-// Restyled to cream/white/ink/clay; old #C9A96E gold and #B76E79 rose
-// accents use the v2.1 clay constant (CLAY = #B8826F).
+// Restyled to monochrome (white/off-white/ink/black-accent per Artefact 2 §7.2); old #C9A96E gold and #B76E79 rose
+// accents use ACCENT_BLACK per Artefact 2 §7.2 monochrome lock.
 //
 // English-only chrome per speed-mode brief. Existing 15-locale T table
 // preserved for tab-internal strings (uploadTapPrompt, cameraError, etc.)
@@ -29,18 +29,11 @@ import { saveScan, getStreak, saveStreak } from "../lib/storage";
 import CircleIconButton from "../components/CircleIconButton";
 import PillButton from "../components/PillButton";
 import Dropdown from "../components/Dropdown";
+import { BG_WHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE } from "../lib/design-tokens";
 
 // ─── v2.1 palette + typography ──────────────────────────────────────────
 const SERIF = "'DM Serif Display', Georgia, serif";
 const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
-const CREAM = '#F5F1EA';
-const WHITE = '#FFFFFF';
-const INK   = '#1A1A1A';
-const CLAY  = '#B8826F';
-const HAIRLINE = 'rgba(26,26,26,0.08)';
-const HAIRLINE_STRONG = 'rgba(26,26,26,0.15)';
-const DIM   = 'rgba(26,26,26,0.55)';
-const FAINT = 'rgba(26,26,26,0.35)';
 
 function toHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
 function fromHex(hex){ const m=hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i); return m?{r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)}:null; }
@@ -187,18 +180,18 @@ function UploadTab({onColorPicked, t}) {
       <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{display:'none'}} onChange={handleFileChange} />
       {!uploadedImage && (
         <div onClick={()=>fileInputRef.current?.click()} onTouchEnd={e=>{e.preventDefault();fileInputRef.current?.click();}}
-          style={{border:`2px dashed ${CLAY}`,borderRadius:14,padding:'32px 20px',textAlign:'center',cursor:'pointer',background:CREAM,fontFamily:SANS}}>
+          style={{border:`2px dashed ${BORDER_ACTIVE}`,borderRadius:14,padding:'32px 20px',textAlign:'center',cursor:'pointer',background:BG_WHITE,fontFamily:SANS}}>
           <div style={{fontSize:40}}>🖼️</div>
-          <div style={{color:CLAY,fontWeight:700,marginTop:8,fontSize:14}}>{t.choosePhoto}</div>
-          <div style={{color:DIM,fontSize:12,marginTop:4}}>{t.uploadFormats}</div>
+          <div style={{color:INK_PRIMARY,fontWeight:700,marginTop:8,fontSize:14}}>{t.choosePhoto}</div>
+          <div style={{color:INK_SECONDARY,fontSize:12,marginTop:4}}>{t.uploadFormats}</div>
         </div>
       )}
       <div style={{display:uploadedImage?'block':'none',position:'relative'}}>
         <canvas ref={canvasRef} onClick={handleCanvasClick} onTouchEnd={handleCanvasTouch}
           style={{width:'100%',borderRadius:12,cursor:'crosshair',touchAction:'none',display:'block'}} />
-        {pin && <div style={{position:'absolute',left:pin.cx-11,top:pin.cy-11,width:22,height:22,borderRadius:'50%',border:`3px solid ${WHITE}`,boxShadow:'0 0 0 2px rgba(0,0,0,0.6)',pointerEvents:'none'}} />}
-        <p style={{textAlign:'center',fontSize:13,color:DIM,marginTop:8,fontFamily:SANS}}>{t.uploadTapPrompt}</p>
-        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:`1px solid ${HAIRLINE_STRONG}`,borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:INK,fontFamily:SANS}}>{t.changeImage}</button>
+        {pin && <div style={{position:'absolute',left:pin.cx-11,top:pin.cy-11,width:22,height:22,borderRadius:'50%',border:`3px solid ${BG_WHITE}`,boxShadow:'0 0 0 2px rgba(0,0,0,0.6)',pointerEvents:'none'}} />}
+        <p style={{textAlign:'center',fontSize:13,color:INK_SECONDARY,marginTop:8,fontFamily:SANS}}>{t.uploadTapPrompt}</p>
+        <button onClick={reset} style={{display:'block',margin:'8px auto',background:'none',border:`1px solid ${HAIRLINE}`,borderRadius:20,padding:'4px 16px',cursor:'pointer',fontSize:13,color:INK_PRIMARY,fontFamily:SANS}}>{t.changeImage}</button>
       </div>
     </div>
   );
@@ -236,14 +229,14 @@ function CameraTab({onColorPicked, t}) {
 
   function retake() { stopStream();setFrozenSrc(null);setCapturedColor(null);onColorPicked(null);setPhase("idle"); }
 
-  const camBtnStyle = {background:CLAY,color:WHITE,border:'none',borderRadius:14,padding:'13px 32px',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:SANS};
-  const camSecondary = {background:WHITE,color:INK,border:`1px solid ${HAIRLINE_STRONG}`,borderRadius:14,padding:'13px 16px',cursor:'pointer',fontFamily:SANS};
+  const camBtnStyle = {background:ACCENT_BLACK,color:BG_WHITE,border:'none',borderRadius:14,padding:'13px 32px',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:SANS};
+  const camSecondary = {background:BG_WHITE,color:INK_PRIMARY,border:`1px solid ${HAIRLINE}`,borderRadius:14,padding:'13px 16px',cursor:'pointer',fontFamily:SANS};
 
   return (
     <div style={{textAlign:"center",fontFamily:SANS}}>
       <canvas ref={canvasRef} style={{display:"none"}}/>
       {phase==="idle"&&(<div>
-        <p style={{color:INK,fontSize:13,margin:"0 0 12px"}}>{t.cameraPrompt}</p>
+        <p style={{color:INK_PRIMARY,fontSize:13,margin:"0 0 12px"}}>{t.cameraPrompt}</p>
         <div style={{fontSize:48,marginBottom:12}}>📸</div>
         {camError&&<div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:10,padding:"10px 14px",color:"#dc2626",fontSize:12,marginBottom:14,textAlign:"left"}}>⚠️ {camError}</div>}
         <button onClick={startCamera} style={camBtnStyle}>{t.startCamera}</button>
@@ -253,7 +246,7 @@ function CameraTab({onColorPicked, t}) {
           <video ref={videoRef} autoPlay playsInline muted style={{width:"100%",display:"block",borderRadius:14,maxHeight:320,objectFit:"cover"}}/>
           <div style={{position:"absolute",inset:0,pointerEvents:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:60,height:60,borderRadius:"50%",border:"2px solid rgba(255,255,255,0.9)",position:"absolute"}}/>
-            <div style={{width:6,height:6,borderRadius:"50%",background:INK,position:"absolute"}}/>
+            <div style={{width:6,height:6,borderRadius:"50%",background:INK_PRIMARY,position:"absolute"}}/>
             <div style={{position:"absolute",width:40,height:1,background:"rgba(255,255,255,0.8)"}}/>
             <div style={{position:"absolute",width:1,height:40,background:"rgba(255,255,255,0.8)"}}/>
           </div>
@@ -264,16 +257,16 @@ function CameraTab({onColorPicked, t}) {
         </div>
       </div>)}
       {phase==="captured"&&frozenSrc&&capturedColor&&(<div>
-        <p style={{color:INK,fontSize:13,margin:"0 0 10px"}}>✅ Color captured!</p>
+        <p style={{color:INK_PRIMARY,fontSize:13,margin:"0 0 10px"}}>✅ Color captured!</p>
         <div style={{position:"relative",borderRadius:14,overflow:"hidden",lineHeight:0,marginBottom:12}}>
           <img src={frozenSrc} alt="captured" style={{width:"100%",display:"block",borderRadius:14,maxHeight:320,objectFit:"cover"}}/>
-          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:24,height:24,borderRadius:"50%",background:capturedColor.hex,border:`3px solid ${WHITE}`,boxShadow:"0 0 0 2px rgba(0,0,0,0.5)",pointerEvents:"none"}}/>
+          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:24,height:24,borderRadius:"50%",background:capturedColor.hex,border:`3px solid ${BG_WHITE}`,boxShadow:"0 0 0 2px rgba(0,0,0,0.5)",pointerEvents:"none"}}/>
         </div>
-        <div style={{display:"inline-flex",alignItems:"center",gap:10,background:CREAM,borderRadius:12,padding:"8px 14px",marginBottom:14}}>
+        <div style={{display:"inline-flex",alignItems:"center",gap:10,background:BG_WHITE,borderRadius:12,padding:"8px 14px",marginBottom:14}}>
           <div style={{width:28,height:28,borderRadius:"50%",background:capturedColor.hex,flexShrink:0}}/>
-          <span style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:INK}}>{capturedColor.hex}</span>
+          <span style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:INK_PRIMARY}}>{capturedColor.hex}</span>
         </div>
-        <div><button onClick={retake} style={{background:'none',border:`1px solid ${HAIRLINE_STRONG}`,borderRadius:10,padding:"8px 20px",cursor:"pointer",fontSize:13,color:INK,fontWeight:600,fontFamily:SANS}}>🔄 Retake</button></div>
+        <div><button onClick={retake} style={{background:'none',border:`1px solid ${HAIRLINE}`,borderRadius:10,padding:"8px 20px",cursor:"pointer",fontSize:13,color:INK_PRIMARY,fontWeight:600,fontFamily:SANS}}>🔄 Retake</button></div>
       </div>)}
     </div>
   );
@@ -420,26 +413,26 @@ function PickerTab({color, onWheel, onHexType, t}) {
 
   return (
     <div style={{textAlign:"center",fontFamily:SANS}}>
-      <p style={{color:INK,fontSize:13,margin:"0 0 12px"}}>{t.pickerPrompt}</p>
+      <p style={{color:INK_PRIMARY,fontSize:13,margin:"0 0 12px"}}>{t.pickerPrompt}</p>
 
       <div style={{position:"relative",width:"100%",maxWidth:SV_SIZE,margin:"0 auto",aspectRatio:"1",borderRadius:12,overflow:"hidden",cursor:"crosshair",touchAction:"none"}}>
         <canvas ref={svCanvasRef} width={SV_SIZE} height={SV_SIZE}
           onMouseDown={onSVDown} onTouchStart={onSVDown}
           style={{width:"100%",height:"100%",display:"block",borderRadius:12}} />
-        <div style={{position:"absolute",left:`${svX}%`,top:`${svY}%`,width:20,height:20,borderRadius:"50%",border:`3px solid ${WHITE}`,boxShadow:"0 0 0 1px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none",background:color?.hex||"#FF6B9D"}} />
+        <div style={{position:"absolute",left:`${svX}%`,top:`${svY}%`,width:20,height:20,borderRadius:"50%",border:`3px solid ${BG_WHITE}`,boxShadow:"0 0 0 1px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none",background:color?.hex||"#FF6B9D"}} />
       </div>
 
       <div style={{position:"relative",width:"100%",maxWidth:SV_SIZE,margin:"12px auto 0",height:HUE_H,borderRadius:14,overflow:"hidden",cursor:"pointer",touchAction:"none"}}>
         <canvas ref={hueCanvasRef} width={SV_SIZE} height={HUE_H}
           onMouseDown={onHueDown} onTouchStart={onHueDown}
           style={{width:"100%",height:"100%",display:"block",borderRadius:14}} />
-        <div style={{position:"absolute",left:`${hueX}%`,top:"50%",width:8,height:HUE_H+4,borderRadius:4,border:`3px solid ${WHITE}`,boxShadow:"0 0 0 1px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none"}} />
+        <div style={{position:"absolute",left:`${hueX}%`,top:"50%",width:8,height:HUE_H+4,borderRadius:4,border:`3px solid ${BG_WHITE}`,boxShadow:"0 0 0 1px rgba(0,0,0,0.3)",transform:"translate(-50%,-50%)",pointerEvents:"none"}} />
       </div>
 
       <div style={{textAlign:"center",marginTop:16}}>
-        <label style={{fontSize:12,color:DIM,fontWeight:600}}>{t.hexLabel}</label>
+        <label style={{fontSize:12,color:INK_SECONDARY,fontWeight:600}}>{t.hexLabel}</label>
         <input type="text" value={color?.hex||""} onChange={onHexType} placeholder="#FF6B9D"
-          style={{display:"block",margin:"4px auto 0",width:180,padding:"10px 14px",borderRadius:12,border:`2px solid ${HAIRLINE_STRONG}`,textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700,background:WHITE,color:INK}}/>
+          style={{display:"block",margin:"4px auto 0",width:180,padding:"10px 14px",borderRadius:12,border:`2px solid ${HAIRLINE}`,textAlign:"center",fontFamily:"monospace",fontSize:15,fontWeight:700,background:BG_WHITE,color:INK_PRIMARY}}/>
       </div>
     </div>
   );
@@ -557,29 +550,29 @@ export default function ColorScanner() {
   function DropdownRow({ label, ...dropdownProps }) {
     return (
       <div style={{ marginBottom: 12 }}>
-        <label style={{ display:'block',fontSize:11,fontWeight:600,color:DIM,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:6,fontFamily:SANS }}>{label}</label>
+        <label style={{ display:'block',fontSize:11,fontWeight:600,color:INK_SECONDARY,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:6,fontFamily:SANS }}>{label}</label>
         <Dropdown {...dropdownProps} />
       </div>
     );
   }
 
   return (
-    <div style={{minHeight:"100vh",background:CREAM,fontFamily:SANS}}>
+    <div style={{minHeight:"100vh",background:BG_WHITE,fontFamily:SANS}}>
       {/* Top utility bar */}
       <div style={{padding:"12px 16px 4px",maxWidth:560,margin:"0 auto"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             {streak.current_streak >= 1 && (
-              <div style={{background:CLAY,color:WHITE,borderRadius:20,padding:"4px 10px",fontSize:12,fontWeight:700}}>
+              <div style={{background:ACCENT_BLACK,color:BG_WHITE,borderRadius:20,padding:"4px 10px",fontSize:12,fontWeight:700}}>
                 🔥 {streak.current_streak}
               </div>
             )}
           </div>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <button onClick={()=>navigate('/MyDNA')} style={{background:WHITE,color:INK,border:`1px solid ${HAIRLINE_STRONG}`,borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",minHeight:32,fontFamily:SANS}}>
+            <button onClick={()=>navigate('/MyDNA')} style={{background:BG_WHITE,color:INK_PRIMARY,border:`1px solid ${HAIRLINE}`,borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",minHeight:32,fontFamily:SANS}}>
               My DNA
             </button>
-            <button onClick={()=>navigate('/Library')} style={{background:WHITE,color:INK,border:`1px solid ${HAIRLINE_STRONG}`,borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",minHeight:32,fontFamily:SANS}}>
+            <button onClick={()=>navigate('/Library')} style={{background:BG_WHITE,color:INK_PRIMARY,border:`1px solid ${HAIRLINE}`,borderRadius:20,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer",minHeight:32,fontFamily:SANS}}>
               {t.library}
             </button>
           </div>
@@ -590,10 +583,10 @@ export default function ColorScanner() {
 
         {/* Hero */}
         <div style={{textAlign:'center',marginBottom:24}}>
-          <h1 style={{margin:0,fontSize:28,fontWeight:400,color:INK,fontFamily:SERIF,letterSpacing:'-0.02em',lineHeight:1.15,marginBottom:8}}>
+          <h1 style={{margin:0,fontSize:28,fontWeight:400,color:INK_PRIMARY,fontFamily:SERIF,letterSpacing:'-0.02em',lineHeight:1.15,marginBottom:8}}>
             Find your shade
           </h1>
-          <p style={{margin:0,fontSize:13,color:DIM,fontFamily:SANS,lineHeight:1.5}}>
+          <p style={{margin:0,fontSize:13,color:INK_SECONDARY,fontFamily:SANS,lineHeight:1.5}}>
             Upload a photo, use your camera, or pick a colour.
           </p>
         </div>
@@ -606,7 +599,7 @@ export default function ColorScanner() {
         </div>
 
         {/* Scan card */}
-        <div style={{background:WHITE,borderRadius:18,padding:18,border:`1px solid ${HAIRLINE}`,marginBottom:14}}>
+        <div style={{background:BG_WHITE,borderRadius:18,padding:18,border:`1px solid ${HAIRLINE}`,marginBottom:14}}>
           {tab==="upload"&&<UploadTab onColorPicked={setColor} t={t}/>}
           {tab==="camera"&&<CameraTab onColorPicked={setColor} t={t}/>}
           {tab==="picker"&&<PickerTab color={color} onWheel={onWheel} onHexType={onHexType} t={t}/>}
@@ -614,21 +607,21 @@ export default function ColorScanner() {
 
         {/* Color preview card */}
         {color?.hex&&/^#[0-9A-Fa-f]{6}$/.test(color.hex)&&(
-          <div style={{background:WHITE,borderRadius:18,padding:16,border:`1px solid ${HAIRLINE}`,marginBottom:14,display:"flex",alignItems:"center",gap:16}}>
-            <div style={{width:56,height:56,borderRadius:"50%",flexShrink:0,background:color.hex,boxShadow:`0 4px 14px ${color.hex}66`,border:`3px solid ${WHITE}`}}/>
+          <div style={{background:BG_WHITE,borderRadius:18,padding:16,border:`1px solid ${HAIRLINE}`,marginBottom:14,display:"flex",alignItems:"center",gap:16}}>
+            <div style={{width:56,height:56,borderRadius:"50%",flexShrink:0,background:color.hex,boxShadow:`0 4px 14px ${color.hex}66`,border:`3px solid ${BG_WHITE}`}}/>
             <div style={{flex:1,minWidth:0}}>
-              <div style={{fontSize:18,fontWeight:600,color:CLAY,fontFamily:SERIF,marginBottom:4}}>{getColourName(color.r, color.g, color.b)}</div>
+              <div style={{fontSize:18,fontWeight:600,color:INK_PRIMARY,fontFamily:SERIF,marginBottom:4}}>{getColourName(color.r, color.g, color.b)}</div>
               <div style={{display:"flex",alignItems:"baseline",gap:10,flexWrap:"wrap"}}>
-                <div style={{fontFamily:"monospace",fontSize:15,fontWeight:700,color:INK}}>{color.hex}</div>
-                <div style={{fontSize:11,color:DIM}}>R {color.r} · G {color.g} · B {color.b}</div>
+                <div style={{fontFamily:"monospace",fontSize:15,fontWeight:700,color:INK_PRIMARY}}>{color.hex}</div>
+                <div style={{fontSize:11,color:INK_SECONDARY}}>R {color.r} · G {color.g} · B {color.b}</div>
               </div>
             </div>
           </div>
         )}
 
         {/* Five-dropdown personalise card */}
-        <div style={{background:WHITE,borderRadius:18,padding:18,border:`1px solid ${HAIRLINE}`,marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:600,color:DIM,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:14,fontFamily:SANS}}>Personalise</div>
+        <div style={{background:BG_WHITE,borderRadius:18,padding:18,border:`1px solid ${HAIRLINE}`,marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:600,color:INK_SECONDARY,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:14,fontFamily:SANS}}>Personalise</div>
           <DropdownRow label="Category"   value={category} options={CATEGORY_OPTIONS}  onChange={setCategory} />
           <DropdownRow label="Skin Tone"  value={skinTone} options={SKIN_TONE_OPTIONS} onChange={setSkinTone} placeholder="Any" />
           <DropdownRow label="Occasion"   value={occasion} options={OCCASION_OPTIONS}  onChange={setOccasion} placeholder="Any" />
@@ -659,11 +652,11 @@ export default function ColorScanner() {
         </div>
 
         {loading && step && (
-          <div style={{textAlign:"center",marginTop:10,color:CLAY,fontSize:13,fontWeight:600,fontFamily:SANS}}>{step}</div>
+          <div style={{textAlign:"center",marginTop:10,color:INK_PRIMARY,fontSize:13,fontWeight:600,fontFamily:SANS}}>{step}</div>
         )}
 
-        <p style={{textAlign:"center",fontSize:11,color:DIM,marginTop:24,fontFamily:SANS}}>
-          By using this app you agree to our <span onClick={()=>navigate('/Terms')} style={{color:CLAY,cursor:"pointer"}}>Terms & Conditions</span> and <span onClick={()=>navigate('/Privacy')} style={{color:CLAY,cursor:"pointer"}}>Privacy Policy</span>.
+        <p style={{textAlign:"center",fontSize:11,color:INK_SECONDARY,marginTop:24,fontFamily:SANS}}>
+          By using this app you agree to our <span onClick={()=>navigate('/Terms')} style={{color:INK_PRIMARY,cursor:"pointer"}}>Terms & Conditions</span> and <span onClick={()=>navigate('/Privacy')} style={{color:INK_PRIMARY,cursor:"pointer"}}>Privacy Policy</span>.
         </p>
       </div>
     </div>

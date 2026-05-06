@@ -2,7 +2,8 @@
 //
 // Closed: pill-shaped trigger matching PillButton secondary. Open: panel
 // floats below the trigger. Selected option in the open list takes the
-// active clay-fill treatment matching the v2.1 button vocabulary.
+// monochrome-differentiated treatment (BG_OFFWHITE row + 2px BORDER_ACTIVE
+// left edge) per Artefact 6 §3.3.
 //
 // Demo-velocity choice: panel floats below on all viewports (no separate
 // mobile bottom-sheet). If polish pass wants a bottom-sheet variant on
@@ -20,17 +21,7 @@
 //   disabled     — boolean, default false
 
 import { useState, useRef, useEffect } from 'react';
-
-const PALETTE = {
-  white: '#FFFFFF',
-  ink: '#1A1A1A',
-  ink55: 'rgba(26,26,26,0.55)',
-  clay: '#B8826F',
-  clayHover: '#9E6A56',
-  cream: '#F5F1EA',
-  hairline: 'rgba(26,26,26,0.15)',
-  hairlineHover: 'rgba(26,26,26,0.4)',
-};
+import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, HAIRLINE, BORDER_ACTIVE } from '../lib/design-tokens';
 
 const SANS = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 
@@ -76,15 +67,15 @@ export default function Dropdown({
         onMouseLeave={() => setHoverTrigger(false)}
         disabled={disabled}
         style={{
-          background: PALETTE.white,
-          border: `2px solid ${hoverTrigger ? PALETTE.hairlineHover : PALETTE.hairline}`,
+          background: BG_WHITE,
+          border: `2px solid ${hoverTrigger ? BORDER_ACTIVE : HAIRLINE}`,
           borderRadius: 999,
           padding: '12px 18px',
           cursor: disabled ? 'default' : 'pointer',
           opacity: disabled ? 0.4 : 1,
           fontSize: 13,
           fontWeight: 600,
-          color: selected ? PALETTE.ink : PALETTE.ink55,
+          color: selected ? INK_PRIMARY : INK_SECONDARY,
           fontFamily: SANS,
           display: 'inline-flex',
           alignItems: 'center',
@@ -98,7 +89,7 @@ export default function Dropdown({
           {selected?.icon && <span style={{ fontSize: 14, lineHeight: 1 }}>{selected.icon}</span>}
           <span>{displayText}</span>
         </span>
-        <span style={{ fontSize: 11, color: PALETTE.clay, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 120ms ease' }}>▾</span>
+        <span style={{ fontSize: 11, color: INK_SECONDARY, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 120ms ease' }}>▾</span>
       </button>
 
       {open && (
@@ -109,11 +100,11 @@ export default function Dropdown({
             top: 'calc(100% + 6px)',
             left: 0,
             minWidth: '100%',
-            background: PALETTE.white,
-            border: `1px solid ${PALETTE.hairline}`,
+            background: BG_WHITE,
+            border: `1px solid ${HAIRLINE}`,
             borderRadius: 14,
             padding: 6,
-            boxShadow: '0 6px 24px rgba(26,26,26,0.08)',
+            boxShadow: '0 6px 24px rgba(0,0,0,0.08)',
             zIndex: 50,
             maxHeight: 280,
             overflowY: 'auto',
@@ -139,10 +130,11 @@ export default function Dropdown({
 
 function DropdownItem({ option, selected, onSelect }) {
   const [hover, setHover] = useState(false);
+  // Selected: BG_OFFWHITE row + 2px BORDER_ACTIVE left edge.
+  // Unselected hover: subtle pure-black tint (rgba(0,0,0,0.03)).
   const bg = selected
-    ? (hover ? PALETTE.clayHover : PALETTE.clay)
-    : (hover ? 'rgba(245,241,234,0.6)' : 'transparent');
-  const color = selected ? PALETTE.white : PALETTE.ink;
+    ? BG_OFFWHITE
+    : (hover ? 'rgba(0,0,0,0.03)' : 'transparent');
   return (
     <button
       type="button"
@@ -156,17 +148,18 @@ function DropdownItem({ option, selected, onSelect }) {
         textAlign: 'left',
         background: bg,
         border: 'none',
+        borderLeft: selected ? `2px solid ${BORDER_ACTIVE}` : '2px solid transparent',
         borderRadius: 10,
         padding: '10px 14px',
         cursor: 'pointer',
         fontSize: 13,
         fontWeight: selected ? 600 : 500,
-        color,
+        color: INK_PRIMARY,
         fontFamily: 'inherit',
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        transition: 'background 120ms ease, color 120ms ease',
+        transition: 'background 120ms ease',
       }}
     >
       {option.icon && <span style={{ fontSize: 16, lineHeight: 1 }}>{option.icon}</span>}

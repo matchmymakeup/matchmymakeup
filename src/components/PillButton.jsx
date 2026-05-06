@@ -4,13 +4,14 @@
 // Match"), secondary text actions ("Continue to My DNA →"), Save
 // buttons, and any text-only interactive element.
 //
-// v2.1 button vocabulary rules:
-//   - secondary (default): white background, ink text, hairline border
-//   - primary: clay background, cream text (no visible border)
-//   - active on secondary: clay background, cream text — selected state
-//     and primary CTA share visual weight intentionally
-//   - Hover: border/bg shifts subtly; on primary or active, darker clay
+// Monochrome chrome per Artefact 2 §7.2 (clay retired 2026-05-02):
+//   - secondary (default): BG_WHITE fill, INK_PRIMARY label, HAIRLINE border
+//   - primary or active:   ACCENT_BLACK fill, BG_WHITE label
+//   - Hover (secondary): border tightens HAIRLINE → BORDER_ACTIVE
 //   - Disabled: 40% opacity, no hover, no cursor pointer
+//
+// active=true on a secondary takes the primary visual treatment —
+// selected and primary CTA share visual weight by intent.
 //
 // Props:
 //   children  — text content
@@ -21,15 +22,7 @@
 //   size      — 'sm' | 'md' | 'lg', default 'md'
 
 import { useState } from 'react';
-
-const PALETTE = {
-  white: '#FFFFFF',
-  ink: '#1A1A1A',
-  clay: '#B8826F',
-  clayHover: '#9E6A56',
-  hairline: 'rgba(26,26,26,0.15)',
-  hairlineHover: 'rgba(26,26,26,0.4)',
-};
+import { BG_WHITE, INK_PRIMARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE } from '../lib/design-tokens';
 
 const SIZES = {
   sm: { px: 16, py: 8,  font: 12 },
@@ -50,17 +43,13 @@ export default function PillButton({
   const [hover, setHover] = useState(false);
   const s = SIZES[size] || SIZES.md;
 
-  // Active state on secondary takes the primary visual treatment
-  // (clay-filled). Explicit `variant='primary'` is the same.
   const filled = variant === 'primary' || active;
 
-  const bg = filled
-    ? (hover ? PALETTE.clayHover : PALETTE.clay)
-    : PALETTE.white;
-  const color = filled ? PALETTE.white : PALETTE.ink;
+  const bg = filled ? ACCENT_BLACK : BG_WHITE;
+  const color = filled ? BG_WHITE : INK_PRIMARY;
   const borderColor = filled
-    ? (hover ? PALETTE.clayHover : PALETTE.clay)
-    : (hover ? PALETTE.hairlineHover : PALETTE.hairline);
+    ? ACCENT_BLACK
+    : (hover ? BORDER_ACTIVE : HAIRLINE);
 
   return (
     <button

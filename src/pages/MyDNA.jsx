@@ -1,5 +1,5 @@
 // v2.1 hub — visual rebuild for Desiree-review demo (speed mode).
-// Cream/white/ink/clay palette, serif headline, hero with shade avatar,
+// Monochrome chrome (Artefact 2 §7.2), serif headline, hero with shade avatar,
 // 3 quick-action tiles, 8 library category tiles.
 //
 // Existing v1 Beauty DNA profile builder is preserved inline inside a
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { formatShadeName } from "../lib/munsell";
+import { BG_WHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE } from "../lib/design-tokens";
 
 // 8 library categories per v2.1 decision #10
 const CATEGORIES = [
@@ -45,16 +46,9 @@ function categoryCount(arr, key) {
 
 const SERIF = "'DM Serif Display', Georgia, serif";
 const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
-const CREAM = '#F5F1EA';
-const WHITE = '#FFFFFF';
-const INK   = '#1A1A1A';
-const CLAY  = '#B8826F';
-const HAIRLINE = 'rgba(26,26,26,0.08)';
-const DIM   = 'rgba(26,26,26,0.55)';
-const FAINT = 'rgba(26,26,26,0.35)';
 
 const tileBase = {
-  background: WHITE,
+  background: BG_WHITE,
   border: `1px solid ${HAIRLINE}`,
   borderRadius: 14,
   padding: '16px 12px',
@@ -67,10 +61,10 @@ const tileBase = {
   minHeight: 86,
   transition: 'transform 120ms ease, border-color 120ms ease',
 };
-const tilePrimary = { ...tileBase, border: `2px solid ${CLAY}` };
+const tilePrimary = { ...tileBase, background: ACCENT_BLACK, border: `2px solid ${BORDER_ACTIVE}` };
 
 const catTileStyle = {
-  background: WHITE,
+  background: BG_WHITE,
   border: `1px solid ${HAIRLINE}`,
   borderRadius: 14,
   padding: '14px 16px',
@@ -107,7 +101,7 @@ export default function MyDNA() {
     : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: CREAM }}>
+    <div style={{ minHeight: '100vh', background: BG_WHITE }}>
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '28px 16px 60px' }}>
 
         {/* Hero — shade circle + greeting + shade name */}
@@ -115,25 +109,25 @@ export default function MyDNA() {
           <div style={{
             width: 72, height: 72, borderRadius: '50%',
             background: primaryShade?.hex || '#E5E0D5',
-            border: `3px solid ${WHITE}`,
-            boxShadow: '0 2px 12px rgba(26,26,26,0.08)',
+            border: `3px solid ${BG_WHITE}`,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
             flexShrink: 0,
           }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1 style={{
               margin: 0,
-              fontSize: 24, fontWeight: 400, color: INK,
+              fontSize: 24, fontWeight: 400, color: INK_PRIMARY,
               fontFamily: SERIF, letterSpacing: '-0.02em', lineHeight: 1.15,
               overflow: 'hidden', textOverflow: 'ellipsis',
             }}>
               {userName ? `Hi ${userName}` : 'Hi there'}
             </h1>
             {shadeDisplay ? (
-              <div style={{ fontSize: 13, color: CLAY, marginTop: 6, fontFamily: SANS, fontWeight: 500 }}>
+              <div style={{ fontSize: 13, color: INK_PRIMARY, marginTop: 6, fontFamily: SANS, fontWeight: 500 }}>
                 {shadeDisplay}
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: DIM, marginTop: 6, fontFamily: SANS }}>
+              <div style={{ fontSize: 13, color: INK_SECONDARY, marginTop: 6, fontFamily: SANS }}>
                 Take the quiz to find your shade
               </div>
             )}
@@ -152,12 +146,12 @@ export default function MyDNA() {
               the route exists. */}
           <button onClick={() => navigate('/ColorScanner')} style={tilePrimary}>
             <div style={{ fontSize: 24, lineHeight: 1 }}>📷</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginTop: 4 }}>Just Scan</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: BG_WHITE, marginTop: 4 }}>Just Scan</div>
           </button>
           {!loading && !session && (
             <button onClick={() => navigate('/LogIn')} style={tileBase}>
               <div style={{ fontSize: 24, lineHeight: 1 }}>🔑</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginTop: 4 }}>Sign in</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: INK_PRIMARY, marginTop: 4 }}>Sign in</div>
             </button>
           )}
         </div>
@@ -165,7 +159,7 @@ export default function MyDNA() {
         {/* Library section heading */}
         <h2 style={{
           margin: '0 0 12px',
-          fontSize: 11, fontWeight: 600, color: DIM,
+          fontSize: 11, fontWeight: 600, color: INK_SECONDARY,
           letterSpacing: '0.1em', textTransform: 'uppercase',
           fontFamily: SANS,
         }}>
@@ -189,8 +183,8 @@ export default function MyDNA() {
               >
                 <span style={{ fontSize: 22, lineHeight: 1 }}>{cat.emoji}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: INK }}>{cat.label}</div>
-                  <div style={{ fontSize: 11, color: count > 0 ? CLAY : FAINT, marginTop: 2 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: INK_PRIMARY }}>{cat.label}</div>
+                  <div style={{ fontSize: 11, color: count > 0 ? INK_PRIMARY : INK_SECONDARY, marginTop: 2 }}>
                     {count > 0 ? `${count} saved` : 'Empty'}
                   </div>
                 </div>
@@ -202,7 +196,7 @@ export default function MyDNA() {
         {/* Profile builder — collapsed; v1 dark theme inside is intentional
             speed-mode mismatch, polished in post-review pass */}
         <details style={{
-          background: WHITE,
+          background: BG_WHITE,
           borderRadius: 14,
           padding: '14px 18px',
           border: `1px solid ${HAIRLINE}`,
@@ -211,12 +205,12 @@ export default function MyDNA() {
         }}>
           <summary style={{
             cursor: 'pointer',
-            fontSize: 13, fontWeight: 600, color: INK,
+            fontSize: 13, fontWeight: 600, color: INK_PRIMARY,
             listStyle: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
             <span>Edit your Beauty DNA profile</span>
-            <span style={{ fontSize: 14, color: CLAY }}>▾</span>
+            <span style={{ fontSize: 14, color: INK_SECONDARY }}>▾</span>
           </summary>
           <div style={{ marginTop: 14 }}>
             <BeautyDNABuilder />
@@ -230,7 +224,7 @@ export default function MyDNA() {
               onClick={() => supabase.auth.signOut()}
               style={{
                 background: 'none', border: 'none',
-                color: CLAY, fontSize: 12, fontWeight: 600,
+                color: INK_SECONDARY, fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', fontFamily: SANS,
                 letterSpacing: '0.05em', textTransform: 'uppercase',
               }}
@@ -247,7 +241,8 @@ export default function MyDNA() {
 // ─────────────────────────────────────────────────────────────────────
 // Beauty DNA builder — preserved from v1 Profile.jsx logic, inlined as
 // a sub-component so MyDNA can collapse it. Dark theme inside is
-// pre-v2.1 styling; post-Desiree-review pass restyles to cream/clay.
+// pre-v2.1 styling; post-Desiree-review pass restyles to monochrome
+// per Artefact 2 §7.1–§7.3 (clay/cream retired 2026-05-02).
 // ─────────────────────────────────────────────────────────────────────
 
 const ETHNICITIES = ['East Asian','South Asian','Southeast Asian','Middle Eastern','Black/African','Latino/Hispanic','White/European','Mixed','Prefer not to say'];

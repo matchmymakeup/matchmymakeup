@@ -1,5 +1,5 @@
 // v2.1 Page-1 entry — PR4 rebuild using shared button vocabulary.
-// Cream/clay/serif aesthetic; CircleIconButton entry tiles; Dropdown
+// Monochrome chrome (Artefact 2 §7.2); CircleIconButton entry tiles; Dropdown
 // consultant selector wired to sessionStorage 'mmm_language' (same key
 // ColorScanner.jsx:352 reads from). English-only chrome per speed-mode.
 //
@@ -18,13 +18,10 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
 import CircleIconButton from "../components/CircleIconButton";
 import Dropdown from "../components/Dropdown";
+import { BG_WHITE, INK_PRIMARY, INK_SECONDARY } from "../lib/design-tokens";
 
 const SERIF = "'DM Serif Display', Georgia, serif";
 const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
-const CREAM = '#F5F1EA';
-const INK   = '#1A1A1A';
-const CLAY  = '#B8826F';
-const DIM   = 'rgba(26,26,26,0.55)';
 
 // 15 personas, slash-separated <Language> / <Persona> / <Region> labels
 // (locked 2026-05-02). Inlined here vs centralising to src/lib/personas.js
@@ -69,7 +66,7 @@ export default function Landing() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: CREAM }}>
+    <div style={{ minHeight: '100vh', background: BG_WHITE }}>
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '40px 20px 60px' }}>
 
         {/* Wordmark */}
@@ -77,7 +74,7 @@ export default function Landing() {
           textAlign: 'center',
           fontSize: 11,
           fontWeight: 700,
-          color: CLAY,
+          color: INK_SECONDARY,
           letterSpacing: '0.3em',
           fontFamily: SERIF,
           marginBottom: 64,
@@ -91,7 +88,7 @@ export default function Landing() {
             margin: 0,
             fontSize: 36,
             fontWeight: 400,
-            color: INK,
+            color: INK_PRIMARY,
             fontFamily: SERIF,
             letterSpacing: '-0.02em',
             lineHeight: 1.1,
@@ -102,7 +99,7 @@ export default function Landing() {
           <p style={{
             margin: 0,
             fontSize: 14,
-            color: DIM,
+            color: INK_SECONDARY,
             fontFamily: SANS,
             lineHeight: 1.5,
             maxWidth: 320,
@@ -155,7 +152,7 @@ export default function Landing() {
               onClick={() => navigate('/MyDNA')}
               style={{
                 background: 'none', border: 'none',
-                color: CLAY, fontSize: 13, fontWeight: 600,
+                color: INK_PRIMARY, fontSize: 13, fontWeight: 600,
                 cursor: 'pointer', fontFamily: SANS,
                 letterSpacing: '0.02em',
                 padding: '8px 12px',
