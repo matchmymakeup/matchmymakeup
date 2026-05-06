@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUser } from '../lib/auth'
+import { BG_WHITE, INK_PRIMARY, INK_SECONDARY, HAIRLINE } from '../lib/design-tokens'
 
 // Library / Log in / Log out remain hardcoded English — pre-existing tech
 // debt to be retrofitted in Phase 4+ alongside the broader Header / Profile
@@ -52,8 +53,8 @@ function resolveLang() {
 function HeaderLogo({ hovered }) {
   return (
     <svg width="32" height="28" viewBox="0 0 64 56" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: hovered ? 0.85 : 1, transition: 'opacity 120ms ease' }}>
-      <polyline points="4,52 18,12 32,36 46,12 60,52" stroke="#C9A96E" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="32" cy="8" r="5" fill="#B76E79" />
+      <polyline points="4,52 18,12 32,36 46,12 60,52" stroke={INK_PRIMARY} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="32" cy="8" r="5" fill={INK_SECONDARY} />
     </svg>
   )
 }
@@ -72,7 +73,7 @@ export default function Header() {
   function navLinkStyle(path) {
     const active = location.pathname === path
     return {
-      color: active ? '#C9A96E' : 'rgba(245,240,232,0.6)',
+      color: active ? INK_PRIMARY : INK_SECONDARY,
       fontSize: 13,
       fontWeight: 600,
       textDecoration: 'none',
@@ -84,8 +85,8 @@ export default function Header() {
 
   return (
     <header style={{
-      background: '#1C1C1E',
-      borderBottom: '1px solid #2C2C2E',
+      background: BG_WHITE,
+      borderBottom: `1px solid ${HAIRLINE}`,
       padding: '10px 16px',
       display: 'flex',
       alignItems: 'center',
@@ -111,14 +112,14 @@ export default function Header() {
         {loading ? null : session ? (
           <button
             onClick={handleLogout}
-            style={{ background: 'none', border: 'none', color: '#C9A96E', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}
+            style={{ background: 'none', border: 'none', color: INK_PRIMARY, fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}
           >
             {LABELS.logOut}
           </button>
         ) : (
           <Link
             to="/LogIn"
-            style={{ color: '#C9A96E', fontSize: 13, fontWeight: 600, textDecoration: 'none', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}
+            style={{ color: INK_PRIMARY, fontSize: 13, fontWeight: 600, textDecoration: 'none', padding: 8, fontFamily: "'Segoe UI', Helvetica, sans-serif" }}
           >
             {LABELS.logIn}
           </Link>
