@@ -7,6 +7,8 @@ import PageBackBar from "../components/PageBackBar";
 import Dropdown from "../components/Dropdown";
 import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW } from "../lib/design-tokens";
 
+const SERIF = "'DM Serif Display', Georgia, serif";
+
 // PR5 — Shop In dropdown options match ColorScanner. Inlined here vs
 // importing because ColorScanner exports nothing and centralisation is
 // banked polish-pass work.
@@ -24,7 +26,7 @@ const SHOP_IN_OPTIONS = [
 ];
 
 const T = {
-  en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →" },
+  en: { loading:"Loading your results...", noResults:"No results found", scanFirst:"Please scan a color first.", scanAgain:"← Scan Another", yourColor:"Your Scanned Color", adviceTitle:"Beauty Advice", consultant:"Your personal beauty consultant", noAdvice:"Try scanning again for fresh recommendations! ✨", matchingProducts:"Matching Products", bestMatch:"⭐ Best", colorDistance:"Color distance", shopNow:"Shop Now →", upsellHeading:"Seeing only 10 matches from 50 products?", upsellSub:"Premium members match against 500+ products from 100+ brands including Charlotte Tilbury, NARS, Rare Beauty, Colorkey and more.", upsellBtn:"Upgrade to Premium — $4.99/month →", revealMomentMeasured:"Here's what we measured.", personaRevealFrame:"Here's what your colour tells me about you.", specificityBridge:"{personaName} chose these products with your colour in mind.", upsellEmotionalGrounding:"{personaName} found {matchCount} matches that fit you. Premium opens up the full library." },
   hi: { loading:"आपके परिणाम लोड हो रहे हैं...", noResults:"कोई परिणाम नहीं मिला", scanFirst:"कृपया पहले रंग स्कैन करें।", scanAgain:"← दूसरा स्कैन करें", yourColor:"आपका स्कैन किया रंग", adviceTitle:"ब्यूटी सलाह", consultant:"आपकी व्यक्तिगत ब्यूटी सलाहकार", noAdvice:"ताज़ी सलाह के लिए फिर से स्कैन करें! ✨", matchingProducts:"मिलते-जुलते प्रोडक्ट", bestMatch:"⭐ बेस्ट", colorDistance:"रंग अंतर", shopNow:"अभी खरीदें →", upsellHeading:"केवल 50 में से 10 मैच दिख रहे हैं?", upsellSub:"प्रीमियम सदस्य 500+ प्रोडक्ट से मैच करते हैं।", upsellBtn:"प्रीमियम अपग्रेड करें — $4.99/माह →" },
   pt: { loading:"Carregando seus resultados...", noResults:"Nenhum resultado encontrado", scanFirst:"Por favor, escaneie uma cor primeiro.", scanAgain:"← Escanear Outra", yourColor:"Sua Cor Escaneada", adviceTitle:"Conselho de Beleza", consultant:"Sua consultora de beleza pessoal", noAdvice:"Tente escanear novamente! ✨", matchingProducts:"Produtos Correspondentes", bestMatch:"⭐ Melhor", colorDistance:"Distância de cor", shopNow:"Comprar Agora →", upsellHeading:"Vendo apenas 10 de 50 produtos?", upsellSub:"Membros premium combinam com 500+ produtos de 100+ marcas.", upsellBtn:"Seja Premium — $4,99/mês →" },
   zh: { loading:"正在加载你的结果...", noResults:"未找到结果", scanFirst:"请先扫描一种颜色。", scanAgain:"← 再次扫描", yourColor:"你扫描的颜色", adviceTitle:"美妆建议", consultant:"你的专属美妆顾问", noAdvice:"请重新扫描以获取新建议！✨", matchingProducts:"匹配产品", bestMatch:"⭐ 最佳", colorDistance:"色差", shopNow:"立即购买 →", upsellHeading:"仅看到50款中的10个匹配？", upsellSub:"高级会员可从500+产品中匹配。", upsellBtn:"升级至高级版 — $4.99/月 →" },
@@ -376,6 +378,7 @@ export default function MatchResults() {
   const personaName = record.personaName || "Maya";
   const personaEmoji = record.personaEmoji || "💄";
   const allProducts = [...products, ...bonusProducts];
+  const matchCount = allProducts.length;
 
   // PR5 — country dropdown change triggers in-place /api/match re-run.
   // Advice text stays from original scan; user clicks Match Again to
@@ -467,6 +470,12 @@ export default function MatchResults() {
           <span style={{fontSize:20}}>💄</span>
           <span style={{fontWeight:800,fontSize:16,color:INK_PRIMARY}}>MatchMyMakeup<span style={{fontSize:8}}>{'™'}</span></span>
         </div>
+
+        {/* Moment 1 — reveal frame label opening the result sequence (CIT §3.2 element 2) */}
+        <div style={{fontSize:11,fontWeight:600,color:INK_SECONDARY,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:8}}>
+          {t.revealMomentMeasured ?? T.en.revealMomentMeasured}
+        </div>
+
         {/* Scanned color */}
         <div style={{background:BG_OFFWHITE,borderRadius:20,padding:20,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:20}}>
           <div style={{fontSize:11,color:"#aaa",fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:12}}>{t.yourColor}</div>
@@ -497,6 +506,10 @@ export default function MatchResults() {
               <div style={{fontWeight:800,fontSize:15,color:INK_PRIMARY}}>{personaName}'s {t.adviceTitle}</div>
               <div style={{fontSize:11,color:"#aaa"}}>{t.consultant}</div>
             </div>
+          </div>
+          {/* Moment 2 — persona reveal frame line (CIT §3.2 element 3) */}
+          <div style={{fontStyle:'italic',color:INK_SECONDARY,fontSize:13,marginBottom:10}}>
+            {t.personaRevealFrame ?? T.en.personaRevealFrame}
           </div>
           {adviceParagraphs.length > 0 ? (
             <div style={{fontSize:14,lineHeight:1.8,color:INK_PRIMARY}}>
@@ -595,7 +608,12 @@ export default function MatchResults() {
               <div style={{flex:1}}>
                 {!trialInfo.started ? (
                   <>
-                    <div style={{fontWeight:800,fontSize:14,color:INK_PRIMARY,marginBottom:4}}>{t.upsellHeading}</div>
+                    {/* Moment 4 — emotional grounding before commercial offer (CIT §3.2 element 5) */}
+                    <div style={{fontWeight:800,fontSize:14,color:INK_PRIMARY,marginBottom:4}}>
+                      {(t.upsellEmotionalGrounding ?? T.en.upsellEmotionalGrounding)
+                        .replace('{personaName}', personaName)
+                        .replace('{matchCount}', matchCount)}
+                    </div>
                     <div style={{fontSize:12,color:"#999",lineHeight:1.5,marginBottom:12}}>{t.upsellSub}</div>
                     <button onClick={handleCheckout} style={{display:"inline-block",background:ACCENT_BLACK,color:BG_WHITE,borderRadius:12,padding:"9px 18px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
                       Try Premium Free — 7 days, no card needed →
@@ -624,6 +642,10 @@ export default function MatchResults() {
         {/* Products */}
         {allProducts.length > 0 && (
           <div>
+            {/* Moment 3 — specificity bridge (CIT §3.2 element 4) */}
+            <div style={{fontFamily:SERIF,color:INK_PRIMARY,fontSize:16,fontWeight:400,lineHeight:1.4,marginBottom:16}}>
+              {(t.specificityBridge ?? T.en.specificityBridge).replace('{personaName}', personaName)}
+            </div>
             <div style={{fontWeight:800,fontSize:16,color:INK_PRIMARY,marginBottom:12}}>🎯 {allProducts.length} {t.matchingProducts}</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
               {allProducts.map((p,i) => (
