@@ -536,12 +536,12 @@ export default function MatchResults() {
 
         {/* Progressive: Skin tone banner (after 1st scan) */}
         {showSkinToneBanner && (
-          <div style={{position:"relative",background:"linear-gradient(135deg,#fffbeb,#fef3c7)",border:"1px solid #fbbf24",borderRadius:16,padding:"14px 40px 14px 14px",marginBottom:16,cursor:"pointer"}} onClick={()=>setShowSkinToneSheet(true)}>
-            <button onClick={e=>{e.stopPropagation();setSkinToneBannerDismissed(true);}} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:14,color:"#d97706",padding:"2px 6px"}}>✕</button>
+          <div style={{position:"relative",background:BG_OFFWHITE,border:`1px solid ${HAIRLINE}`,borderRadius:16,padding:"14px 40px 14px 14px",marginBottom:16,cursor:"pointer"}} onClick={()=>setShowSkinToneSheet(true)}>
+            <button onClick={e=>{e.stopPropagation();setSkinToneBannerDismissed(true);}} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:14,color:INK_SECONDARY,padding:"2px 6px"}}>✕</button>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{fontSize:24}}>✨</span>
               <div>
-                <div style={{fontWeight:700,fontSize:13,color:"#92400e"}}>{personaName} found {products.length} matches. Tell us your skin tone and unlock 5 more →</div>
+                <div style={{fontWeight:700,fontSize:13,color:INK_PRIMARY}}>{personaName} found {products.length} matches. Tell us your skin tone and unlock 5 more →</div>
               </div>
             </div>
           </div>
@@ -549,12 +549,12 @@ export default function MatchResults() {
 
         {/* Progressive: Age range banner (after 2nd scan) */}
         {showAgeBanner && (
-          <div style={{position:"relative",background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",border:"1px solid #86efac",borderRadius:16,padding:"14px 40px 14px 14px",marginBottom:16,cursor:"pointer"}} onClick={()=>setShowAgeSheet(true)}>
-            <button onClick={e=>{e.stopPropagation();setAgeBannerDismissed(true);}} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:14,color:"#16a34a",padding:"2px 6px"}}>✕</button>
+          <div style={{position:"relative",background:BG_OFFWHITE,border:`1px solid ${HAIRLINE}`,borderRadius:16,padding:"14px 40px 14px 14px",marginBottom:16,cursor:"pointer"}} onClick={()=>setShowAgeSheet(true)}>
+            <button onClick={e=>{e.stopPropagation();setAgeBannerDismissed(true);}} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:14,color:INK_SECONDARY,padding:"2px 6px"}}>✕</button>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{fontSize:24}}>🎂</span>
               <div>
-                <div style={{fontWeight:700,fontSize:13,color:"#166534"}}>Add your age range and get personalised advice from {personaName} →</div>
+                <div style={{fontWeight:700,fontSize:13,color:INK_PRIMARY}}>Add your age range and get personalised advice from {personaName} →</div>
               </div>
             </div>
           </div>
@@ -733,7 +733,7 @@ export default function MatchResults() {
             <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:INK_PRIMARY}}>Save This Color</h3>
             <div style={{width:"100%",height:48,borderRadius:12,background:record.scannedHex,marginBottom:12}} />
             <div style={{textAlign:"center",fontFamily:"monospace",fontSize:16,fontWeight:700,color:INK_PRIMARY,marginBottom:16}}>{record.scannedHex}</div>
-            <input placeholder='e.g. "My everyday lip"' value={shadeName} onChange={e=>setShadeName(e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid #555",fontSize:14,marginBottom:12,background:"#3C3C3E",color:INK_PRIMARY}} />
+            <input placeholder='e.g. "My everyday lip"' value={shadeName} onChange={e=>setShadeName(e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:`1px solid ${HAIRLINE}`,fontSize:14,marginBottom:12,background:BG_OFFWHITE,color:INK_PRIMARY}} />
             <button onClick={handleSaveShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:ACCENT_BLACK,color:BG_WHITE,fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save to My Shades</button>
           </div>
         </div>

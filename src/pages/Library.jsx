@@ -4,6 +4,7 @@ import { isPremium } from "../lib/trial";
 import { getSavedProducts, getSavedShades, saveProduct, saveShade, removeSavedProduct, removeSavedShade } from "../lib/storage";
 import { supabase } from "../lib/supabase";
 import PageBackBar from "../components/PageBackBar";
+import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW } from "../lib/design-tokens";
 
 function loadStore(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; }
@@ -13,7 +14,7 @@ function saveStore(key, data) { localStorage.setItem(key, JSON.stringify(data));
 const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour','concealer','tinted_sunscreen','mineral_powder'];
 const tabBtn = (active) => ({
   flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
-  background:active?"#C9A96E":"transparent",color:active?"white":"#666"
+  background:active?ACCENT_BLACK:"transparent",color:active?BG_WHITE:INK_SECONDARY
 });
 
 export default function Library() {
@@ -168,18 +169,18 @@ export default function Library() {
   const premiumGate = (label) => (
     <div style={{textAlign:"center",padding:"48px 20px"}}>
       <div style={{fontSize:40,marginBottom:12}}>🔒</div>
-      <div style={{fontWeight:700,fontSize:15,color:"#B76E79",marginBottom:6}}>Premium Feature</div>
+      <div style={{fontWeight:700,fontSize:15,color:INK_PRIMARY,marginBottom:6}}>Premium Feature</div>
       <div style={{color:"#888",fontSize:13,marginBottom:20,maxWidth:260,margin:"0 auto 20px"}}>{label}</div>
-      <button onClick={()=>navigate('/MatchResults')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:16,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44}}>
+      <button onClick={()=>navigate('/MatchResults')} style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:16,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44}}>
         Unlock Premium →
       </button>
     </div>
   );
 
-  const inputStyle = {width:'100%',padding:'10px 12px',borderRadius:10,border:'1px solid #555',fontSize:14,marginBottom:8,background:'#3C3C3E',color:'#F5F0E8'};
+  const inputStyle = {width:'100%',padding:'10px 12px',borderRadius:10,border:`1px solid ${HAIRLINE}`,fontSize:14,marginBottom:8,background:BG_OFFWHITE,color:INK_PRIMARY};
 
   return (
-    <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
+    <div style={{minHeight:"100vh",background:BG_WHITE,fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{maxWidth:480,margin:"0 auto",padding:"16px"}}>
         {/* Uses shared <PageBackBar/> — see src/components/PageBackBar.jsx */}
         {migrationError && (
@@ -190,7 +191,7 @@ export default function Library() {
         )}
         <PageBackBar onBack={() => navigate('/ColorScanner')} label="← Scanner" title="💄 My Library" />
         {/* Tabs */}
-        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:"#2C2C2E",borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
+        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:BG_OFFWHITE,borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
           <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
           <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Products</button>
           <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Shades</button>
@@ -207,26 +208,26 @@ export default function Library() {
               <div style={{fontSize:48,marginBottom:16}}>🎨</div>
               <div style={{fontWeight:700,fontSize:16,color:"#999",marginBottom:8}}>No scans yet</div>
               <div style={{color:"#bbb",fontSize:13,marginBottom:24}}>Your scan history will appear here automatically</div>
-              <button onClick={()=>navigate('/ColorScanner')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Start Scanning</button>
+              <button onClick={()=>navigate('/ColorScanner')} style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:16,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Start Scanning</button>
             </div>
           ) : (
             <div>
               {!isPremiumUser && scans.length > 10 && (
-                <div style={{background:"#fef3c7",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:12,color:"#92400e",fontWeight:600}}>
+                <div style={{background:BG_OFFWHITE,border:`1px solid ${HAIRLINE}`,borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:12,color:INK_PRIMARY,fontWeight:600}}>
                   Showing last 10 scans. Premium unlocks your full history ({scans.length} scans).
                 </div>
               )}
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
                 {visibleScans.map((scan,i)=>(
-                  <div key={i} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+                  <div key={i} style={{background:BG_OFFWHITE,borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:scan.color?.hex,flexShrink:0,boxShadow:`0 2px 8px ${scan.color?.hex}60`}}/>
                       <div>
-                        <div style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{scan.color?.hex}</div>
-                        <div style={{fontSize:12,color:"rgba(201,169,110,0.7)"}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
+                        <div style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:INK_PRIMARY}}>{scan.color?.hex}</div>
+                        <div style={{fontSize:12,color:INK_SECONDARY}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
                       </div>
                     </div>
-                    {scan.advice&&<div style={{fontSize:12,color:"#F5F0E8",lineHeight:1.5,background:"#3C3C3E",borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
+                    {scan.advice&&<div style={{fontSize:12,color:INK_PRIMARY,lineHeight:1.5,background:BG_OFFWHITE,borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}
                   </div>
                 ))}
               </div>
@@ -238,37 +239,37 @@ export default function Library() {
         {tab==="products"&&(
           !isPremiumUser ? premiumGate("Save products you own, rate them, and build your personal collection.") : (
             <div>
-              <button onClick={()=>setShowAddProduct(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Add Product</button>
+              <button onClick={()=>setShowAddProduct(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:`2px dashed ${HAIRLINE}`,background:BG_OFFWHITE,cursor:"pointer",fontSize:14,fontWeight:700,color:INK_PRIMARY,marginBottom:16,minHeight:44}}>+ Add Product</button>
               {loading && <p style={{textAlign:"center",padding:20,color:"#888",fontSize:13}}>Loading…</p>}
               {error && (
                 <div style={{textAlign:"center",padding:20}}>
                   <p style={{color:"#dc2626",marginBottom:8,fontSize:13}}>Couldn't load — tap to retry</p>
-                  <button onClick={loadAll} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Retry</button>
+                  <button onClick={loadAll} style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Retry</button>
                 </div>
               )}
               {!loading && !error && products.length === 0 && (
                 <div style={{textAlign:"center",padding:"40px 20px"}}>
                   <p style={{color:"#aaa",fontSize:13,marginBottom:12}}>No saved products yet</p>
-                  <button onClick={()=>navigate('/MatchResults')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Browse products</button>
+                  <button onClick={()=>navigate('/MatchResults')} style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Browse products</button>
                   {/* TODO Step 6: show migration hint for authed users with localStorage entries */}
                 </div>
               )}
               {!loading && !error && products.length > 0 && (
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 {products.map(p => (
-                  <div key={p.id} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+                  <div key={p.id} style={{background:BG_OFFWHITE,borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <div style={{width:40,height:40,borderRadius:"50%",background:p.hex,flexShrink:0}} />
                       <div style={{flex:1}}>
-                        <div style={{fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{p.name}</div>
-                        <div style={{fontSize:12,color:"rgba(201,169,110,0.7)"}}>{p.brand} · {p.category}</div>
+                        <div style={{fontWeight:700,fontSize:14,color:INK_PRIMARY}}>{p.name}</div>
+                        <div style={{fontSize:12,color:INK_SECONDARY}}>{p.brand} · {p.category}</div>
                         {p.rating != null && p.rating > 0 && (
                           <div style={{fontSize:14,color:"#fbbf24",marginTop:2}}>{stars(p.rating)}</div>
                         )}
                       </div>
                       <button onClick={()=>removeProduct(p.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#ccc",padding:4}}>✕</button>
                     </div>
-                    {p.notes && p.notes.trim().length > 0 && <div style={{fontSize:12,color:"#F5F0E8",marginTop:8,background:"#3C3C3E",borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
+                    {p.notes && p.notes.trim().length > 0 && <div style={{fontSize:12,color:INK_PRIMARY,marginTop:8,background:BG_OFFWHITE,borderRadius:8,padding:"6px 10px"}}>{p.notes}</div>}
                   </div>
                 ))}
               </div>
@@ -276,9 +277,9 @@ export default function Library() {
               {showAddProduct && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddProduct(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
-                  <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
+                  <div style={{position:"relative",background:BG_OFFWHITE,borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Add Product</h3>
+                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:INK_PRIMARY}}>Add Product</h3>
                     <input placeholder="Product name" value={newProduct.name} onChange={e=>setNewProduct(p=>({...p,name:e.target.value}))} style={inputStyle} />
                     <input placeholder="Brand" value={newProduct.brand} onChange={e=>setNewProduct(p=>({...p,brand:e.target.value}))} style={inputStyle} />
                     <select value={newProduct.category} onChange={e=>setNewProduct(p=>({...p,category:e.target.value}))} style={inputStyle}>
@@ -295,7 +296,7 @@ export default function Library() {
                       ))}</div>
                     </div>
                     <textarea placeholder="Notes (optional)" value={newProduct.notes} onChange={e=>setNewProduct(p=>({...p,notes:e.target.value}))} style={{...inputStyle,height:60,resize:"none"}} />
-                    <button onClick={addProduct} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Product</button>
+                    <button onClick={addProduct} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:ACCENT_BLACK,color:BG_WHITE,fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Product</button>
                   </div>
                 </div>
               )}
@@ -307,29 +308,29 @@ export default function Library() {
         {tab==="shades"&&(
           !isPremiumUser ? premiumGate("Save your favourite hex codes with custom names and build a personal swatch library.") : (
             <div>
-              <button onClick={()=>setShowAddShade(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Save a Shade</button>
+              <button onClick={()=>setShowAddShade(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:`2px dashed ${HAIRLINE}`,background:BG_OFFWHITE,cursor:"pointer",fontSize:14,fontWeight:700,color:INK_PRIMARY,marginBottom:16,minHeight:44}}>+ Save a Shade</button>
               {loading && <p style={{textAlign:"center",padding:20,color:"#888",fontSize:13}}>Loading…</p>}
               {error && (
                 <div style={{textAlign:"center",padding:20}}>
                   <p style={{color:"#dc2626",marginBottom:8,fontSize:13}}>Couldn't load — tap to retry</p>
-                  <button onClick={loadAll} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Retry</button>
+                  <button onClick={loadAll} style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Retry</button>
                 </div>
               )}
               {!loading && !error && shades.length === 0 && (
                 <div style={{textAlign:"center",padding:"40px 20px"}}>
                   <p style={{color:"#aaa",fontSize:13,marginBottom:12}}>No saved shades yet</p>
-                  <button onClick={()=>navigate('/')} style={{background:"#C9A96E",color:"#1C1C1E",border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Start scanning</button>
+                  <button onClick={()=>navigate('/')} style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:14,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",minHeight:44}}>Start scanning</button>
                   {/* TODO Step 6: show migration hint for authed users with localStorage entries */}
                 </div>
               )}
               {!loading && !error && shades.length > 0 && (
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
                 {shades.map(s => (
-                  <div key={s.id} style={{background:"#2C2C2E",borderRadius:16,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",position:"relative"}}>
-                    <button onClick={()=>removeShade(s.id)} style={{position:"absolute",top:4,right:4,background:"rgba(255,255,255,0.8)",border:"none",borderRadius:"50%",width:22,height:22,cursor:"pointer",fontSize:12,color:"#999",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                  <div key={s.id} style={{background:BG_OFFWHITE,borderRadius:16,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",position:"relative"}}>
+                    <button onClick={()=>removeShade(s.id)} style={{position:"absolute",top:4,right:4,background:ACCENT_BLACK,border:"none",borderRadius:"50%",width:22,height:22,cursor:"pointer",fontSize:12,color:BG_WHITE,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                     <div style={{height:64,background:s.hex}} />
                     <div style={{padding:"8px 10px"}}>
-                      <div style={{fontSize:12,fontWeight:700,color:"#F5F0E8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
+                      <div style={{fontSize:12,fontWeight:700,color:INK_PRIMARY,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
                       <div style={{fontSize:11,color:"#888",fontFamily:"monospace"}}>{s.hex}</div>
                     </div>
                   </div>
@@ -339,16 +340,16 @@ export default function Library() {
               {showAddShade && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddShade(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
-                  <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480}}>
+                  <div style={{position:"relative",background:BG_OFFWHITE,borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Save a Shade</h3>
+                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:INK_PRIMARY}}>Save a Shade</h3>
                     <input placeholder='e.g. "My everyday lip"' value={newShade.name} onChange={e=>setNewShade(s=>({...s,name:e.target.value}))} style={inputStyle} />
                     <div style={{display:"flex",gap:8,marginBottom:16,alignItems:"center"}}>
                       <input type="color" value={newShade.hex} onChange={e=>setNewShade(s=>({...s,hex:e.target.value}))} style={{width:44,height:44,border:"none",borderRadius:10,cursor:"pointer"}} />
                       <input value={newShade.hex} onChange={e=>setNewShade(s=>({...s,hex:e.target.value}))} style={{...inputStyle,marginBottom:0,flex:1}} />
                     </div>
                     <div style={{width:"100%",height:48,borderRadius:12,background:newShade.hex,marginBottom:16}} />
-                    <button onClick={addShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Shade</button>
+                    <button onClick={addShade} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:ACCENT_BLACK,color:BG_WHITE,fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Shade</button>
                   </div>
                 </div>
               )}
@@ -360,21 +361,21 @@ export default function Library() {
         {tab==="looks"&&(
           !isPremiumUser ? premiumGate("Create and save makeup looks by combining your saved shades with occasion tags.") : (
             <div>
-              <button onClick={()=>setShowAddLook(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:"2px dashed #C9A96E",background:"#2C2C2E",cursor:"pointer",fontSize:14,fontWeight:700,color:"#C9A96E",marginBottom:16,minHeight:44}}>+ Create a Look</button>
+              <button onClick={()=>setShowAddLook(true)} style={{width:"100%",padding:"14px",borderRadius:16,border:`2px dashed ${HAIRLINE}`,background:BG_OFFWHITE,cursor:"pointer",fontSize:14,fontWeight:700,color:INK_PRIMARY,marginBottom:16,minHeight:44}}>+ Create a Look</button>
               {myLooks.length===0 && <div style={{textAlign:"center",padding:"40px 20px",color:"#aaa",fontSize:13}}>Create your first look to save shade combinations</div>}
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
                 {myLooks.map(l => (
-                  <div key={l.id} style={{background:"#2C2C2E",borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
+                  <div key={l.id} style={{background:BG_OFFWHITE,borderRadius:16,padding:14,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
                       <div>
-                        <div style={{fontWeight:700,fontSize:14,color:"#F5F0E8"}}>{l.name}</div>
-                        <div style={{fontSize:12,color:"rgba(201,169,110,0.7)",textTransform:"capitalize"}}>{l.occasion}</div>
+                        <div style={{fontWeight:700,fontSize:14,color:INK_PRIMARY}}>{l.name}</div>
+                        <div style={{fontSize:12,color:INK_SECONDARY,textTransform:"capitalize"}}>{l.occasion}</div>
                       </div>
                       <button onClick={()=>removeLook(l.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:"#ccc"}}>✕</button>
                     </div>
                     <div style={{display:"flex",gap:6}}>
                       {l.shades.map((hex,i) => (
-                        <div key={i} style={{width:36,height:36,borderRadius:"50%",background:hex,border:"2px solid white",boxShadow:"0 2px 6px rgba(0,0,0,0.15)"}} />
+                        <div key={i} style={{width:36,height:36,borderRadius:"50%",background:hex,border:`1px solid ${HAIRLINE}`,boxShadow:"0 2px 6px rgba(0,0,0,0.15)"}} />
                       ))}
                     </div>
                   </div>
@@ -383,9 +384,9 @@ export default function Library() {
               {showAddLook && (
                 <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
                   <div onClick={()=>setShowAddLook(false)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.4)"}} />
-                  <div style={{position:"relative",background:"#2C2C2E",borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
+                  <div style={{position:"relative",background:BG_OFFWHITE,borderRadius:"24px 24px 0 0",padding:"24px 16px 32px",width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"}}>
                     <div style={{width:40,height:4,background:"#e5e7eb",borderRadius:2,margin:"0 auto 16px"}} />
-                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:"#F5F0E8"}}>Create a Look</h3>
+                    <h3 style={{margin:"0 0 16px",fontSize:18,fontWeight:800,textAlign:"center",color:INK_PRIMARY}}>Create a Look</h3>
                     <input placeholder="Look name" value={newLook.name} onChange={e=>setNewLook(l=>({...l,name:e.target.value}))} style={inputStyle} />
                     <select value={newLook.occasion} onChange={e=>setNewLook(l=>({...l,occasion:e.target.value}))} style={inputStyle}>
                       {['everyday','office','evening','wedding','festival','editorial'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -394,17 +395,17 @@ export default function Library() {
                     <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
                       <input type="color" value={lookShadeHex} onChange={e=>setLookShadeHex(e.target.value)} style={{width:44,height:44,border:"none",borderRadius:10,cursor:"pointer"}} />
                       <input value={lookShadeHex} onChange={e=>setLookShadeHex(e.target.value)} style={{...inputStyle,marginBottom:0,flex:1}} />
-                      <button onClick={addLookShade} style={{padding:"10px 16px",borderRadius:10,border:"none",background:"#C9A96E",color:"#1C1C1E",fontWeight:700,cursor:"pointer",fontSize:13,minHeight:44}}>+</button>
+                      <button onClick={addLookShade} style={{padding:"10px 16px",borderRadius:10,border:"none",background:ACCENT_BLACK,color:BG_WHITE,fontWeight:700,cursor:"pointer",fontSize:13,minHeight:44}}>+</button>
                     </div>
                     {newLook.shades.length > 0 && (
                       <div style={{display:"flex",gap:6,marginBottom:16}}>
                         {newLook.shades.map((hex,i) => (
-                          <div key={i} style={{width:36,height:36,borderRadius:"50%",background:hex,border:"2px solid white",boxShadow:"0 2px 6px rgba(0,0,0,0.15)",cursor:"pointer"}}
+                          <div key={i} style={{width:36,height:36,borderRadius:"50%",background:hex,border:`1px solid ${HAIRLINE}`,boxShadow:"0 2px 6px rgba(0,0,0,0.15)",cursor:"pointer"}}
                             onClick={()=>setNewLook(l=>({...l,shades:l.shades.filter((_,j)=>j!==i)}))} />
                         ))}
                       </div>
                     )}
-                    <button onClick={addLook} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"#C9A96E",color:"#1C1C1E",fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Look</button>
+                    <button onClick={addLook} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:ACCENT_BLACK,color:BG_WHITE,fontSize:15,fontWeight:700,cursor:"pointer",minHeight:44}}>Save Look</button>
                   </div>
                 </div>
               )}
@@ -415,20 +416,20 @@ export default function Library() {
         {/* MATCH MY OUTFIT — Premium+ */}
         {tab==="outfit"&&(
           <div style={{textAlign:"center",padding:"32px 16px"}}>
-            <div style={{background:"#2C2C2E",borderRadius:20,padding:"32px 20px",border:"1px solid rgba(201,169,110,0.2)"}}>
+            <div style={{background:BG_OFFWHITE,borderRadius:20,padding:"32px 20px",border:`1px solid ${HAIRLINE}`}}>
               <div style={{fontSize:48,marginBottom:12}}>🔒</div>
-              <div style={{fontSize:10,color:"#C9A96E",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
-              <div style={{fontWeight:800,fontSize:18,color:"#F5F0E8",marginBottom:8}}>Match My Outfit</div>
+              <div style={{fontSize:10,color:INK_PRIMARY,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
+              <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Outfit</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Upload photos of your outfits and get makeup recommendations that perfectly complement your look</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
                 {['Casual','Office','Evening'].map(label => (
-                  <div key={label} style={{background:"#3C3C3E",borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
+                  <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
                     <div style={{fontSize:28,marginBottom:6}}>📷</div>
                     <div style={{fontSize:11,color:"#666",fontWeight:600}}>{label}</div>
                   </div>
                 ))}
               </div>
-              <button style={{background:"linear-gradient(135deg,#C9A96E,#B8956A)",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:"0 4px 16px rgba(201,169,110,0.3)"}}>
+              <button style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:SHADOW}}>
                 Upgrade to Premium+
               </button>
             </div>
@@ -438,20 +439,20 @@ export default function Library() {
         {/* MATCH MY SHOES — Premium+ */}
         {tab==="shoes"&&(
           <div style={{textAlign:"center",padding:"32px 16px"}}>
-            <div style={{background:"#2C2C2E",borderRadius:20,padding:"32px 20px",border:"1px solid rgba(201,169,110,0.2)"}}>
+            <div style={{background:BG_OFFWHITE,borderRadius:20,padding:"32px 20px",border:`1px solid ${HAIRLINE}`}}>
               <div style={{fontSize:48,marginBottom:12}}>🔒</div>
-              <div style={{fontSize:10,color:"#C9A96E",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
-              <div style={{fontWeight:800,fontSize:18,color:"#F5F0E8",marginBottom:8}}>Match My Shoes</div>
+              <div style={{fontSize:10,color:INK_PRIMARY,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
+              <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Shoes</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Photograph your shoe collection and find nail polish and lip colours that match perfectly</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
                 {['Heels','Sneakers','Boots'].map(label => (
-                  <div key={label} style={{background:"#3C3C3E",borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
+                  <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
                     <div style={{fontSize:28,marginBottom:6}}>👠</div>
                     <div style={{fontSize:11,color:"#666",fontWeight:600}}>{label}</div>
                   </div>
                 ))}
               </div>
-              <button style={{background:"linear-gradient(135deg,#C9A96E,#B8956A)",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:"0 4px 16px rgba(201,169,110,0.3)"}}>
+              <button style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:SHADOW}}>
                 Upgrade to Premium+
               </button>
             </div>
@@ -461,17 +462,20 @@ export default function Library() {
         {/* MATCH MY HAIR — Premium+ */}
         {tab==="hair"&&(
           <div style={{textAlign:"center",padding:"32px 16px"}}>
-            <div style={{background:"#2C2C2E",borderRadius:20,padding:"32px 20px",border:"1px solid rgba(201,169,110,0.2)"}}>
+            <div style={{background:BG_OFFWHITE,borderRadius:20,padding:"32px 20px",border:`1px solid ${HAIRLINE}`}}>
               <div style={{fontSize:48,marginBottom:12}}>🔒</div>
-              <div style={{fontSize:10,color:"#C9A96E",fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
-              <div style={{fontWeight:800,fontSize:18,color:"#F5F0E8",marginBottom:8}}>Match My Hair</div>
+              <div style={{fontSize:10,color:INK_PRIMARY,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
+              <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Hair</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Scan your hair colour or choose a new shade and get perfectly coordinated makeup looks</div>
+              {/* Hair-colour swatch array — chromatic content per Artefact 2 §7.2
+                  carve-out (classification swatches). #1C1C1E here represents very
+                  dark hair, not page chrome. */}
               <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:24,flexWrap:"wrap"}}>
                 {['#1C1C1E','#3B1F0A','#8B6914','#C8A951','#D4A76A','#8B3A3A'].map(hex => (
                   <div key={hex} style={{width:40,height:40,borderRadius:"50%",background:hex,border:"2px solid #555",boxShadow:`0 2px 8px ${hex}40`}} />
                 ))}
               </div>
-              <button style={{background:"linear-gradient(135deg,#C9A96E,#B8956A)",color:"#1C1C1E",border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:"0 4px 16px rgba(201,169,110,0.3)"}}>
+              <button style={{background:ACCENT_BLACK,color:BG_WHITE,border:"none",borderRadius:16,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer",minHeight:44,boxShadow:SHADOW}}>
                 Upgrade to Premium+
               </button>
             </div>

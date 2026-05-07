@@ -19,6 +19,7 @@
 //   onChange     — (newValue) => void
 //   placeholder  — optional override for unselected display text
 //   disabled     — boolean, default false
+//   width        — optional fixed pixel width (default: content-width via minWidth 120)
 
 import { useState, useRef, useEffect } from 'react';
 import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, HAIRLINE, BORDER_ACTIVE } from '../lib/design-tokens';
@@ -32,6 +33,7 @@ export default function Dropdown({
   onChange,
   placeholder,
   disabled = false,
+  width,
 }) {
   const [open, setOpen] = useState(false);
   const [hoverTrigger, setHoverTrigger] = useState(false);
@@ -82,6 +84,8 @@ export default function Dropdown({
           gap: 8,
           transition: 'border-color 120ms ease',
           minWidth: 120,
+          width: width || undefined,
+          boxSizing: 'border-box',
           justifyContent: 'space-between',
         }}
       >

@@ -546,12 +546,17 @@ export default function ColorScanner() {
 
   const isReady = !!(color?.hex && /^#[0-9A-Fa-f]{6}$/.test(color.hex));
 
-  // Dropdown row helper — label + dropdown stacked
+  // Dropdown row helper — centered label + centered fixed-width dropdown.
+  // Equal-width treatment per CIT §3.4 (visual symmetry signals "five
+  // equally weighted invitations to personalise"). Width 250 measured for
+  // longest default consultant text "🌍 English / Maya / Global ▾".
   function DropdownRow({ label, ...dropdownProps }) {
     return (
       <div style={{ marginBottom: 12 }}>
-        <label style={{ display:'block',fontSize:11,fontWeight:600,color:INK_SECONDARY,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:6,fontFamily:SANS }}>{label}</label>
-        <Dropdown {...dropdownProps} />
+        <label style={{ display:'block',fontSize:11,fontWeight:600,color:INK_SECONDARY,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:6,fontFamily:SANS,textAlign:'center' }}>{label}</label>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Dropdown width={250} {...dropdownProps} />
+        </div>
       </div>
     );
   }
@@ -622,11 +627,14 @@ export default function ColorScanner() {
         {/* Five-dropdown personalise card */}
         <div style={{background:BG_WHITE,borderRadius:18,padding:18,border:`1px solid ${HAIRLINE}`,marginBottom:14}}>
           <div style={{fontSize:11,fontWeight:600,color:INK_SECONDARY,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:14,fontFamily:SANS}}>Personalise</div>
-          <DropdownRow label="Category"   value={category} options={CATEGORY_OPTIONS}  onChange={setCategory} />
+          {/* CIT §3.2 emotional reading order: relational anchor (consultant) →
+              personal (skin tone) → contextual (occasion) → geographic (shop in) →
+              commercial (category). Reorder locked PR-A.3 2026-05-07. */}
+          <DropdownRow label="Consultant" value={lang}     options={PERSONA_OPTIONS}   onChange={setLang} />
           <DropdownRow label="Skin Tone"  value={skinTone} options={SKIN_TONE_OPTIONS} onChange={setSkinTone} placeholder="Any" />
           <DropdownRow label="Occasion"   value={occasion} options={OCCASION_OPTIONS}  onChange={setOccasion} placeholder="Any" />
           <DropdownRow label="Shop In"    value={country}  options={SHOP_IN_OPTIONS}   onChange={setCountry}  placeholder="Global" />
-          <DropdownRow label="Consultant" value={lang}     options={PERSONA_OPTIONS}   onChange={setLang} />
+          <DropdownRow label="Category"   value={category} options={CATEGORY_OPTIONS}  onChange={setCategory} />
         </div>
 
         {/* Error */}
