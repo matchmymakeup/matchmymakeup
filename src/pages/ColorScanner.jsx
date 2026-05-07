@@ -631,10 +631,10 @@ export default function ColorScanner() {
               personal (skin tone) → contextual (occasion) → geographic (shop in) →
               commercial (category). Reorder locked PR-A.3 2026-05-07. */}
           <DropdownRow label="Consultant" value={lang}     options={PERSONA_OPTIONS}   onChange={setLang} />
-          <DropdownRow label="Skin Tone"  value={skinTone} options={SKIN_TONE_OPTIONS} onChange={setSkinTone} placeholder="Any" />
-          <DropdownRow label="Occasion"   value={occasion} options={OCCASION_OPTIONS}  onChange={setOccasion} placeholder="Any" />
-          <DropdownRow label="Shop In"    value={country}  options={SHOP_IN_OPTIONS}   onChange={setCountry}  placeholder="Global" />
-          <DropdownRow label="Category"   value={category} options={CATEGORY_OPTIONS}  onChange={setCategory} />
+          <DropdownRow label="Skin Tone"  value={skinTone} options={SKIN_TONE_OPTIONS} onChange={setSkinTone} placeholder="Any" align="center" />
+          <DropdownRow label="Occasion"   value={occasion} options={OCCASION_OPTIONS}  onChange={setOccasion} placeholder="Any" align="center" />
+          <DropdownRow label="Shop In"    value={country}  options={SHOP_IN_OPTIONS}   onChange={setCountry}  placeholder="Global" align="center" />
+          <DropdownRow label="Category"   value={category} options={CATEGORY_OPTIONS}  onChange={setCategory} align="center" />
         </div>
 
         {/* Error */}

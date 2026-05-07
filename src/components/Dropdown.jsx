@@ -20,6 +20,7 @@
 //   placeholder  — optional override for unselected display text
 //   disabled     — boolean, default false
 //   width        — optional fixed pixel width (default: content-width via minWidth 120)
+//   align        — 'left' (default) | 'center' — content+caret cluster alignment within trigger
 
 import { useState, useRef, useEffect } from 'react';
 import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, HAIRLINE, BORDER_ACTIVE } from '../lib/design-tokens';
@@ -34,6 +35,7 @@ export default function Dropdown({
   placeholder,
   disabled = false,
   width,
+  align = 'left',
 }) {
   const [open, setOpen] = useState(false);
   const [hoverTrigger, setHoverTrigger] = useState(false);
@@ -86,7 +88,7 @@ export default function Dropdown({
           minWidth: 120,
           width: width || undefined,
           boxSizing: 'border-box',
-          justifyContent: 'space-between',
+          justifyContent: align === 'center' ? 'center' : 'space-between',
         }}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
