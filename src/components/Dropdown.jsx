@@ -122,6 +122,7 @@ export default function Dropdown({
               key={opt.value}
               option={opt}
               selected={opt.value === value}
+              align={align}
               onSelect={() => {
                 onChange?.(opt.value);
                 setOpen(false);
@@ -134,9 +135,11 @@ export default function Dropdown({
   );
 }
 
-function DropdownItem({ option, selected, onSelect }) {
+function DropdownItem({ option, selected, onSelect, align = 'left' }) {
   const [hover, setHover] = useState(false);
-  // Selected: BG_OFFWHITE row + 2px BORDER_ACTIVE left edge.
+  // Selected: BG_OFFWHITE row + 2px BORDER_ACTIVE left edge (preserved across
+  // both align modes per PR-A.5 Option A — marker is selection signal,
+  // independent of content alignment).
   // Unselected hover: subtle pure-black tint (rgba(0,0,0,0.03)).
   const bg = selected
     ? BG_OFFWHITE
@@ -151,7 +154,7 @@ function DropdownItem({ option, selected, onSelect }) {
       onMouseLeave={() => setHover(false)}
       style={{
         width: '100%',
-        textAlign: 'left',
+        textAlign: align === 'center' ? 'center' : 'left',
         background: bg,
         border: 'none',
         borderLeft: selected ? `2px solid ${BORDER_ACTIVE}` : '2px solid transparent',
@@ -164,6 +167,7 @@ function DropdownItem({ option, selected, onSelect }) {
         fontFamily: 'inherit',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: align === 'center' ? 'center' : 'flex-start',
         gap: 10,
         transition: 'background 120ms ease',
       }}
