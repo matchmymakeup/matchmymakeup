@@ -11,9 +11,20 @@ function loadStore(key, fallback) {
 }
 function saveStore(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
+// Phase 2 renamed the persisted scan date field to created_at; legacy localStorage
+// entries from v1 may still carry .date. Fallback chain handles both; silent-fail
+// on Invalid Date so cards render category-only rather than the literal string.
+function formatScanDate(scan) {
+  const raw = scan.created_at || scan.date || scan.timestamp;
+  if (!raw) return '';
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString();
+}
+
 const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour','concealer','tinted_sunscreen','mineral_powder'];
 const tabBtn = (active) => ({
-  flex:1,padding:"10px 4px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
+  flexShrink:0,padding:"10px 14px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
   background:active?ACCENT_BLACK:"transparent",color:active?BG_WHITE:INK_SECONDARY
 });
 
@@ -191,11 +202,11 @@ export default function Library() {
         )}
         <PageBackBar onBack={() => navigate('/ColorScanner')} label="← Scanner" title="💄 My Library" />
         {/* Tabs */}
-        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:BG_OFFWHITE,borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:2,scrollbarWidth:"none",msOverflowStyle:"none"}}>
+        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:BG_OFFWHITE,borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:8,scrollbarWidth:"none",msOverflowStyle:"none"}}>
           <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
-          <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Products</button>
-          <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Shades</button>
-          <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap",minWidth:0}}>{isPremiumUser?'':'🔒 '}Looks</button>
+          <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Products</button>
+          <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Shades</button>
+          <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Looks</button>
           <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap",minWidth:0}}>👗 Outfit</button>
           <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap",minWidth:0}}>👠 Shoes</button>
           <button onClick={()=>setTab("hair")} style={{...tabBtn(tab==="hair"),whiteSpace:"nowrap",minWidth:0}}>💇 Hair</button>
@@ -224,7 +235,7 @@ export default function Library() {
                       <div style={{width:40,height:40,borderRadius:"50%",background:scan.color?.hex,flexShrink:0,boxShadow:`0 2px 8px ${scan.color?.hex}60`}}/>
                       <div>
                         <div style={{fontFamily:"monospace",fontWeight:700,fontSize:14,color:INK_PRIMARY}}>{scan.color?.hex}</div>
-                        <div style={{fontSize:12,color:INK_SECONDARY}}>{new Date(scan.date).toLocaleDateString()} · {scan.category||'all'}</div>
+                        <div style={{fontSize:12,color:INK_SECONDARY}}>{[formatScanDate(scan), scan.category || 'all'].filter(Boolean).join(' · ')}</div>
                       </div>
                     </div>
                     {scan.advice&&<div style={{fontSize:12,color:INK_PRIMARY,lineHeight:1.5,background:BG_OFFWHITE,borderRadius:10,padding:"8px 12px",wordBreak:"break-word",overflowWrap:"anywhere"}}>{scan.advice}</div>}

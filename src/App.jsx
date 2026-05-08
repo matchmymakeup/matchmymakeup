@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider } from './lib/auth'
 import AppLayout from './components/AppLayout';
+import ScrollToTop from './components/ScrollToTop';
 import Landing from './pages/Landing';
 import MatchResults from './pages/MatchResults';
 import ColorScanner from './pages/ColorScanner';
@@ -21,6 +22,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Landing />} />
 
