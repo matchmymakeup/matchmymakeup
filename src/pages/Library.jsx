@@ -201,15 +201,25 @@ export default function Library() {
           </div>
         )}
         <PageBackBar onBack={() => navigate('/ColorScanner')} label="← Scanner" title="💄 My Library" />
-        {/* Tabs */}
-        <div style={{display:"flex",flexWrap:"wrap",background:BG_OFFWHITE,borderRadius:16,padding:8,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:8}}>
-          <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
-          <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Products</button>
-          <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Shades</button>
-          <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Looks</button>
-          <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap",minWidth:0}}>👗 Outfit</button>
-          <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap",minWidth:0}}>👠 Shoes</button>
-          <button onClick={()=>setTab("hair")} style={{...tabBtn(tab==="hair"),whiteSpace:"nowrap",minWidth:0}}>💇 Hair</button>
+        {/* Tabs — explicit two-row structure, row 2 indented for visual balance */}
+        <div style={{
+          background: BG_OFFWHITE,
+          borderRadius: 16,
+          padding: 8,
+          marginBottom: 16,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+        }}>
+          <div style={{display:'flex', gap:8, marginBottom:8}}>
+            <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap"}}>🎨 Scans</button>
+            <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Products</button>
+            <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Shades</button>
+          </div>
+          <div style={{display:'flex', gap:8, paddingLeft:16}}>
+            <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Looks</button>
+            <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap"}}>👗 Outfit</button>
+            <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap"}}>👠 Shoes</button>
+            <button onClick={()=>setTab("hair")} style={{...tabBtn(tab==="hair"),whiteSpace:"nowrap"}}>💇 Hair</button>
+          </div>
         </div>
 
         {/* SCAN HISTORY */}
