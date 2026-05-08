@@ -1,11 +1,7 @@
 // v2.1 hub — visual rebuild for Desiree-review demo (speed mode).
 // Monochrome chrome (Artefact 2 §7.2), serif headline, hero with shade avatar,
-// 3 quick-action tiles, 8 library category tiles.
-//
-// Existing v1 Beauty DNA profile builder is preserved inline inside a
-// collapsed <details> accordion at the bottom (dark theme visible when
-// expanded — acceptable mismatch per the speed-mode brief; full polish
-// in post-Desiree-review pass).
+// 3 quick-action tiles, 8 library category tiles, MyDNAArtefactCard at top
+// (PR-F-light: Artefact 2 §4.2 portable artefact surface).
 //
 // English-only strings throughout — Path A i18n deferred to Phase 4+.
 
@@ -14,7 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { formatShadeName } from "../lib/munsell";
-import { BG_WHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE } from "../lib/design-tokens";
+import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW } from "../lib/design-tokens";
+import { rgbToLab, seasonToMetallic } from "../lib/colorScience";
+import PillButton from "../components/PillButton";
 
 // 8 library categories per v2.1 decision #10
 const CATEGORIES = [
@@ -36,6 +34,9 @@ function getSavedShadesLS() {
 }
 function getSavedProductsLS() {
   try { return JSON.parse(localStorage.getItem('mmm_my_products') || '[]'); } catch { return []; }
+}
+function getLibraryLS() {
+  try { return JSON.parse(localStorage.getItem('mmm_library') || '{}'); } catch { return {}; }
 }
 
 function categoryCount(arr, key) {
@@ -77,6 +78,126 @@ const catTileStyle = {
   minHeight: 64,
 };
 
+// ─────────────────────────────────────────────────────────────────────
+// MyDNAArtefactCard — user-facing portable colour artefact per Artefact
+// 2 §4.2. SEASON / CIELAB / PALETTE (placeholder) / METALLIC fields
+// ladder to the panel record (Charter §1.1). LocalStorage source-of-
+// truth this PR; DB-backed read path downstream of Phase 1 auth.
+// Save/Share onClick stubs are post-Desiree gated.
+// ─────────────────────────────────────────────────────────────────────
+
+function MyDNAArtefactCard() {
+  const profile = getProfileLS();
+  const season = profile.season || null;
+  const metallic = seasonToMetallic(season);
+
+  const lib = getLibraryLS();
+  const scans = Array.isArray(lib.scans) ? lib.scans : [];
+  const latestScan = scans.length > 0 ? scans[scans.length - 1] : null;
+
+  const lab = (latestScan && latestScan.scannedRed != null)
+    ? rgbToLab({
+        r: latestScan.scannedRed,
+        g: latestScan.scannedGreen,
+        b: latestScan.scannedBlue,
+      })
+    : null;
+
+  const scanDate = (latestScan && latestScan.timestamp)
+    ? new Date(latestScan.timestamp).toLocaleDateString('en-AU', {
+        day: '2-digit', month: 'short', year: 'numeric',
+      })
+    : '—';
+
+  const labelStyle = {
+    fontFamily: SANS,
+    fontSize: 11,
+    fontWeight: 600,
+    color: INK_SECONDARY,
+    letterSpacing: '0.15em',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  };
+
+  return (
+    <div style={{
+      background: BG_WHITE,
+      borderRadius: 14,
+      padding: '24px 20px',
+      margin: '0 auto 24px',
+      boxShadow: SHADOW,
+      border: `1px solid ${HAIRLINE}`,
+      fontFamily: SANS,
+    }}>
+      {/* Header row — wordmark + scan date */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
+        <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 400, color: INK_PRIMARY, letterSpacing: '-0.01em' }}>
+          MatchMyMakeup
+        </div>
+        <div style={{ fontFamily: SANS, fontSize: 12, color: INK_SECONDARY }}>
+          {scanDate}
+        </div>
+      </div>
+
+      {/* SEASON */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={labelStyle}>Season</div>
+        <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 400, color: INK_PRIMARY, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+          {season || 'Not yet classified'}
+        </div>
+      </div>
+
+      {/* CIELAB */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={labelStyle}>CIELAB</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          {['L', 'a', 'b'].map(k => (
+            <div key={k} style={{ fontFamily: SANS, fontSize: 18, fontWeight: 600, color: INK_PRIMARY, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ color: INK_SECONDARY, fontWeight: 500, marginRight: 4 }}>{k}</span>
+              {lab ? lab[k].toFixed(1) : '—'}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* PALETTE */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={labelStyle}>Palette</div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} style={{
+              width: 40,
+              height: 40,
+              borderRadius: 6,
+              background: BG_OFFWHITE,
+              border: `1px dashed ${HAIRLINE}`,
+            }} />
+          ))}
+        </div>
+        <div style={{ fontFamily: SANS, fontSize: 11, color: INK_SECONDARY }}>
+          Palette mapping in development.
+        </div>
+      </div>
+
+      {/* METALLIC — omit section entirely when null (boundary case deferred) */}
+      {metallic && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={labelStyle}>Metallic</div>
+          <div style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 400, color: INK_PRIMARY }}>
+            {metallic}
+          </div>
+        </div>
+      )}
+
+      {/* Save / Share — stub onClicks; real export gated on Desiree review */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
+        <PillButton size="sm" onClick={() => console.log('save: post-Desiree')}>Save</PillButton>
+        <PillButton size="sm" onClick={() => console.log('share: post-Desiree')}>Share</PillButton>
+      </div>
+    </div>
+  );
+}
+
 export default function MyDNA() {
   const { session, loading } = useUser();
   const navigate = useNavigate();
@@ -103,6 +224,8 @@ export default function MyDNA() {
   return (
     <div style={{ minHeight: '100vh', background: BG_WHITE }}>
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '28px 16px 60px' }}>
+
+        <MyDNAArtefactCard />
 
         {/* Hero — shade circle + greeting + shade name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
@@ -193,12 +316,11 @@ export default function MyDNA() {
           })}
         </div>
 
-        {/* Profile builder — collapsed; v1 dark theme inside is intentional
-            speed-mode mismatch, polished in post-review pass */}
+        {/* Profile builder — collapsed */}
         <details style={{
           background: BG_WHITE,
           borderRadius: 14,
-          padding: '14px 18px',
+          padding: '14px 0',
           border: `1px solid ${HAIRLINE}`,
           marginBottom: 20,
           fontFamily: SANS,
@@ -240,9 +362,8 @@ export default function MyDNA() {
 
 // ─────────────────────────────────────────────────────────────────────
 // Beauty DNA builder — preserved from v1 Profile.jsx logic, inlined as
-// a sub-component so MyDNA can collapse it. Dark theme inside is
-// pre-v2.1 styling; post-Desiree-review pass restyles to monochrome
-// per Artefact 2 §7.1–§7.3 (clay/cream retired 2026-05-02).
+// a sub-component so MyDNA can collapse it. Monochrome chrome per
+// Artefact 2 §7.1–§7.3 (PR-F-light retrofit, 2026-05-08).
 // ─────────────────────────────────────────────────────────────────────
 
 const ETHNICITIES = ['East Asian','South Asian','Southeast Asian','Middle Eastern','Black/African','Latino/Hispanic','White/European','Mixed','Prefer not to say'];
@@ -293,61 +414,53 @@ function BeautyDNABuilder() {
     return s.multi ? (Array.isArray(v) && v.length > 0) : !!v;
   }
 
-  const pillStyle = (active) => ({
-    padding:'10px 14px',borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:600,
-    border: active ? '2px solid #C9A96E' : '2px solid #555',
-    background: active ? '#3C3C3E' : '#2C2C2E',
-    color: active ? '#C9A96E' : '#F5F0E8',
-    transition:'all 0.15s',minHeight:44,
-  });
-
   function renderOptions(section) {
     if (section.key === 'ageRange') return AGE_RANGES.map(v => (
-      <button key={v} onClick={()=>save('ageRange',v)} style={pillStyle(profile.ageRange===v)}>{v}</button>
+      <PillButton key={v} active={profile.ageRange===v} onClick={()=>save('ageRange',v)}>{v}</PillButton>
     ));
     if (section.key === 'ethnicity') return ETHNICITIES.map(v => (
-      <button key={v} onClick={()=>toggleMulti('ethnicity',v)} style={pillStyle((profile.ethnicity||[]).includes(v))}>{v}</button>
+      <PillButton key={v} active={(profile.ethnicity||[]).includes(v)} onClick={()=>toggleMulti('ethnicity',v)}>{v}</PillButton>
     ));
     if (section.key === 'skinConcerns') return SKIN_CONCERNS.map(v => (
-      <button key={v} onClick={()=>toggleMulti('skinConcerns',v)} style={pillStyle((profile.skinConcerns||[]).includes(v))}>{v}</button>
+      <PillButton key={v} active={(profile.skinConcerns||[]).includes(v)} onClick={()=>toggleMulti('skinConcerns',v)}>{v}</PillButton>
     ));
     if (section.key === 'beautyGoals') return BEAUTY_GOALS.map(v => (
-      <button key={v} onClick={()=>toggleMulti('beautyGoals',v)} style={pillStyle((profile.beautyGoals||[]).includes(v))}>{v}</button>
+      <PillButton key={v} active={(profile.beautyGoals||[]).includes(v)} onClick={()=>toggleMulti('beautyGoals',v)}>{v}</PillButton>
     ));
     if (section.key === 'budget') return BUDGETS.map(v => (
-      <button key={v} onClick={()=>save('budget',v)} style={pillStyle(profile.budget===v)}>{v}</button>
+      <PillButton key={v} active={profile.budget===v} onClick={()=>save('budget',v)}>{v}</PillButton>
     ));
     if (section.key === 'climate') return CLIMATES.map(v => (
-      <button key={v} onClick={()=>save('climate',v)} style={pillStyle(profile.climate===v)}>{v}</button>
+      <PillButton key={v} active={profile.climate===v} onClick={()=>save('climate',v)}>{v}</PillButton>
     ));
   }
 
   return (
-    <div style={{background:'#1C1C1E',borderRadius:12,padding:'16px 12px',marginTop:6,fontFamily:SANS}}>
+    <div style={{background:BG_WHITE,borderRadius:12,padding:'16px 12px',marginTop:6,fontFamily:SANS}}>
       {/* Progress bar */}
-      <div style={{background:'#2C2C2E',borderRadius:14,padding:14,marginBottom:12}}>
+      <div style={{background:BG_OFFWHITE,borderRadius:14,padding:14,marginBottom:12}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-          <span style={{fontSize:12,fontWeight:700,color:'#F5F0E8'}}>{pct===100?'Profile Complete':'Profile Completeness'}</span>
-          <span style={{fontSize:13,fontWeight:800,color:pct===100?'#16a34a':'#7c3aed'}}>{pct}%</span>
+          <span style={{fontSize:12,fontWeight:700,color:INK_PRIMARY}}>{pct===100?'Profile Complete':'Profile Completeness'}</span>
+          <span style={{fontSize:13,fontWeight:800,color:INK_PRIMARY}}>{pct}%</span>
         </div>
-        <div style={{height:8,background:pct===100?'#1a3a1a':'#3C3C3E',borderRadius:5,overflow:'hidden'}}>
-          <div style={{height:'100%',background:pct===100?'#16a34a':'#C9A96E',borderRadius:5,width:`${pct}%`,transition:'width 0.5s ease'}} />
+        <div style={{height:8,background:HAIRLINE,borderRadius:5,overflow:'hidden'}}>
+          <div style={{height:'100%',background:INK_PRIMARY,borderRadius:5,width:`${pct}%`,transition:'width 0.5s ease'}} />
         </div>
       </div>
 
       {/* Skin Tone */}
-      <div style={{background:'#2C2C2E',borderRadius:14,padding:12,marginBottom:8}}>
+      <div style={{background:BG_OFFWHITE,borderRadius:14,padding:12,marginBottom:8}}>
         <div onClick={()=>setOpenSection(openSection==='skinTone'?null:'skinTone')} style={{display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',minHeight:32}}>
           <div style={{display:'flex',alignItems:'center',gap:8}}>
             {skinToneDone ? <span style={{fontSize:14}}>✅</span> : <span style={{fontSize:14}}>⬜</span>}
-            <div style={{fontWeight:700,fontSize:13,color:'#F5F0E8'}}>Skin Tone</div>
+            <div style={{fontWeight:700,fontSize:13,color:INK_PRIMARY}}>Skin Tone</div>
           </div>
-          <span style={{fontSize:12,color:'#aaa'}}>{openSection==='skinTone'?'▲':'▼'}</span>
+          <span style={{fontSize:12,color:INK_SECONDARY}}>{openSection==='skinTone'?'▲':'▼'}</span>
         </div>
         {openSection==='skinTone' && (
           <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:10}}>
             {SKIN_TONES.map(st => (
-              <button key={st.id} onClick={()=>save('skinTone',st.id)} style={pillStyle(profile.skinTone===st.id)}>{st.label}</button>
+              <PillButton key={st.id} active={profile.skinTone===st.id} onClick={()=>save('skinTone',st.id)}>{st.label}</PillButton>
             ))}
           </div>
         )}
@@ -358,13 +471,13 @@ function BeautyDNABuilder() {
         const done = isComplete(section);
         const open = openSection === section.key;
         return (
-          <div key={section.key} style={{background:'#2C2C2E',borderRadius:14,padding:12,marginBottom:8}}>
+          <div key={section.key} style={{background:BG_OFFWHITE,borderRadius:14,padding:12,marginBottom:8}}>
             <div onClick={()=>setOpenSection(open?null:section.key)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',minHeight:32}}>
               <div style={{display:'flex',alignItems:'center',gap:8}}>
                 {done ? <span style={{fontSize:14}}>✅</span> : <span style={{fontSize:14}}>⬜</span>}
-                <div style={{fontWeight:700,fontSize:13,color:'#F5F0E8'}}>{section.label}</div>
+                <div style={{fontWeight:700,fontSize:13,color:INK_PRIMARY}}>{section.label}</div>
               </div>
-              <span style={{fontSize:12,color:'#aaa'}}>{open?'▲':'▼'}</span>
+              <span style={{fontSize:12,color:INK_SECONDARY}}>{open?'▲':'▼'}</span>
             </div>
             {open && (
               <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:10}}>

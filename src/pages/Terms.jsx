@@ -7,7 +7,7 @@ export default function Terms() {
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{maxWidth:480,margin:"0 auto",padding:"24px 16px 60px",fontSize:13,color:"#F5F0E8",lineHeight:1.8}}>
-        <PageBackBar onBack={() => navigate(-1)} label="← Back" title="Terms & Conditions" />
+        <PageBackBar onBack={() => navigate(-1)} label="← Back" title="Terms & Conditions" variant="dark" />
         <h2 style={{color:"#C9A96E",fontSize:18,fontWeight:700,marginBottom:4}}>MatchMyMakeup Terms & Conditions</h2>
         <p style={{color:"#888",fontSize:12,marginBottom:20}}>Last updated: April 2026</p>
 
