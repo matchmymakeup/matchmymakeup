@@ -202,7 +202,7 @@ export default function Library() {
         )}
         <PageBackBar onBack={() => navigate('/ColorScanner')} label="← Scanner" title="💄 My Library" />
         {/* Tabs */}
-        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",background:BG_OFFWHITE,borderRadius:16,padding:4,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:8,scrollbarWidth:"none",msOverflowStyle:"none"}}>
+        <div style={{display:"flex",flexWrap:"wrap",background:BG_OFFWHITE,borderRadius:16,padding:8,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",gap:8}}>
           <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap",minWidth:0}}>🎨 Scans</button>
           <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Products</button>
           <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Shades</button>
