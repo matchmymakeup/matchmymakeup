@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
 import CircleIconButton from "../components/CircleIconButton";
 import Dropdown from "../components/Dropdown";
-import { BG_WHITE, INK_PRIMARY, INK_SECONDARY } from "../lib/design-tokens";
+import { BG_WHITE, INK_PRIMARY, INK_SECONDARY, HAIRLINE } from "../lib/design-tokens";
 
 const SERIF = "'DM Serif Display', Georgia, serif";
 const SANS  = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
@@ -162,6 +162,33 @@ export default function Landing() {
             </button>
           </div>
         )}
+
+        {/* Footer — regulatory document discoverability per APP1 / GDPR / POPIA / LGPD / DPDP / CCPA */}
+        <div style={{
+          marginTop: 48,
+          paddingTop: 24,
+          borderTop: `1px solid ${HAIRLINE}`,
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 16,
+          fontFamily: SANS,
+          fontSize: 12,
+          color: INK_SECONDARY,
+        }}>
+          <span
+            onClick={() => navigate('/Privacy')}
+            style={{ cursor: 'pointer' }}
+          >
+            Privacy
+          </span>
+          <span>·</span>
+          <span
+            onClick={() => navigate('/Terms')}
+            style={{ cursor: 'pointer' }}
+          >
+            Terms
+          </span>
+        </div>
       </div>
     </div>
   );

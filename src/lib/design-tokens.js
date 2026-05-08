@@ -12,8 +12,9 @@ export const INK_SECONDARY = '#666666';
 export const ACCENT_BLACK = '#000000';
 
 // Hairlines + borders (monochrome differentiation per Artefact 6 §3.3)
-export const HAIRLINE = 'rgba(26,26,26,0.10)';   // default subtle separator
-export const BORDER_ACTIVE = '#1A1A1A';          // selected/active state border (full ink)
+export const HAIRLINE = 'rgba(26,26,26,0.10)';           // default subtle separator
+export const PLACEHOLDER_BORDER = 'rgba(26,26,26,0.25)'; // empty-state/placeholder tier (between HAIRLINE and BORDER_ACTIVE)
+export const BORDER_ACTIVE = '#1A1A1A';                  // selected/active state border (full ink)
 
 // Surface — Artefact 2 §7.2: pure shadow without colour cast
 export const SHADOW = '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)';

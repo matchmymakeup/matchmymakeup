@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { formatShadeName } from "../lib/munsell";
-import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW } from "../lib/design-tokens";
+import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW, PLACEHOLDER_BORDER } from "../lib/design-tokens";
 import { rgbToLab, seasonToMetallic } from "../lib/colorScience";
 import PillButton from "../components/PillButton";
 
@@ -169,8 +169,8 @@ function MyDNAArtefactCard() {
               width: 40,
               height: 40,
               borderRadius: 6,
-              background: BG_OFFWHITE,
-              border: `1px dashed ${HAIRLINE}`,
+              background: 'transparent',
+              border: `1.5px dashed ${PLACEHOLDER_BORDER}`,
             }} />
           ))}
         </div>
