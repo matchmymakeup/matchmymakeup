@@ -209,12 +209,12 @@ export default function Library() {
           marginBottom: 16,
           boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
         }}>
-          <div style={{display:'flex', gap:8, marginBottom:8}}>
+          <div style={{display:'flex', gap:8, marginBottom:8, justifyContent:'center'}}>
             <button onClick={()=>setTab("scans")} style={{...tabBtn(tab==="scans"),whiteSpace:"nowrap"}}>🎨 Scans</button>
             <button onClick={()=>setTab("products")} style={{...tabBtn(tab==="products"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Products</button>
             <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Shades</button>
           </div>
-          <div style={{display:'flex', gap:8, paddingLeft:16}}>
+          <div style={{display:'flex', gap:8, justifyContent:'center'}}>
             <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Looks</button>
             <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap"}}>👗 Outfit</button>
             <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap"}}>👠 Shoes</button>
