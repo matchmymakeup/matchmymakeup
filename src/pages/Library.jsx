@@ -5,6 +5,7 @@ import { getSavedProducts, getSavedShades, saveProduct, saveShade, removeSavedPr
 import { supabase } from "../lib/supabase";
 import PageBackBar from "../components/PageBackBar";
 import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW } from "../lib/design-tokens";
+import { TShirt, Briefcase, Sparkle, HighHeel, Sneaker, Boot } from "@phosphor-icons/react";
 
 function loadStore(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; }
@@ -23,6 +24,17 @@ function formatScanDate(scan) {
 }
 
 const CATS = ['lipstick','foundation','blush','eyeshadow','nail_polish','mascara','highlighter','lip_liner','eyeliner','hair_colour','concealer','tinted_sunscreen','mineral_powder'];
+
+const OUTFIT_TILES = [
+  { label: 'Casual',  Icon: TShirt },
+  { label: 'Office',  Icon: Briefcase },
+  { label: 'Evening', Icon: Sparkle },
+];
+const SHOES_TILES = [
+  { label: 'Heels',    Icon: HighHeel },
+  { label: 'Sneakers', Icon: Sneaker },
+  { label: 'Boots',    Icon: Boot },
+];
 const tabBtn = (active) => ({
   flexShrink:0,padding:"10px 14px",border:"none",borderRadius:12,cursor:"pointer",fontSize:12,fontWeight:600,minHeight:44,
   background:active?ACCENT_BLACK:"transparent",color:active?BG_WHITE:INK_SECONDARY
@@ -443,9 +455,11 @@ export default function Library() {
               <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Outfit</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Upload photos of your outfits and get makeup recommendations that perfectly complement your look</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
-                {['Casual','Office','Evening'].map(label => (
+                {OUTFIT_TILES.map(({label, Icon}) => (
                   <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
-                    <div style={{fontSize:28,marginBottom:6}}>📷</div>
+                    <div style={{marginBottom:6,lineHeight:0}}>
+                      <Icon size={32} weight="light" color={INK_SECONDARY} />
+                    </div>
                     <div style={{fontSize:11,color:"#666",fontWeight:600}}>{label}</div>
                   </div>
                 ))}
@@ -466,9 +480,11 @@ export default function Library() {
               <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Shoes</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Photograph your shoe collection and find nail polish and lip colours that match perfectly</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
-                {['Heels','Sneakers','Boots'].map(label => (
+                {SHOES_TILES.map(({label, Icon}) => (
                   <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555"}}>
-                    <div style={{fontSize:28,marginBottom:6}}>👠</div>
+                    <div style={{marginBottom:6,lineHeight:0}}>
+                      <Icon size={32} weight="light" color={INK_SECONDARY} />
+                    </div>
                     <div style={{fontSize:11,color:"#666",fontWeight:600}}>{label}</div>
                   </div>
                 ))}
