@@ -456,7 +456,7 @@ export default function Library() {
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Upload photos of your outfits and get makeup recommendations that perfectly complement your look</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
                 {OUTFIT_TILES.map(({label, Icon}) => (
-                  <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555",textAlign:"center"}}>
+                  <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
                     <div style={{marginBottom:6,lineHeight:0}}>
                       <Icon size={32} weight="light" color={INK_SECONDARY} />
                     </div>
@@ -481,7 +481,7 @@ export default function Library() {
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Photograph your shoe collection and find nail polish and lip colours that match perfectly</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
                 {SHOES_TILES.map(({label, Icon}) => (
-                  <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555",textAlign:"center"}}>
+                  <div key={label} style={{background:BG_OFFWHITE,borderRadius:14,padding:"20px 8px",border:"1px dashed #555",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
                     <div style={{marginBottom:6,lineHeight:0}}>
                       <Icon size={32} weight="light" color={INK_SECONDARY} />
                     </div>
