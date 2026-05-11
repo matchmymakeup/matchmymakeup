@@ -202,6 +202,10 @@ export default function MyDNA() {
   const { session, loading } = useUser();
   const navigate = useNavigate();
 
+  // 100px aligns tile icon with "Just Scan" text in 2-col anon grid; auth collapses to 1-col, parity breaks.
+  const isAnon = !loading && !session;
+  const tileLeftPadding = isAnon ? 100 : 16;
+
   const profile = getProfileLS();
   const shades = getSavedShadesLS();
   const products = getSavedProductsLS();
@@ -302,7 +306,7 @@ export default function MyDNA() {
               <button
                 key={cat.key}
                 onClick={() => navigate('/Library')}
-                style={catTileStyle}
+                style={{...catTileStyle, paddingLeft: tileLeftPadding}}
               >
                 <span style={{ fontSize: 22, lineHeight: 1 }}>{cat.emoji}</span>
                 <div style={{ flex: 1 }}>
