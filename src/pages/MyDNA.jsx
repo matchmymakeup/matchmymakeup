@@ -78,6 +78,19 @@ const catTileStyle = {
   minHeight: 64,
 };
 
+// scannedRed/Green/Blue isn't persisted by saveScan; derive RGB from color_hex instead.
+function hexToRgb(hex) {
+  if (!hex || typeof hex !== 'string') return null;
+  let h = hex.replace(/^#/, '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // MyDNAArtefactCard — user-facing portable colour artefact per Artefact
 // 2 §4.2. SEASON / CIELAB / PALETTE (placeholder) / METALLIC fields
@@ -95,13 +108,8 @@ function MyDNAArtefactCard() {
   const scans = Array.isArray(lib.scans) ? lib.scans : [];
   const latestScan = scans.length > 0 ? scans[scans.length - 1] : null;
 
-  const lab = (latestScan && latestScan.scannedRed != null)
-    ? rgbToLab({
-        r: latestScan.scannedRed,
-        g: latestScan.scannedGreen,
-        b: latestScan.scannedBlue,
-      })
-    : null;
+  const scanRgb = latestScan ? hexToRgb(latestScan.color_hex) : null;
+  const lab = scanRgb ? rgbToLab(scanRgb) : null;
 
   const scanDate = (latestScan && latestScan.timestamp)
     ? new Date(latestScan.timestamp).toLocaleDateString('en-AU', {
