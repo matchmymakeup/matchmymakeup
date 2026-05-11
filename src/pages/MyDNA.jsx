@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/auth";
 import { supabase } from "../lib/supabase";
-import { formatShadeName } from "../lib/munsell";
+import { formatShadeName, classifyShade, seasonDisplayEN } from "../lib/munsell";
 import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW, PLACEHOLDER_BORDER } from "../lib/design-tokens";
 import { rgbToLab, seasonToMetallic } from "../lib/colorScience";
 import PillButton from "../components/PillButton";
@@ -101,8 +101,7 @@ function hexToRgb(hex) {
 
 function MyDNAArtefactCard() {
   const profile = getProfileLS();
-  const season = profile.season || null;
-  const metallic = seasonToMetallic(season);
+  const country = profile.country_code || profile.country || 'AU';
 
   const lib = getLibraryLS();
   const scans = Array.isArray(lib.scans) ? lib.scans : [];
@@ -110,6 +109,14 @@ function MyDNAArtefactCard() {
 
   const scanRgb = latestScan ? hexToRgb(latestScan.color_hex) : null;
   const lab = scanRgb ? rgbToLab(scanRgb) : null;
+
+  // profile.season is dead-write; derive at render via munsell classifier.
+  // Pass canonical key to seasonToMetallic (Fall vs Autumn collapses to one).
+  const classification = scanRgb ? classifyShade(latestScan.color_hex, country) : null;
+  const season = classification
+    ? seasonDisplayEN(classification.canonicalSeasonKey, classification.hemisphere)
+    : null;
+  const metallic = seasonToMetallic(classification?.canonicalSeasonKey);
 
   const scanDate = (latestScan && latestScan.timestamp)
     ? new Date(latestScan.timestamp).toLocaleDateString('en-AU', {
