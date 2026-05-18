@@ -101,11 +101,12 @@ function hexToRgb(hex) {
 
 function MyDNAArtefactCard() {
   const profile = getProfileLS();
-  const country = profile.country_code || profile.country || 'AU';
 
   const lib = getLibraryLS();
   const scans = Array.isArray(lib.scans) ? lib.scans : [];
   const latestScan = scans.length > 0 ? scans[scans.length - 1] : null;
+
+  const country = latestScan?.country || profile.country_code || profile.country || 'AU';
 
   const scanRgb = latestScan ? hexToRgb(latestScan.color_hex) : null;
   const lab = scanRgb ? rgbToLab(scanRgb) : null;
