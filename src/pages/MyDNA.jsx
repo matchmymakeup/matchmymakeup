@@ -236,7 +236,10 @@ export default function MyDNA() {
   // country_code (ISO) preferred; falls back to legacy profiles.country (full
   // name) and finally to 'AU' for the demo. Migration 0004 added country_code
   // but write-paths from My DNA creation aren't wired yet (Step 3).
-  const country = profile.country_code || profile.country || 'AU';
+  const lib = getLibraryLS();
+  const scans = Array.isArray(lib.scans) ? lib.scans : [];
+  const latestScan = scans.length > 0 ? scans[scans.length - 1] : null;
+  const country = latestScan?.country || profile.country_code || profile.country || 'AU';
   const shadeDisplay = primaryShade?.hex
     ? formatShadeName(primaryShade.hex, country)
     : null;
