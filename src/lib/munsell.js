@@ -21,9 +21,22 @@ const SOUTHERN_COUNTRIES = new Set([
   'BR', 'ID',
 ]);
 
+// Writer-side (ColorScanner SHOP_IN_OPTIONS, /api/match, /api/advice) uses
+// full country names; profile.country_code (migration 0004) uses ISO. Accept
+// both at the boundary — full names map to ISO, ISO and unknowns pass through.
+const NAME_TO_ISO = {
+  'USA': 'US', 'Australia': 'AU', 'India': 'IN', 'Brazil': 'BR', 'China': 'CN',
+  'Indonesia': 'ID', 'Nigeria': 'NG', 'Philippines': 'PH', 'South Africa': 'ZA',
+};
+
+function normaliseCountry(c) {
+  return NAME_TO_ISO[c] || c;
+}
+
 export function getHemisphere(countryCode) {
   if (!countryCode) return 'N';
-  return SOUTHERN_COUNTRIES.has(countryCode.toUpperCase()) ? 'S' : 'N';
+  const iso = normaliseCountry(countryCode);
+  return SOUTHERN_COUNTRIES.has(iso.toUpperCase()) ? 'S' : 'N';
 }
 
 // ─── Hex → HSL helper ────────────────────────────────────────────────────
