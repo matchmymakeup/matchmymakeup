@@ -119,6 +119,11 @@ function MyDNAArtefactCard() {
     : null;
   const metallic = seasonToMetallic(classification?.canonicalSeasonKey);
 
+  // Tier gate for CIELAB transparency per Artefact 6 §4.2 + UXI Spec §3.3.
+  // subscription_tier mirror into localStorage is Phase A item 6; until then
+  // every user reads as free (Premium branch unreachable without DevTools).
+  const isPremiumTier = profile.subscription_tier === 'premium' || profile.subscription_tier === 'premium_plus';
+
   const scanDate = (latestScan && latestScan.timestamp)
     ? new Date(latestScan.timestamp).toLocaleDateString('en-AU', {
         day: '2-digit', month: 'short', year: 'numeric',
@@ -163,18 +168,31 @@ function MyDNAArtefactCard() {
         </div>
       </div>
 
-      {/* CIELAB */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={labelStyle}>CIELAB</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-          {['L', 'a', 'b'].map(k => (
-            <div key={k} style={{ fontFamily: SANS, fontSize: 18, fontWeight: 600, color: INK_PRIMARY, fontVariantNumeric: 'tabular-nums' }}>
-              <span style={{ color: INK_SECONDARY, fontWeight: 500, marginRight: 4 }}>{k}</span>
-              {lab ? lab[k].toFixed(1) : '—'}
-            </div>
-          ))}
+      {/* CIELAB — tier-gated */}
+      {isPremiumTier ? (
+        <div style={{ marginBottom: 20 }}>
+          <div style={labelStyle}>CIELAB</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            {['L', 'a', 'b'].map(k => (
+              <div key={k} style={{ fontFamily: SANS, fontSize: 18, fontWeight: 600, color: INK_PRIMARY, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ color: INK_SECONDARY, fontWeight: 500, marginRight: 4 }}>{k}</span>
+                {lab ? lab[k].toFixed(1) : '—'}
+              </div>
+            ))}
+          </div>
+          <div style={{ fontFamily: SANS, fontSize: 11, color: INK_SECONDARY, marginTop: 8 }}>
+            Professional colour-science breakdown — used by makeup labs worldwide
+          </div>
         </div>
-      </div>
+      ) : (
+        <div style={{ marginBottom: 20 }}>
+          <div style={labelStyle}>Colour Signature</div>
+          <div style={{ fontFamily: SANS, fontSize: 12, color: INK_SECONDARY, marginBottom: 10 }}>
+            Unlock professional colour-science values with Premium
+          </div>
+          <PillButton size="sm" onClick={() => console.log('upgrade: Stripe wiring pending')}>Upgrade — A$4.99/mo</PillButton>
+        </div>
+      )}
 
       {/* PALETTE */}
       <div style={{ marginBottom: 20 }}>
