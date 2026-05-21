@@ -227,7 +227,7 @@ export default function Library() {
             <button onClick={()=>setTab("shades")} style={{...tabBtn(tab==="shades"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Shades</button>
           </div>
           <div style={{display:'flex', gap:8, justifyContent:'center'}}>
-            <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Looks</button>
+            <button onClick={()=>setTab("looks")} style={{...tabBtn(tab==="looks"),whiteSpace:"nowrap"}}>{!isPremiumUser && <span style={{marginLeft:4,marginRight:4}}>🔒</span>}Looks{!isPremiumUser && <span style={{marginLeft:6,fontSize:9,fontWeight:600,color:INK_SECONDARY,letterSpacing:0.5}}>· Premium</span>}</button>
             <button onClick={()=>setTab("outfit")} style={{...tabBtn(tab==="outfit"),whiteSpace:"nowrap"}}>👗 Outfit</button>
             <button onClick={()=>setTab("shoes")} style={{...tabBtn(tab==="shoes"),whiteSpace:"nowrap"}}>👠 Shoes</button>
             <button onClick={()=>setTab("hair")} style={{...tabBtn(tab==="hair"),whiteSpace:"nowrap"}}>💇 Hair</button>
@@ -451,6 +451,7 @@ export default function Library() {
           <div style={{textAlign:"center",padding:"32px 16px"}}>
             <div style={{background:BG_OFFWHITE,borderRadius:20,padding:"32px 20px",border:`1px solid ${HAIRLINE}`}}>
               <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+              <div style={{fontSize:10,color:INK_SECONDARY,fontWeight:600,letterSpacing:1.5,marginBottom:6}}>Personal Beauty Library · Premium+</div>
               <div style={{fontSize:10,color:INK_PRIMARY,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
               <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Outfit</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Upload photos of your outfits and get makeup recommendations that perfectly complement your look</div>
@@ -476,6 +477,7 @@ export default function Library() {
           <div style={{textAlign:"center",padding:"32px 16px"}}>
             <div style={{background:BG_OFFWHITE,borderRadius:20,padding:"32px 20px",border:`1px solid ${HAIRLINE}`}}>
               <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+              <div style={{fontSize:10,color:INK_SECONDARY,fontWeight:600,letterSpacing:1.5,marginBottom:6}}>Personal Beauty Library · Premium+</div>
               <div style={{fontSize:10,color:INK_PRIMARY,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
               <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Shoes</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Photograph your shoe collection and find nail polish and lip colours that match perfectly</div>
@@ -501,6 +503,7 @@ export default function Library() {
           <div style={{textAlign:"center",padding:"32px 16px"}}>
             <div style={{background:BG_OFFWHITE,borderRadius:20,padding:"32px 20px",border:`1px solid ${HAIRLINE}`}}>
               <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+              <div style={{fontSize:10,color:INK_SECONDARY,fontWeight:600,letterSpacing:1.5,marginBottom:6}}>Personal Beauty Library · Premium+</div>
               <div style={{fontSize:10,color:INK_PRIMARY,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Premium+ Feature</div>
               <div style={{fontWeight:800,fontSize:18,color:INK_PRIMARY,marginBottom:8}}>Match My Hair</div>
               <div style={{color:"#888",fontSize:13,lineHeight:1.6,marginBottom:24,maxWidth:280,margin:"0 auto 24px"}}>Scan your hair colour or choose a new shade and get perfectly coordinated makeup looks</div>

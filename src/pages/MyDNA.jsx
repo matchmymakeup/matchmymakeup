@@ -74,6 +74,7 @@ const catTileStyle = {
   fontFamily: SANS,
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: 12,
   minHeight: 64,
 };
@@ -320,12 +321,15 @@ export default function MyDNA() {
           )}
         </div>
 
-        {/* Library section heading */}
+        {/* Library section heading — textAlign center overrides h2 default
+            per Craig 2026-05-21 (PR-F-light.16): eye-funnelling beats token
+            convention here. Pairs with catTileStyle justifyContent center. */}
         <h2 style={{
           margin: '0 0 12px',
           fontSize: 11, fontWeight: 600, color: INK_SECONDARY,
           letterSpacing: '0.1em', textTransform: 'uppercase',
           fontFamily: SANS,
+          textAlign: 'center',
         }}>
           Your Library
         </h2>
@@ -343,10 +347,10 @@ export default function MyDNA() {
               <button
                 key={cat.key}
                 onClick={() => navigate('/Library')}
-                style={{...catTileStyle, paddingLeft: tileLeftPadding}}
+                style={catTileStyle}
               >
                 <span style={{ fontSize: 22, lineHeight: 1 }}>{cat.emoji}</span>
-                <div style={{ flex: 1 }}>
+                <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: INK_PRIMARY }}>{cat.label}</div>
                   <div style={{ fontSize: 11, color: count > 0 ? INK_PRIMARY : INK_SECONDARY, marginTop: 2 }}>
                     {count > 0 ? `${count} saved` : 'Empty'}
@@ -355,6 +359,19 @@ export default function MyDNA() {
               </button>
             );
           })}
+        </div>
+
+        {/* Tier status — read-only display (PR-F-light.16). Reads from
+            profile.subscription_tier; Phase A item 6 mirror pending so
+            everyone reads as 'Free' until that lands. */}
+        <div style={{
+          fontSize: 11, fontWeight: 600, color: INK_SECONDARY,
+          letterSpacing: '0.1em', textTransform: 'uppercase',
+          fontFamily: SANS, textAlign: 'center', marginBottom: 12,
+        }}>
+          Your tier · {profile.subscription_tier === 'premium_plus' ? 'Premium+'
+                     : profile.subscription_tier === 'premium' ? 'Premium'
+                     : 'Free'}
         </div>
 
         {/* Profile builder — collapsed */}
