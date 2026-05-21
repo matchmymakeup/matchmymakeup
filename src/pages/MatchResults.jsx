@@ -43,7 +43,7 @@ const T = {
   zu: { loading:"Ilayisha imiphumela yakho...", noResults:"Ayikho imiphumela etholakele", scanFirst:"Sicela uskene umbala kuqala.", scanAgain:"← Skena okunye", yourColor:"Umbala Wakho Oskenwe", adviceTitle:"Iseluleko Sobuhle", consultant:"Umeluleki wakho wobuhle", noAdvice:"Zama ukuskena futhi! ✨", matchingProducts:"Imikhiqizo Efanayo", bestMatch:"⭐ Engcono", colorDistance:"Ibanga lombala", shopNow:"Thenga Manje →", upsellHeading:"Ubona ama-match angu-10 kuphela kwimikhiqizo engu-50?", upsellSub:"Amalungu e-Premium afanisa nemikhiqizo engu-500+ yama-brand angu-100+.", upsellBtn:"Thuthukisela ku-Premium — R89/inyanga →" },
 };
 
-const COUNTRIES_LABELS = { USA:"🇺🇸 USA", Australia:"🇦🇺 Australia", India:"🇮🇳 India", Brazil:"🇧🇷 Brazil", Indonesia:"🇮🇩 Indonesia", Nigeria:"🇳🇬 Nigeria", China:"🇨🇳 China", "Latin America":"🇲🇽 Latin America", "Middle East":"🇸🇦 Middle East", France:"🇫🇷 France", Bangladesh:"🇧🇩 Bangladesh", "East Africa":"🇰🇪 East Africa" };
+const COUNTRIES_LABELS = { USA:"🇺🇸 USA", Australia:"🇦🇺 Australia", India:"🇮🇳 India", Brazil:"🇧🇷 Brazil", Indonesia:"🇮🇩 Indonesia", Nigeria:"🇳🇬 Nigeria", China:"🇨🇳 China", Philippines:"🇵🇭 Philippines", "South Africa":"🇿🇦 South Africa", "Latin America":"🇲🇽 Latin America", "Middle East":"🇸🇦 Middle East", France:"🇫🇷 France", Bangladesh:"🇧🇩 Bangladesh", "East Africa":"🇰🇪 East Africa" };
 
 function formatAdvice(text) {
   if (!text) return [];
