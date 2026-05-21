@@ -12,7 +12,7 @@ export default function Terms() {
         <p style={{color:"#888",fontSize:12,marginBottom:20}}>Last updated: April 2026</p>
 
         <h3 style={h3Style}>1. Data Collection</h3>
-        <p style={{color:"#ccc"}}>By using MatchMyMakeup you agree that we collect anonymised scan data including scanned colours, selected filters, and retailer click-throughs. This data is used for internal market research and may be aggregated and sold to cosmetics brands as beauty intelligence. No personally identifiable information is collected or stored.</p>
+        <p style={{color:"#ccc"}}>By using MatchMyMakeup you agree that we collect anonymised scan data including scanned colours, selected filters, and retailer click-throughs. This data is used for internal market research and may be aggregated into anonymised beauty-intelligence reports for cosmetics brands. Individual scan data is never sold or shared in identifiable form. No personally identifiable information is collected or stored.</p>
 
         <h3 style={h3Style}>2. Use of Service</h3>
         <p style={{color:"#ccc"}}>MatchMyMakeup is provided for personal, non-commercial use. The colour matching results are indicative only — actual product shades may vary by screen calibration, lighting and individual skin tone.</p>
