@@ -153,8 +153,13 @@ function MyDNAArtefactCard() {
     }}>
       {/* Header row — wordmark + scan date */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
-        <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 400, color: INK_PRIMARY, letterSpacing: '-0.01em' }}>
-          MatchMyMakeup
+        <div>
+          <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 400, color: INK_PRIMARY, letterSpacing: '-0.01em' }}>
+            MatchMyMakeup<span style={{ fontSize: 8, verticalAlign: 'super', color: INK_SECONDARY }}>{'™'}</span>
+          </div>
+          <div style={{ fontFamily: SANS, fontSize: 8, fontWeight: 600, color: INK_SECONDARY, letterSpacing: 2, textTransform: 'uppercase', marginTop: 2 }}>
+            AI Beauty Intelligence
+          </div>
         </div>
         <div style={{ fontFamily: SANS, fontSize: 12, color: INK_SECONDARY }}>
           {scanDate}

@@ -343,6 +343,15 @@ export default function MatchResults() {
     // Persona
     ctx.fillStyle = '#B76E79'; ctx.font = '16px Segoe UI, sans-serif';
     ctx.fillText(`Matched by ${personaName} ${personaEmoji}`, 210, 250);
+    // Brand lockup — registered wordmark + tagline. Cream on dark per locked
+    // monochrome system (NOT gold — gold is the superseded palette). Centred
+    // on the right half (left half holds the colour swatch at x=120).
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#F5F0E8'; ctx.font = 'bold 20px Segoe UI, sans-serif';
+    ctx.fillText('MatchMyMakeup™', 420, 306);
+    ctx.fillStyle = '#F5F0E8'; ctx.font = '600 9px Segoe UI, sans-serif';
+    ctx.fillText('AI BEAUTY INTELLIGENCE', 420, 322);
+    ctx.textAlign = 'left';
     // Watermark
     ctx.fillStyle = '#C9A96E'; ctx.font = 'bold 14px Segoe UI, sans-serif';
     ctx.fillText('matchmymakeup.ai', 210, 350);
@@ -506,7 +515,10 @@ export default function MatchResults() {
         {/* fontSize:8 trademark trick — visually intentional, not a typo */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:20}}>
           <span style={{fontSize:20}}>💄</span>
-          <span style={{fontWeight:800,fontSize:16,color:INK_PRIMARY}}>MatchMyMakeup<span style={{fontSize:8}}>{'™'}</span></span>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+            <span style={{fontWeight:800,fontSize:16,color:INK_PRIMARY}}>MatchMyMakeup<span style={{fontSize:8}}>{'™'}</span></span>
+            <span style={{fontFamily:"'Inter',sans-serif",fontSize:9,fontWeight:600,color:INK_SECONDARY,letterSpacing:2,textTransform:'uppercase'}}>AI Beauty Intelligence</span>
+          </div>
         </div>
 
         {/* Moment 1 — reveal frame label opening the result sequence (CIT §3.2 element 2) */}
