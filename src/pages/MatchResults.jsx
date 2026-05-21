@@ -5,7 +5,7 @@ import { getProfile, saveProfile, getSavedProducts, saveProduct, getSavedShades,
 import { getTrialInfo, startTrial } from "../lib/trial";
 import PageBackBar from "../components/PageBackBar";
 import Dropdown from "../components/Dropdown";
-import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW } from "../lib/design-tokens";
+import { BG_WHITE, BG_OFFWHITE, INK_PRIMARY, INK_SECONDARY, ACCENT_BLACK, HAIRLINE, BORDER_ACTIVE, SHADOW, PLACEHOLDER_BORDER } from "../lib/design-tokens";
 
 const SERIF = "'DM Serif Display', Georgia, serif";
 
@@ -380,6 +380,19 @@ export default function MatchResults() {
   const allProducts = [...products, ...bonusProducts];
   const matchCount = allProducts.length;
 
+  // Tier gate per Artefact 6 §4.2 + UXI Spec §3.3 — same accessor as MyDNA
+  // (Phase A item 6 wiring pending; everyone reads as 'free' until then).
+  const isPremiumTier = profile.subscription_tier === 'premium' || profile.subscription_tier === 'premium_plus';
+  const FREE_LIMIT = 3;
+  const displayedProducts = isPremiumTier ? allProducts : allProducts.slice(0, FREE_LIMIT);
+  const showLockedTile = !isPremiumTier && matchCount > FREE_LIMIT;
+
+  const brandCount = new Set(allProducts.map(p => p.brand)).size;
+  const countryLabel = record.country ? (COUNTRIES_LABELS[record.country] || record.country) : null;
+  const matchesHeadline = countryLabel
+    ? `${personaName} found ${matchCount} matches across ${brandCount} brands in ${countryLabel}`
+    : `${personaName} found ${matchCount} matches for you`;
+
   // PR5 — country dropdown change triggers in-place /api/match re-run.
   // Advice text stays from original scan; user clicks Match Again to
   // refresh advice for the new country.
@@ -646,9 +659,9 @@ export default function MatchResults() {
             <div style={{fontFamily:SERIF,color:INK_PRIMARY,fontSize:16,fontWeight:400,lineHeight:1.4,marginBottom:16}}>
               {(t.specificityBridge ?? T.en.specificityBridge).replace('{personaName}', personaName)}
             </div>
-            <div style={{fontWeight:800,fontSize:16,color:INK_PRIMARY,marginBottom:12}}>🎯 {allProducts.length} {t.matchingProducts}</div>
+            <div style={{fontWeight:800,fontSize:16,color:INK_PRIMARY,marginBottom:12}}>🎯 {matchesHeadline}</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              {allProducts.map((p,i) => (
+              {displayedProducts.map((p,i) => (
                 <div key={p.id||i} style={{background:BG_OFFWHITE,borderRadius:16,overflow:"hidden",boxShadow:"0 4px 16px rgba(0,0,0,0.08)",display:"flex",flexDirection:"column",position:"relative"}}>
                   {i >= products.length && <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:INK_PRIMARY,textAlign:"center",fontSize:9,fontWeight:700,padding:"3px 0",letterSpacing:0.5,textTransform:"uppercase"}}>Bonus Match</div>}
                   <div style={{height:80,background:p.hexCode||BG_OFFWHITE,display:"flex",alignItems:"center",justifyContent:"center",position:"relative",marginTop:i>=products.length?18:0}}>
@@ -674,6 +687,13 @@ export default function MatchResults() {
                   </div>
                 </div>
               ))}
+              {showLockedTile && (
+                <button onClick={() => console.log('upgrade: Stripe wiring pending (forward #24)')} style={{background:BG_OFFWHITE,border:`2px dashed ${PLACEHOLDER_BORDER}`,borderRadius:16,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 12px",textAlign:"center",fontFamily:"inherit",minHeight:200}}>
+                  <div style={{fontSize:32,marginBottom:10,lineHeight:1}}>🔒</div>
+                  <div style={{fontSize:13,fontWeight:700,color:INK_PRIMARY,marginBottom:4,lineHeight:1.3}}>Unlock all {matchCount} matches</div>
+                  <div style={{fontSize:11,color:INK_SECONDARY}}>Premium · A$4.99/mo</div>
+                </button>
+              )}
             </div>
           </div>
         )}

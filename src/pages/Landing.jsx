@@ -163,9 +163,25 @@ export default function Landing() {
           </div>
         )}
 
+        {/* Tier ladder — informational band above legal footer. PR-F-light.15. */}
+        <div style={{
+          marginTop: 40,
+          paddingTop: 20,
+          borderTop: `1px solid ${HAIRLINE}`,
+          fontFamily: SANS,
+          fontSize: 12,
+          color: INK_SECONDARY,
+          lineHeight: 1.9,
+          textAlign: 'center',
+        }}>
+          <div>Free — Scan &amp; match basics</div>
+          <div>Premium A$4.99/mo — Full matches + CIELAB + advice</div>
+          <div>Premium+ A$9.99/mo — Personal Beauty Library</div>
+        </div>
+
         {/* Footer — regulatory document discoverability per APP1 / GDPR / POPIA / LGPD / DPDP / CCPA */}
         <div style={{
-          marginTop: 48,
+          marginTop: 24,
           paddingTop: 24,
           borderTop: `1px solid ${HAIRLINE}`,
           display: 'flex',
