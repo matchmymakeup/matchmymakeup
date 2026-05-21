@@ -493,6 +493,8 @@ export default function ColorScanner() {
       const matchData = await matchRes.json();
       if (!matchRes.ok) throw new Error(matchData.error || 'Failed to match products');
       const matches = matchData.matches;
+      const fallbackToGlobal = matchData.fallbackToGlobal === true;
+      const alias = matchData.alias || null;
       setStep(t.gettingAdvice);
       let userProfile = {};
       try { userProfile = JSON.parse(localStorage.getItem('mmm_profile') || '{}'); } catch {}
@@ -522,7 +524,8 @@ export default function ColorScanner() {
       sessionStorage.setItem('matchResults', JSON.stringify({
         scannedHex: color.hex, scannedRed: color.r, scannedGreen: color.g, scannedBlue: color.b,
         matchedProducts: matches, claudeAdvice, skinTone, occasion, country, category, lang,
-        personaName: persona.name, personaEmoji: persona.emoji
+        personaName: persona.name, personaEmoji: persona.emoji,
+        fallbackToGlobal, alias
       }));
       try {
         const today = new Date().toISOString().slice(0,10);

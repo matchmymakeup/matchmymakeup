@@ -320,28 +320,38 @@ const COUNTRY_ALIASES = { 'Australia': 'USA', 'Philippines': 'Indonesia', 'South
 function findColorMatches(r, g, b, country, category = null, limit = 10) {
   let pool = PRODUCTS;
   const resolvedCountry = COUNTRY_ALIASES[country] || country;
-  if (resolvedCountry) pool = pool.filter(p => p.country === resolvedCountry);
-  if (pool.length === 0) pool = PRODUCTS;
+  let fellBackToGlobal = false;
+  if (resolvedCountry) {
+    const filtered = pool.filter(p => p.country === resolvedCountry);
+    if (filtered.length === 0) fellBackToGlobal = true;
+    else pool = filtered;
+  }
   if (category) pool = pool.filter(p => p.category === category);
-  return pool
+  const matches = pool
     .map(p => ({
       ...p,
       colorDistance: Math.round(Math.sqrt((r - p.red) ** 2 + (g - p.green) ** 2 + (b - p.blue) ** 2))
     }))
     .sort((a, b) => a.colorDistance - b.colorDistance)
     .slice(0, limit);
+  return { matches, fellBackToGlobal };
 }
 
 function findMoreMatches(r, g, b, country, category = null, skip = 10, limit = 5) {
   let pool = PRODUCTS;
   const resolvedCountry = COUNTRY_ALIASES[country] || country;
-  if (resolvedCountry) pool = pool.filter(p => p.country === resolvedCountry);
-  if (pool.length === 0) pool = PRODUCTS;
+  let fellBackToGlobal = false;
+  if (resolvedCountry) {
+    const filtered = pool.filter(p => p.country === resolvedCountry);
+    if (filtered.length === 0) fellBackToGlobal = true;
+    else pool = filtered;
+  }
   if (category) pool = pool.filter(p => p.category === category);
-  return pool
+  const matches = pool
     .map(p => ({ ...p, colorDistance: Math.round(Math.sqrt((r - p.red) ** 2 + (g - p.green) ** 2 + (b - p.blue) ** 2)) }))
     .sort((a, b) => a.colorDistance - b.colorDistance)
     .slice(skip, skip + limit);
+  return { matches, fellBackToGlobal };
 }
 
 const rateLimitMap = new Map();
@@ -399,12 +409,19 @@ export default function handler(req, res) {
     if (country && !VALID_COUNTRIES.includes(country)) return res.status(400).json({ error: 'Invalid input' });
     if (category && !VALID_CATEGORIES.includes(category)) return res.status(400).json({ error: 'Invalid input' });
 
-    let matches;
+    let result;
     if (skip !== undefined) {
-      matches = findMoreMatches(r, g, b, country, category, skip, limit || 5);
+      result = findMoreMatches(r, g, b, country, category, skip, limit || 5);
     } else {
-      matches = findColorMatches(r, g, b, country, category, limit || 10);
+      result = findColorMatches(r, g, b, country, category, limit || 10);
     }
+    let matches = result.matches;
+    const fallbackToGlobal = result.fellBackToGlobal;
+
+    // Alias disclosure signal — present only when COUNTRY_ALIASES actually
+    // resolved the request to a different pool (Australia→USA, etc.).
+    const aliasedTo = country ? (COUNTRY_ALIASES[country] || null) : null;
+    const alias = aliasedTo ? { from: country, to: aliasedTo } : null;
 
     // Convert currencies for aliased countries
     if (country === 'Australia') {
@@ -429,7 +446,7 @@ export default function handler(req, res) {
       }));
     }
 
-    return res.status(200).json({ matches });
+    return res.status(200).json({ matches, fallbackToGlobal, alias });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }

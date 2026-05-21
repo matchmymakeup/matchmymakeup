@@ -417,6 +417,11 @@ export default function MatchResults() {
         setProducts(data.matches);
         setBonusProducts([]); // bonus products were tied to original country
       }
+      setRecord(prev => ({
+        ...prev,
+        fallbackToGlobal: data.fallbackToGlobal === true,
+        alias: data.alias || null,
+      }));
     } catch (err) { console.error('[MatchResults] country re-match failed:', err); }
     finally { setRematchLoading(false); }
   }
@@ -471,6 +476,26 @@ export default function MatchResults() {
             disabled={rematchLoading}
           />
         </div>
+        {(() => {
+          if (record.alias) {
+            const fromLabel = COUNTRIES_LABELS[record.alias.from] || record.alias.from;
+            const toLabel = COUNTRIES_LABELS[record.alias.to] || record.alias.to;
+            return (
+              <div style={{fontSize:11,color:'#888',marginTop:4,marginBottom:10,textAlign:'center',fontStyle:'italic'}}>
+                Showing {toLabel} catalogue — {fromLabel} catalogue not yet available
+              </div>
+            );
+          }
+          if (record.fallbackToGlobal && record.country) {
+            const fromLabel = COUNTRIES_LABELS[record.country] || record.country;
+            return (
+              <div style={{fontSize:11,color:'#888',marginTop:4,marginBottom:10,textAlign:'center',fontStyle:'italic'}}>
+                Showing global matches — limited results in {fromLabel}
+              </div>
+            );
+          }
+          return null;
+        })()}
         {rematchLoading && (
           <div style={{textAlign:'center',color:INK_SECONDARY,fontSize:12,fontWeight:600,marginBottom:10}}>
             🔍 Re-scanning products in {record.country || 'Global'}…
