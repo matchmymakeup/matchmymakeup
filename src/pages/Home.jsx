@@ -28,6 +28,14 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#1C1C1E', fontFamily: "Georgia, 'Times New Roman', serif", position: 'relative' }}>
+      <style>{`
+        .mmm-wordmark { font-size: 44px; }
+        .mmm-wordmark-tm { font-size: 18px; }
+        @media (max-width: 380px) {
+          .mmm-wordmark { font-size: 36px; }
+          .mmm-wordmark-tm { font-size: 15px; }
+        }
+      `}</style>
       {/* TODO(phase-5+): unify Home auth widget with shared Header design */}
       <div style={{ position: 'absolute', top: 16, right: 24, zIndex: 10 }}>
         {session ? (
@@ -39,10 +47,10 @@ export default function Home() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 24px 40px', boxSizing: 'border-box' }}>
         <MMarkLogo />
         <div style={{ height: 24 }} />
-        <h1 style={{ color: '#F5F0E8', fontSize: 44, fontWeight: 400, margin: '0 0 12px', textAlign: 'center', letterSpacing: 0.5 }}>
-          MatchMyMakeup<span style={{ fontSize: 18, verticalAlign: 'super', color: '#C9A96E' }}>&trade;</span>
+        <h1 className="mmm-wordmark" style={{ color: '#F5F0E8', fontWeight: 400, margin: '0 0 12px', textAlign: 'center', letterSpacing: 0.5 }}>
+          MatchMyMakeup<span className="mmm-wordmark-tm" style={{ verticalAlign: 'super', color: '#F5F0E8' }}>&trade;</span>
         </h1>
-        <p style={{ color: '#C9A96E', textAlign: 'center', maxWidth: 320, lineHeight: 1.8, margin: '0 0 32px', fontSize: 11, fontFamily: "'Segoe UI', Helvetica, sans-serif", fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase' }}>
+        <p style={{ color: '#F5F0E8', textAlign: 'center', maxWidth: 320, lineHeight: 1.8, margin: '0 0 32px', fontSize: 11, fontFamily: "'Segoe UI', Helvetica, sans-serif", fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase' }}>
           AI Beauty Intelligence
         </p>
         <button onClick={() => pickLanguage('en')} style={{ background: '#C9A96E', color: '#1C1C1E', padding: '16px 52px', borderRadius: 0, fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer', letterSpacing: 1.5, textTransform: 'uppercase', fontFamily: "'Segoe UI', Helvetica, sans-serif" }}>

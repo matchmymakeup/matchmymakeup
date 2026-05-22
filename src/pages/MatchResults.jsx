@@ -342,7 +342,7 @@ export default function MatchResults() {
     }
     // Persona
     ctx.fillStyle = '#B76E79'; ctx.font = '16px Segoe UI, sans-serif';
-    ctx.fillText(`Matched by ${personaName} ${personaEmoji}`, 210, 250);
+    ctx.fillText(`Matched by ${personaName}`, 210, 250);
     // Brand lockup — registered wordmark + tagline. Cream on dark per locked
     // monochrome system (NOT gold — gold is the superseded palette). Centred
     // on the right half (left half holds the colour swatch at x=120).
@@ -355,8 +355,6 @@ export default function MatchResults() {
     // Watermark
     ctx.fillStyle = '#C9A96E'; ctx.font = 'bold 14px Segoe UI, sans-serif';
     ctx.fillText('matchmymakeup.ai', 210, 350);
-    // Lipstick emoji area
-    ctx.font = '48px serif'; ctx.fillText('\uD83D\uDC84', 430, 340);
     // Download
     const link = document.createElement('a');
     link.download = 'my-match.png';
