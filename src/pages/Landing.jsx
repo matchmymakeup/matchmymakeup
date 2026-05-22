@@ -69,17 +69,38 @@ export default function Landing() {
     <div style={{ minHeight: '100vh', background: BG_WHITE }}>
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '40px 20px 60px' }}>
 
-        {/* Wordmark */}
-        <div style={{
-          textAlign: 'center',
-          fontSize: 11,
-          fontWeight: 700,
-          color: INK_SECONDARY,
-          letterSpacing: '0.3em',
-          fontFamily: SERIF,
-          marginBottom: 64,
-        }}>
-          MATCHMYMAKEUP
+        {/* Wordmark + tagline lockup — v2.1 monochrome-on-light, mirrors
+            the MyDNA/MatchResults pattern scaled for landing presence.
+            ™ resets letter-spacing so the superscript sits tight to the
+            final wordmark glyph. */}
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{
+            fontFamily: SERIF,
+            fontSize: 28,
+            fontWeight: 400,
+            color: INK_PRIMARY,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.1,
+          }}>
+            MatchMyMakeup<span style={{
+              fontSize: 12,
+              verticalAlign: 'super',
+              color: INK_SECONDARY,
+              letterSpacing: 0,
+              fontWeight: 400,
+            }}>{'™'}</span>
+          </div>
+          <div style={{
+            marginTop: 6,
+            fontFamily: SANS,
+            fontSize: 9,
+            fontWeight: 600,
+            color: INK_SECONDARY,
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+          }}>
+            AI Beauty Intelligence
+          </div>
         </div>
 
         {/* Hero */}
