@@ -12,7 +12,7 @@ Locked 2026-05-01 after design review with Desiree Pretorius. This file is the c
 6. **Palette:** warm cream `#F5F1EA` + white `#FFFFFF` cards + ink `#1A1A1A` + clay accent `#9C5B4A`. Replaces existing noir/champagne/rosegold/ivory.
 7. **Skin tone selection MUST use real photographic samples** — no illustrated/emoji swatches.
 8. **Back nav always returns to My DNA hub**, never to colour box. `PageBackBar` default destination → `/MyDNA`.
-9. **Shade naming: Munsell-derived** format, e.g. "Warm Beige · Spring 6.4". Helper: `src/lib/munsell.js` (PR A2).
+9. **Shade naming: Munsell-derived** format `<descriptor> · <season> <value>/<chroma>`, e.g. "Warm Beige · Spring 6/4". Slash separator matches standard Munsell practitioner notation (`hue value/chroma`) and resolves 2-digit-chroma ambiguity. Helper: `src/lib/munsell.js` (PR A2).
 10. **Library categories are MMM's actual 8:** Lipstick, Nail Polish, Foundation, Mascara, Blush, Eyeshadow, Highlighter, Lip Liner. Tile counts driven by `saved_products.category`.
 11. **Phase 3 (deferred): 12-season colour analysis extension to My DNA.** Awaiting Desiree's methodology document. Don't stub `seasonal_analysis` schema until the methodology lands.
 

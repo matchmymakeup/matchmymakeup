@@ -1,19 +1,35 @@
-// i18n note (Phase 5+): label and title currently passed as English strings.
-// When chrome i18n pass happens, add label/title keys to T table in MatchResults
-// (16 languages) and apply same pattern to other Header-included pages.
+// v2.1 nav rule (decision #8): back navigation default destination is
+// the My DNA hub. Callers passing `onBack` keep their custom behaviour;
+// callers omitting `onBack` get the new hub-default via `home`.
+//
+// variant='light' (default): monochrome chrome — INK_PRIMARY link + title.
+// variant='dark': legacy cream/gold treatment retained for Privacy + Terms
+// pages while their bodies stay dark-themed.
+//
+// i18n note (Phase 5+): label and title currently passed as English
+// strings. When the chrome i18n pass happens, add label/title keys to
+// T table in MatchResults (15 languages) and apply same pattern to
+// other Header-included pages.
 
-export default function PageBackBar({ onBack, label, title }) {
+import { useNavigate } from 'react-router-dom';
+import { INK_PRIMARY } from '../lib/design-tokens';
+
+export default function PageBackBar({ onBack, label, title, home = '/MyDNA', variant = 'light' }) {
+  const navigate = useNavigate();
+  const handleClick = onBack || (() => navigate(home));
+  const linkColor = variant === 'dark' ? '#C9A96E' : INK_PRIMARY;
+  const titleColor = variant === 'dark' ? '#F5F0E8' : INK_PRIMARY;
   return (
     <>
       <div style={{padding:'8px 0 4px 0'}}>
         <button
-          onClick={onBack}
-          style={{background:'none',border:'none',padding:0,fontSize:12,color:'#C9A96E',cursor:'pointer',fontWeight:600,fontFamily:"'Segoe UI',sans-serif"}}
+          onClick={handleClick}
+          style={{background:'none',border:'none',padding:0,fontSize:12,color:linkColor,cursor:'pointer',fontWeight:600,fontFamily:"'Segoe UI',sans-serif"}}
         >
           {label}
         </button>
       </div>
-      <h1 style={{margin:'0 0 16px',fontSize:22,fontWeight:800,color:'#F5F0E8'}}>{title}</h1>
+      <h1 style={{margin:'0 0 16px',fontSize:22,fontWeight:800,color:titleColor}}>{title}</h1>
     </>
-  )
+  );
 }

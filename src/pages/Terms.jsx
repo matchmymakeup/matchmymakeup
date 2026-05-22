@@ -7,12 +7,12 @@ export default function Terms() {
   return (
     <div style={{minHeight:"100vh",background:"#1C1C1E",fontFamily:"'Segoe UI',sans-serif"}}>
       <div style={{maxWidth:480,margin:"0 auto",padding:"24px 16px 60px",fontSize:13,color:"#F5F0E8",lineHeight:1.8}}>
-        <PageBackBar onBack={() => navigate(-1)} label="← Back" title="Terms & Conditions" />
+        <PageBackBar onBack={() => navigate(-1)} label="← Back" title="Terms & Conditions" variant="dark" />
         <h2 style={{color:"#C9A96E",fontSize:18,fontWeight:700,marginBottom:4}}>MatchMyMakeup Terms & Conditions</h2>
         <p style={{color:"#888",fontSize:12,marginBottom:20}}>Last updated: April 2026</p>
 
         <h3 style={h3Style}>1. Data Collection</h3>
-        <p style={{color:"#ccc"}}>By using MatchMyMakeup you agree that we collect anonymised scan data including scanned colours, selected filters, and retailer click-throughs. This data is used for internal market research and may be aggregated and sold to cosmetics brands as beauty intelligence. No personally identifiable information is collected or stored.</p>
+        <p style={{color:"#ccc"}}>By using MatchMyMakeup you agree that we collect anonymised scan data including scanned colours, selected filters, and retailer click-throughs. This data is used for internal market research and may be aggregated into anonymised beauty-intelligence reports for cosmetics brands. Individual scan data is never sold or shared in identifiable form. No personally identifiable information is collected or stored.</p>
 
         <h3 style={h3Style}>2. Use of Service</h3>
         <p style={{color:"#ccc"}}>MatchMyMakeup is provided for personal, non-commercial use. The colour matching results are indicative only — actual product shades may vary by screen calibration, lighting and individual skin tone.</p>
